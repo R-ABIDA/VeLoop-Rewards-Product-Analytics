@@ -1,0 +1,30 @@
+# Python cache
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.pytest_cache/
+
+# Environment files
+.env
+.env.*
+*.env
+
+# Archives & compressed files
+*.zip
+*.tar
+*.tar.gz
+*.rar
+*.7z
+
+# Explicitly excluded project directories per user request
+06_documentation_and_reports/
+06_documentation/
+08_presentation/
+
+# IDE & OS files
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+*.tmp
