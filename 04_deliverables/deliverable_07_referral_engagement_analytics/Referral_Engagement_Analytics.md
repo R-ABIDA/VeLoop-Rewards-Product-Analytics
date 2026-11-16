@@ -142,3 +142,20 @@ In accordance with **Section 20 of `Data_Analyst_01.pdf`**, an "Active User" mus
   8. `withdrawal_requested`
 * **Non-Qualifying Events:** `app_backgrounded`, `push_notification_delivered`, `error_logged`.
 
+---
+
+## 6. Source Data Provenance & Referral Telemetry Notice
+
+> [!WARNING]
+> **Data Authenticity Notice (`SIMULATED DATA — CREATED FOR ANALYTICAL TESTING`):**
+> In the supplied raw workbooks (`VELoop_Rewards_Data_01.xlsx` and `VELOOP_Simulated_User_Behavior_1000.xlsx`), **no relational table linking referring users to referee users exists**.
+> 
+> * **Available Observed Telemetry:**
+>   1. **Referral Acquisition Volume:** Exactly 119 users (11.9% of user base) registered via `acquisition_source = 'Referral'` with `referral_source_detail = 'Friend/Family'` in `Users_1000_Clean`.
+>   2. **Individual Referral Codes:** Every user record is allocated a unique 8-character referral code (e.g., `VL850800`, `VL943899`) stored in `referral_code`.
+>   3. **Daily Referral Activity:** 1,913 user-days in `04_Daily_Activity` record `referral_activity = 'Yes'` (28.7% of all user-days).
+>   4. **Feature Events:** 2,521 events categorized under `feature_name = 'Referral'` logged across 818 distinct users in `03_Feature_Events`.
+> * **Zero Fabricated Attribution Policy:** Without a relational foreign key table (`referring_user_id` $\rightarrow$ `referred_user_id`), calculating user-level referral counts, individual referrer leaderboards, or true viral coefficients ($K$-factor) would require inventing non-existent links. In strict compliance with the Data Authenticity Policy, no fake referral pairs or commissions have been fabricated.
+> * **Production Implementation Blueprint:** The relational schema `referrals` specified in Section 3 and the SQL attribution views in `03_analysis_and_models/sql/05_referral_virality_analytics.sql` provide the complete design for engineering deployment.
+
+

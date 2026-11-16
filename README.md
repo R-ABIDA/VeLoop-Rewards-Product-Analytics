@@ -1,184 +1,227 @@
 # VELOOP REWARDS — PRODUCT ANALYTICS, DATA READINESS & DATA MANAGEMENT BLUEPRINT
-**Task:** Data Analyst Internship — Task 01  
+
 **Organization:** VELOOP Rewards & VELOOP CO.  
-**Role:** Senior Data Analyst & Analytics Engineering Specialist (Data Analyst Intern)  
+**Role:** Senior Data Analyst, Product Analytics Specialist & Analytics Engineer (Data Analyst Intern)  
 **Chief Executive Officer:** Ayan Alam  
-**Duration:** 22–25 Days (2 Development Days / 1 Review Day Sprint Cadence)  
-**Mandatory Integrity Label:** `SIMULATED DATA — CREATED FOR ANALYTICAL TESTING`  
+**Task:** Data Analyst Internship — Task 01 (Comprehensive 21-Deliverable Blueprint)  
+**Duration:** 22–25 Days (2 Development Days / 1 Review Day Sprint Rhythm)  
+**Integrity Policy:** `SIMULATED DATA — CREATED FOR ANALYTICAL TESTING`  
 **Classification:** Confirmed, Proposed, To Be Verified, Simulated  
+**GitHub Repository:** [https://github.com/R-ABIDA/VeLoop-Rewards-Product-Analytics](https://github.com/R-ABIDA/VeLoop-Rewards-Product-Analytics)
 
 ---
 
-## 1. Project Overview & Business Context
+## 1. Project Overview & Institutional Background
 
-**VELOOP Rewards** is an early-stage consumer digital rewards and gamified engagement platform in active development. Users interact with rewarded video advertisements, partner app installs, surveys, games, daily check-in streaks, mining rigs, and lucky wheels to earn reward currencies (`XP`, `Gems`, `Tokens`) that can be redeemed for cash withdrawals (via UPI, Paytm, Bank Transfer, PayPal) or digital vouchers.
+**VELOOP Rewards** is an early-stage consumer digital rewards, gamification, and micro-task monetization ecosystem in active pre-launch development. The platform allows users to engage with rewarded video ads, partner offerwalls, surveys, daily check-in streaks, lucky wheel spins, tap arenas, and cloud mining rigs to accumulate soft rewards (`XP`), premium currency (`Gems`), and platform tokens (`Tokens`) redeemable for real-world fiat cash (UPI, Paytm, Bank Transfer, PayPal) or gift vouchers.
 
-Because VELOOP is currently in pre-launch development, the platform lacks the massive production telemetry volume required for conventional empirical performance analysis. Therefore, this project establishes the **complete analytical architecture, relational data models, event telemetry specifications, quality control systems, and BI dashboard foundations** required to launch and scale production analytics with zero financial leakage and audit compliance.
-
----
-
-## 2. Core Objectives
-
-1. **Product Area Mapping:** Audit all 18 core functional domains and 32 features, distinguishing user actions, system outcomes, and business value.
-2. **Relational Data Architecture:** Design a normalized star-schema in PostgreSQL 15+ (`schema.sql`) enforcing double-entry financial accounting and referential integrity.
-3. **Production Event Tracking:** Formulate 32 production events with exact JSON schemas, Given-When-Then acceptance tests, and Redis 1h stream deduplication.
-4. **Enterprise Standardization:** Publish an 81-field Data Dictionary and 35-metric KPI Catalogue with mathematically rigorous definitions.
-5. **Data Quality & Hygiene:** Audit 12 anomaly classes across messy test sheets and build an automated 6-stage Quality Control Framework.
-6. **Executive Business Intelligence:** Build a functional, interactive 7-section Streamlit analytics dashboard (`05_dashboard/app.py`).
+Because VELOOP is currently in active pre-launch development, the platform lacks massive multi-year production event streams. Therefore, this project establishes the **complete analytical architecture, relational data models, event telemetry specifications, data quality control framework, and executive BI dashboard foundations** required to launch, monitor, and scale the business without financial accounting leakage or data corruption.
 
 ---
 
-## 3. Mandatory Data Authenticity & Integrity Policy
+## 2. Business Objectives & Strategic Scope
 
-In strict adherence to **Section 2 & Section 34 of `Data_Analyst_01.pdf`**:
-* **Simulated Test Data:** All data supplied for this assignment is fictional/simulated. It is never described as actual VELOOP users, revenue, earnings, retention, or conversion rates.
-* **Non-Negotiable Disclaimer:** Every dataset, chart, report, and dashboard banner carries the explicit notice:  
-  `SIMULATED DATA — CREATED FOR ANALYTICAL TESTING`
-* **4-Tier Evidentiary Standard:**
-  1. `[Confirmed]`: Supported by official source documents.
-  2. `[Proposed]`: Professional analytical recommendations formulated by the analyst.
-  3. `[To Be Verified]`: Requires confirmation from VELOOP leadership or engineering.
-  4. `[Simulated]`: Generated or supplied strictly for analytical testing.
+1. **Product Area & Feature Mapping:** Audit all 18 platform domains and 32 features, mapping client-side User Events to server-side System Events and commercial Business Outcomes.
+2. **Relational Data Architecture:** Design a production-grade PostgreSQL 15+ normalized schema (`01_schema_ddl.sql`) enforcing primary keys, foreign keys, check constraints, indexes, and double-entry accounting integrity.
+3. **Standardized Event Telemetry Plan:** Formulate 32 standardized production events with 16 engineering attributes, JSON schemas, Given-When-Then acceptance criteria, and 1-hour Redis deduplication rules.
+4. **Enterprise Standardization:** Formulate an 81-field Data Dictionary and 35-metric KPI Catalogue with exact mathematical formulas and clear operational limitations.
+5. **Data Quality Audit & QC Framework:** Forensically investigate injected quality anomalies across raw sheets and build a 6-stage prevention and automated cleaning pipeline.
+6. **Executive Business Intelligence Dashboard:** Build a high-performance, interactive Streamlit BI application (`05_dashboard/app.py`) matching the sample matte charcoal theme (`#212435`) with white navigation sidebar, dynamic date/device filters, and zero fabricated financial data.
 
 ---
 
-## 4. Dataset Description & Ground-Truth Counts
+## 3. Source Workbooks and Worksheets Used
 
-| Dataset / Sheet Name | Source File | Records | Columns | Primary Key | Key Attributes |
-| :--- | :--- | :---: | :---: | :--- | :--- |
-| `Users_1000_Clean` | `VELoop_Rewards_Data_01.xlsx` | **1,000** | 27 | `user_id` | Master user profiles, acquisition channel, device, verified status, XP balance |
-| `Users_Messy_Audit` | `VELoop_Rewards_Data_01.xlsx` | **1,008** | 28 | `user_id` | Contains controlled duplicates, null emails, bad dates, and negative ages |
-| `02_Sessions` | `Simulated_User_Behavior.xlsx` | **7,913** | 12 | `session_id` | Contiguous user visits, durations, entry points, and exit drop-off screens |
-| `03_Feature_Events` | `Simulated_User_Behavior.xlsx` | **35,704** | 13 | `event_id` | Atomic streaming interaction logs across 15 core product features |
-| `04_Daily_Activity` | `Simulated_User_Behavior.xlsx` | **6,667** | 17 | `(user_id, date)` | Pre-aggregated daily user rollups for fast executive reporting |
-| `05_Task_Activity` | `Simulated_User_Behavior.xlsx` | **9,846** | 12 | `activity_id` | Task execution sessions across 8 categories; duration, failure reasons |
-| `06_Milestones` | `Simulated_User_Behavior.xlsx` | **4,799** | 6 | `user_id` | Milestone achievements (first task, badge, streak, level up) |
-| `07_Feature_Usage` | `Simulated_User_Behavior.xlsx` | **15** | 7 | `feature_name` | Summary adoption and repeat usage metrics per feature |
-| `10_Event_Data_Quality_Audit` | `Simulated_User_Behavior.xlsx` | **35,714** | 13 | `event_id` | Injected messy events with duplicate IDs and inconsistent lowercase casing |
+All metrics, data models, and analytical dashboards are strictly derived from the two original Excel workbooks located in [`01_raw_data/`](file:///d:/Veloop%20data%20Analysis/01_raw_data) (also preserved in [`Data/`](file:///d:/Veloop%20data%20Analysis/Data)):
 
----
+### Source Workbook 1: `VELoop_Rewards_Data_01.xlsx` (359 KB)
+* **`Users_1000_Clean` (1,000 rows, 27 cols):** Master clean user demographic profiles, registration timestamps, acquisition channels, device types, verification flags, and static soft currency `xp_balance`.
+* **`Users_Messy_Audit` (1,008 rows, 28 cols):** Intentionally contaminated audit sheet containing 8 duplicate user IDs, 542 missing demographic cells, extra column `data_environment`, and unformatted dates.
+* **`Data_Dictionary` (28 rows):** Baseline field definitions for the users table.
+* **`Synthetic_Summary` (14 rows):** High-level summary of simulated cohort distribution.
+* **`README_Data_Status` (9 rows):** Metadata and authenticity notice confirming simulated data status.
 
-## 5. Technology Stack
-
-* **Language & Analysis:** Python 3.10+ (NumPy, Pandas)
-* **Database & Schema Modeling:** PostgreSQL 15+ compatible DDL, Standard SQL
-* **Spreadsheet Engineering:** Microsoft Excel (`.xlsx`) via `openpyxl` with styled headers, gridlines, and conditional styling
-* **Interactive Business Intelligence:** Streamlit, Plotly Express, Plotly Graph Objects
-* **Documentation & Diagrams:** GitHub Flavored Markdown, Mermaid.js
-* **Quality Assurance:** Python `unittest`, `py_compile`
+### Source Workbook 2: `VELOOP_Simulated_User_Behavior_1000.xlsx` (6.39 MB)
+* **`01_Users_1000` (1,000 rows, 27 cols):** User profiles matching `Users_1000_Clean`.
+* **`02_Sessions` (7,913 rows, 12 cols):** Contiguous user app sessions, durations, entry features, exit drop-off points, and events per session.
+* **`03_Feature_Events` (35,704 rows, 13 cols):** Granular atomic interaction events across 15 core features (Watch Ads, Missions, Streak, Tap & Earn, Spin, Wallet, Referral, etc.).
+* **`04_Daily_Activity` (6,667 rows, 17 cols):** Daily user activity rollups tracking active flags, duration, daily reward claims, wallet views, and task executions.
+* **`05_Task_Activity` (9,846 rows, 12 cols):** Granular task execution sessions across 8 categories (Completed: 5,627 [57.1%], Abandoned: 2,051, Failed: 1,520, Pending: 648).
+* **`06_Milestones` (4,799 rows, 6 cols):** Gamification milestone unlock records (first task, badge, streak, level up).
+* **`07_Feature_Usage` (15 rows, 7 cols):** Pre-aggregated feature adoption and event volume rollups.
+* **`08_Data_Dictionary` (76 rows):** Baseline field definitions for behavioral entities.
+* **`09_README_Status` (9 rows):** Status notes confirming simulation environment.
+* **`10_Event_Data_Quality_Audit` (35,714 rows, 13 cols):** Intentionally contaminated event stream containing exactly 10 duplicate rows, lowercase feature names, and unverified device strings.
 
 ---
 
-## 6. Project Directory Scaffolding
+## 4. Data Cleaning & Reconciliation Methodology
 
-```
-d:\Veloop data Analysis\
-├── 01_raw_data/                                  # Preserved original source Excel files (untouched)
-├── 02_processed_data/                             # Cleaned, standardized, reproducible CSV datasets
-│   ├── users_cleaned.csv                         # Exactly 1,000 deduplicated, formatted user records
-│   └── events_cleaned.csv                        # Exactly 35,704 standardized, title-cased events
-├── 03_analysis_and_models/                       # Technical scripts, profiling engines, and DDL
-│   ├── sql/                                      # PostgreSQL database schemas
-│   ├── notebooks/                                # Jupyter profiling notebooks
-│   └── profiling/                                # OpenPyXL generators and automated audit scripts
-├── 04_deliverables/                              # All 21 official required deliverables
-│   ├── deliverable_01_executive_summary/         # Deliverable 01: 4-Page Executive Summary
-│   ├── deliverable_02_product_data_audit/        # Deliverable 02: Product Data Readiness Audit Report
-│   ├── deliverable_03_data_coverage_matrix/      # Deliverable 03: Data Coverage Matrix (.xlsx)
-│   ├── deliverable_04_user_analytics_spec/       # Deliverable 04: User Analytics Specification
-│   ├── deliverable_05_reward_analytics_spec/     # Deliverable 05: Earning & Reward Analytics Spec
-│   ├── deliverable_06_wallet_withdrawal_spec/    # Deliverable 06: Wallet & Withdrawal Analytics Spec
-│   ├── deliverable_07_referral_engagement_analytics/ # Deliverable 07: Referral & Engagement Spec
-│   ├── deliverable_08_event_tracking_plan/       # Deliverable 08: Event Tracking Plan (.xlsx)
-│   ├── deliverable_09_data_dictionary/           # Deliverable 09: Enterprise Data Dictionary (.xlsx)
-│   ├── deliverable_10_logical_data_model/        # Deliverable 10: ER Diagram & schema.sql
-│   ├── deliverable_11_kpi_catalogue/             # Deliverable 11: KPI Catalogue (.xlsx)
-│   ├── deliverable_12_simulated_data_profiling/  # Deliverable 12: Profiling Workbook (.xlsx) & Report
-│   ├── deliverable_13_data_quality_audit/        # Deliverable 13: Quality Audit Workbook (.xlsx) & Report
-│   ├── deliverable_14_dashboard_blueprint/       # Deliverable 14: Dashboard Blueprint Specifications
-│   ├── deliverable_15_developer_handoff/         # Deliverable 15: Developer Analytics Handoff
-│   ├── deliverable_16_data_pipeline_proposal/    # Deliverable 16: Pipeline Proposal & Architecture
-│   ├── deliverable_17_privacy_and_governance/    # Deliverable 17: Privacy, Governance & Change Log
-│   ├── deliverable_18_analytics_readiness_assessment/ # Deliverable 18: Readiness Assessment Scorecard
-│   ├── deliverable_19_assumption_and_verification_register/ # Deliverable 19: Source & Verification Register (.xlsx)
-│   ├── deliverable_20_implementation_backlog/    # Deliverable 20: Prioritized Implementation Backlog
-│   └── deliverable_21_final_consolidated_report/ # Deliverable 21: Final Consolidated Technical Report
-├── 05_dashboard/                                 # Interactive Streamlit BI Application
-│   └── app.py                                    # Functional 7-section executive dashboard
-├── 06_documentation_and_reports/                 # General documentation and reference assets
-├── 07_tests_and_validation/                      # Automated Python unit and integrity test suites
-│   ├── test_phase1_audit.py                      # Phase 1 initialization tests
-│   └── test_all_deliverables.py                  # Master validation suite for all 21 deliverables
-├── 08_presentation/                              # Executive PowerPoint & HTML slide decks
-│   ├── VELOOP_Rewards_Final_Presentation.md      # 14-slide presentation speaker deck
-│   └── VELOOP_Rewards_Final_Presentation.html    # Interactive HTML5 slide deck with keyboard controls
-├── Data/                                         # Original input workbooks
-├── requirements.txt                              # Python package dependencies
-├── REQUIREMENTS_AND_DELIVERABLES_TRACKER.md      # Master progress tracking matrix
-├── PHASED_IMPLEMENTATION_PLAN.md                 # 25-day roadmap following 2-dev / 1-review rhythm
-├── MISSING_DEPENDENCIES_AND_SOURCE_REGISTER.md   # Documentation of missing inputs
-└── README.md                                     # Project master documentation (This File)
-```
+To ensure 100% reproducible and audit-compliant analytics, an automated cleaning pipeline [`03_analysis_and_models/profiling/clean_and_export_all_datasets.py`](file:///d:/Veloop%20data%20Analysis/03_analysis_and_models/profiling/clean_and_export_all_datasets.py) was developed:
+
+### 4.1 Forensic Audit & Discrepancy Resolution
+1. **The 10-Record Event Discrepancy:** The 10-record difference between `03_Feature_Events` (35,704 rows) and `10_Event_Data_Quality_Audit` (35,714 rows) was forensically verified: `10_Event_Data_Quality_Audit` contains **exactly 10 duplicate rows** for 10 specific event IDs (`EVT00021600`, `EVT00011275`, `EVT00006040`, `EVT00028196`, `EVT00030205`, `EVT00017051`, `EVT00034075`, `EVT00014772`, `EVT00025552`, `EVT00006379`). Deduplicating on `event_id` yields exactly 35,704 rows matching `03_Feature_Events` 1:1. These 10 duplicate records are archived in [`02_processed_data/event_audit_10_duplicates.csv`](file:///d:/Veloop%20data%20Analysis/02_processed_data/event_audit_10_duplicates.csv).
+2. **Messy User Deduplication:** In `Users_Messy_Audit` (1,008 rows), exactly 8 duplicate user IDs (`VLUSR000095`, `VLUSR000217`, `VLUSR000272`, `VLUSR000335`, `VLUSR000409`, `VLUSR000779`, `VLUSR000803`, `VLUSR000813`) were identified and resolved by retaining the primary record, resulting in exactly 1,000 clean user records archived in [`02_processed_data/users_messy_8_duplicates.csv`](file:///d:/Veloop%20data%20Analysis/02_processed_data/users_messy_8_duplicates.csv).
+3. **Standardized Cleaned Outputs:** Cleaned datasets are persisted in [`02_processed_data/`](file:///d:/Veloop%20data%20Analysis/02_processed_data):
+   * `users_cleaned.csv` (1,000 rows, 27 cols, 0 duplicates, 100% valid PKs)
+   * `events_cleaned.csv` (35,704 rows, 13 cols, title-cased feature names)
+   * `sessions_cleaned.csv` (7,913 rows, 12 cols)
+   * `daily_activity_cleaned.csv` (6,667 rows, 17 cols)
+   * `tasks_cleaned.csv` (9,846 rows, 12 cols)
+   * `milestones_cleaned.csv` (4,799 rows, 6 cols)
 
 ---
 
-## 7. Installation & Local Setup
+## 5. Analytics & Models Developed
 
-### 7.1 Prerequisites
-* Python 3.10, 3.11, 3.12, or 3.13 installed.
+1. **User & Account Lifecycle Model (Deliverable 04):** Deterministic user states (`Prospect` $\rightarrow$ `Registered` $\rightarrow$ `Onboarded` $\rightarrow$ `Active` $\rightarrow$ `Dormant` $\rightarrow$ `Churned`). Standardized regex schemas for `user_id`, `session_id`, `event_id`, and `transaction_id`.
+2. **Earning & Reward Funnel Model (Deliverable 05):** 5-stage lifecycle (**Discovery $\rightarrow$ Start $\rightarrow$ Completion $\rightarrow$ Validation $\rightarrow$ Reward**). Complete decoupling of client task completion (5,627 tasks) from backend financial reward crediting (5,627 credited, 3,571 not credited, 648 pending).
+3. **Double-Entry Wallet Model (Deliverable 06):** Immutable double-entry ledger architecture. For every balance movement, balancing debit and credit entries are created. Enforces the invariant:
+   $$\sum \text{Debit Amount} - \sum \text{Credit Amount} = 0.00$$
+4. **Withdrawal Operations Model (Deliverable 06):** Deterministic payout lifecycle (`Requested` $\rightarrow$ `Under_Review` $\rightarrow$ `Processing` $\rightarrow$ `Completed` / `Rejected` / `Reversed`). 10 formal withdrawal KPIs with exact mathematical formulas and SLA aging brackets.
+5. **Referral & Viral Growth Model (Deliverable 07):** Establishes that registration $\ne$ referral conversion. Evaluates observed data (119 users acquired via Referral, 1,913 active days, 2,521 events) and provides future relational attribution schema.
+
+---
+
+## 6. Dashboard Sections & Live Interactive Capabilities
+
+The Streamlit BI dashboard ([`05_dashboard/app.py`](file:///d:/Veloop%20data%20Analysis/05_dashboard/app.py)) is organized into the **7 official working sections** plus utility modules, featuring a sample-matched dark theme (matte charcoal `#212435`, crisp white navigation sidebar, custom Plotly dark charts, and zero top white space):
+
+1. **Executive Overview:** High-level platform KPIs (Total Users: 1,000, Active Users: 815, Total Sessions: 7,913, Total Events: 35,704, Task Completion Rate: 57.1%), DAU trend line, and feature adoption donut.
+2. **User & Account Analytics:** User demographics, age distribution histogram, gender split, device breakdown (Android vs iOS vs Web), and acquisition source distribution.
+3. **Engagement & Behavioral Analytics:** Session duration distributions, features per session, feature event frequency chart, and daily active user stickiness.
+4. **Earning & Reward Analytics:** Micro-task execution funnel (Viewed $\rightarrow$ Started $\rightarrow$ Completed), task conversion rate, category performance breakdown, and reward status audit.
+5. **Wallet Intelligence:** Observed soft currency analytics (XP wealth quartile distribution, 2,172 wallet view events across 810 users, 1,686 active wallet days) and prominent Data Authenticity Notice regarding absence of monetary transactions.
+6. **Withdrawal Operations:** Operational payout specifications, SLA aging queue templates (<6h, 6–12h, 12–24h, 24h+), payout rail distributions (UPI, Paytm, Bank Transfer), and clear notice stating simulated data contains no live payout records.
+7. **Referral & Viral Growth:** Observed referral acquisition metrics (119 users, 11.9% share, 1,913 active days, 2,521 events), unique 8-character referral code integrity check, and future relational conversion funnel.
+8. **Data Quality & Audit (Utility):** 10-duplicate event audit breakdown, 8 messy user duplicate audit, and missing values analysis.
+9. **Data Explorer & File Upload (Utility):** Dynamic CSV and Excel file uploader with schema validation, record preview, and column summary stats.
+10. **Reports & Document Exports (Utility):** One-click download buttons for all 4 official PDF reports, 7 Excel workbooks, and cleaned CSV datasets.
+11. **Project Information & Governance (Utility):** Project metadata, internship scope, and data authenticity policy.
+
+---
+
+## 7. PostgreSQL Schema & SQL File Structure
+
+Located in [`03_analysis_and_models/sql/`](file:///d:/Veloop%20data%20Analysis/03_analysis_and_models/sql):
+
+| File Name | Purpose & Contents | Tables / Views Created |
+| :--- | :--- | :--- |
+| **`01_schema_ddl.sql`** | Core relational DDL in PostgreSQL 15+ compatible ANSI SQL. Defines PKs, FKs, NOT NULL, CHECK constraints, and 22 performance indexes. | Tables: `users`, `sessions`, `feature_events`, `daily_activity`, `task_activity`, `milestones`, `wallet_accounts`, `wallet_ledger`, `withdrawals`, `referrals`. |
+| **`02_user_and_engagement_analytics.sql`** | User engagement views and queries for DAU, rolling WAU/MAU, stickiness ratio, weekly cohort retention, and session duration brackets. | Views: `v_daily_active_users`, `v_user_retention_cohorts`, `v_session_duration_distribution`. |
+| **`03_earning_and_reward_analytics.sql`** | Earning and task analytics queries: task conversion funnel, category performance breakdown, and reward status audit. | Views: `v_task_conversion_funnel`, `v_category_earning_breakdown`, `v_reward_credit_audit`. |
+| **`04_wallet_and_withdrawal_analytics.sql`** | Soft currency metrics, double-entry mathematical reconciliation (`SUM(debits) - SUM(credits) = 0.00`), and withdrawal SLA aging queue. | Views: `v_wallet_engagement_summary`, `v_wallet_events_breakdown`, `v_user_xp_distribution`, `v_double_entry_reconciliation`, `v_withdrawal_sla_queue_aging`. |
+| **`05_referral_virality_analytics.sql`** | Observed referral acquisition share (119 users), referral activity days, referral code audit, and future relational conversion funnel. | Views: `v_referral_acquisition_summary`, `v_referral_daily_activity`, `v_referral_events_breakdown`, `v_referral_code_audit`, `v_referral_conversion_funnel`. |
+| **`06_data_quality_audit_checks.sql`** | Data quality checks: duplicate event IDs, duplicate users, orphan records, impossible timestamps, and unbalanced transactions. | Views: `v_dq_duplicate_events`, `v_dq_duplicate_users`, `v_dq_orphan_events`, `v_dq_impossible_timestamps`, `v_dq_unbalanced_transactions`. |
+
+---
+
+## 8. Step-by-Step Instructions to Run Dashboard Locally
+
+### Prerequisites
+* Python 3.10, 3.11, or 3.12 installed.
 * Standard terminal (PowerShell, Command Prompt, or Bash).
 
-### 7.2 Environment Installation
 ```bash
-# Clone or navigate to the workspace
+# Step 1: Clone or navigate to the repository directory
 cd "d:\Veloop data Analysis"
 
-# Install required dependencies
+# Step 2: Install required Python dependencies
 pip install -r requirements.txt
-```
 
----
-
-## 8. Execution Instructions
-
-### 8.1 Run Data Profiling & Quality Audit Engine
-Executes automated profiling across all 9 sheets, cleans messy datasets, and outputs Deliverables 12 & 13:
-```bash
-python 03_analysis_and_models/profiling/run_profiling_and_quality_audit.py
-```
-
-### 8.2 Regenerate Excel Workbooks (Deliverables 03, 08, 09, 11, 19)
-```bash
-python 03_analysis_and_models/profiling/build_work_package_a_and_trackers.py
-python 03_analysis_and_models/profiling/generate_deliverables_08_09_11.py
-```
-
-### 8.3 Launch Interactive Streamlit BI Dashboard
-Launches the 7-section executive analytics dashboard locally:
-```bash
+# Step 3: Launch the Streamlit dashboard
 streamlit run 05_dashboard/app.py
 ```
-* **Local Web Interface:** Open `http://localhost:8501` in your browser.
-* **Sections Available:** Executive Overview, User Analytics, Engagement, Rewards, Wallet, Withdrawals, Referrals.
 
-### 8.4 Open Interactive Final Presentation
-Open `08_presentation/VELOOP_Rewards_Final_Presentation.html` directly in Google Chrome or Microsoft Edge. Use the `←` and `→` arrow keys to navigate the 14 executive slides.
+* **Access the Dashboard:** Open your web browser and navigate to `http://localhost:8501`.
+* **Interact with Visuals:** Use the white sidebar on the left to navigate between the 7 core sections and utility tools. Adjust the date range slider or select specific device platforms to filter data dynamically in real time.
 
 ---
 
-## 9. Automated Testing & Verification Suite
+## 9. Step-by-Step Instructions to Execute Automated Tests
 
-To verify that all 21 deliverables exist, Excel workbooks are structurally valid, SQL schemas are intact, and simulation disclaimers are present:
+The project includes an enterprise-grade automated test suite containing **26 test cases across 4 test suites**:
+
 ```bash
-python -m unittest 07_tests_and_validation/test_all_deliverables.py
+# Execute the full automated test suite with verbose output
+python -m unittest discover -s 07_tests_and_validation -p "test_*.py" -v
 ```
-* **Test Result:** `Ran 7 tests ... OK (All passing)`.
+
+### Running Individual Test Suites:
+```bash
+# 1. Master deliverables existence and integrity (10 tests)
+python -m unittest 07_tests_and_validation/test_all_deliverables.py
+
+# 2. Interactive dashboard filters, charts, and uploads (5 tests)
+python -m unittest 07_tests_and_validation/test_dashboard_interactive.py
+
+# 3. Phase 1 foundations and raw data preservation (6 tests)
+python -m unittest 07_tests_and_validation/test_phase1_audit.py
+
+# 4. PostgreSQL DDL, views, and double-entry reconciliation (5 tests)
+python -m unittest 07_tests_and_validation/test_sql_and_reconciliation.py
+```
+
+* **Test Execution Evidence:** Full test execution output is logged in [`07_tests_and_validation/evidence/test_run.log`](file:///d:/Veloop%20data%20Analysis/07_tests_and_validation/evidence/test_run.log) and [`07_tests_and_validation/evidence/test_execution_report.md`](file:///d:/Veloop%20data%20Analysis/07_tests_and_validation/evidence/test_execution_report.md).
 
 ---
 
-## 10. Known Limitations & Future Improvements
+## 10. Data Authenticity & Limitation Notes
 
-1. **Simulated Withdrawals & Transactions:** Standalone tables for withdrawals and double-entry wallet transactions were not provided in the raw files. These have been formally specified in `schema.sql` and modeled for demonstration in the dashboard.
-2. **Attribution Linking:** Referral share events exist, but referee-to-referrer database keys must be deployed in the production auth service before viral coefficient ($K$) can be computed dynamically.
-3. **Automated Orchestration:** Post-launch improvements should deploy Apache Airflow or GitHub Actions to automate the hourly execution of dbt Core models.
+> [!WARNING]
+> **MANDATORY DATA AUTHENTICITY NOTICE (`SIMULATED DATA — CREATED FOR ANALYTICAL TESTING`):**
+> VELOOP Rewards is an active developing product. All metrics, user records, and event logs analyzed herein are synthetic test cohorts created strictly to evaluate data readiness, schemas, and BI pipelines. They do not represent actual commercial users, revenue, or business performance.
 
+1. **Absence of Monetary Transactions:** The raw simulated files contain **no fiat transaction ledgers, withdrawal payout records, or payment gateway feeds**. All soft currency balances represent gamified experience points (`XP`), not real money liabilities. No fake monetary payouts (e.g. ₹125,000 withdrawn) have been fabricated.
+2. **Absence of Referral Relational Pairs:** Individual user records contain an 8-character `referral_code`, but no relational mapping table exists linking referring users to referee users. No fake referral pairs or viral coefficients have been invented.
+3. **4-Tier Classification Standard:** Every statement in this project is explicitly categorized into:
+   * **[Confirmed]:** Directly verified from supplied raw workbooks.
+   * **[Proposed]:** Analytical designs or engineering recommendations formulated by the analyst.
+   * **[To Be Verified]:** Business parameters requiring confirmation from VELOOP leadership.
+   * **[Simulated]:** Data elements generated or supplied for analytical testing.
+
+---
+
+## 11. Public Streamlit Community Cloud Deployment Instructions
+
+The repository is fully configured for zero-configuration deployment to **Streamlit Community Cloud**:
+
+### Deployment Steps:
+1. Fork or push the repository to GitHub: `https://github.com/R-ABIDA/VeLoop-Rewards-Product-Analytics`.
+2. Sign in to [Streamlit Community Cloud](https://share.streamlit.io/) with your GitHub account.
+3. Click **"New app"**.
+4. Configure the deployment parameters:
+   * **Repository:** `R-ABIDA/VeLoop-Rewards-Product-Analytics`
+   * **Branch:** `main`
+   * **Main file path:** `05_dashboard/app.py`
+   * **App URL (optional):** `veloop-rewards-analytics`
+5. Click **"Deploy!"**.
+6. The application uses repository-relative paths (`01_raw_data/`, `02_processed_data/`), standard packages in `requirements.txt`, and requires no external database credentials or environment variables.
+
+---
+
+## 12. Complete 21-Deliverable Checklist
+
+| # | Code | Deliverable Name | File Link(s) | Status |
+| :-: | :--- | :--- | :--- | :---: |
+| **01** | `DEL-01` | Executive Summary | [Executive_Summary.md](file:///d:/Veloop%20data%20Analysis/04_deliverables/deliverable_01_executive_summary/Executive_Summary.md), [PDF](file:///d:/Veloop%20data%20Analysis/04_deliverables/deliverable_01_executive_summary/Executive_Summary.pdf) | **Verified 100%** |
+| **02** | `DEL-02` | Product Data Readiness Audit | [Product_Data_Readiness_Audit.md](file:///d:/Veloop%20data%20Analysis/04_deliverables/deliverable_02_product_data_audit/Product_Data_Readiness_Audit.md) | **Verified 100%** |
+| **03** | `DEL-03` | Data Coverage Matrix & Gaps Register | [Data_Coverage_Matrix.xlsx](file:///d:/Veloop%20data%20Analysis/04_deliverables/deliverable_03_data_coverage_matrix/Data_Coverage_Matrix.xlsx), [MD](file:///d:/Veloop%20data%20Analysis/04_deliverables/deliverable_03_data_coverage_matrix/Data_Coverage_Matrix.md) | **Verified 100%** |
+| **04** | `DEL-04` | User & Account Analytics Specification | [User_Analytics_Specification.md](file:///d:/Veloop%20data%20Analysis/04_deliverables/deliverable_04_user_analytics_spec/User_Analytics_Specification.md) | **Verified 100%** |
+| **05** | `DEL-05` | Earning & Reward Analytics Specification | [Reward_Analytics_Specification.md](file:///d:/Veloop%20data%20Analysis/04_deliverables/deliverable_05_reward_analytics_spec/Reward_Analytics_Specification.md) | **Verified 100%** |
+| **06** | `DEL-06` | Wallet & Withdrawal Specification | [Wallet_Withdrawal_Specification.md](file:///d:/Veloop%20data%20Analysis/04_deliverables/deliverable_06_wallet_withdrawal_spec/Wallet_Withdrawal_Specification.md) | **Verified 100%** |
+| **07** | `DEL-07` | Referral & Engagement Analytics | [Referral_Engagement_Analytics.md](file:///d:/Veloop%20data%20Analysis/04_deliverables/deliverable_07_referral_engagement_analytics/Referral_Engagement_Analytics.md) | **Verified 100%** |
+| **08** | `DEL-08` | Event Tracking Plan (32 Events, 16 Attrs) | [Event_Tracking_Plan.xlsx](file:///d:/Veloop%20data%20Analysis/04_deliverables/deliverable_08_event_tracking_plan/Event_Tracking_Plan.xlsx), [MD](file:///d:/Veloop%20data%20Analysis/04_deliverables/deliverable_08_event_tracking_plan/Event_Tracking_Plan.md) | **Verified 100%** |
+| **09** | `DEL-09` | Enterprise Data Dictionary (81 Fields) | [Data_Dictionary.xlsx](file:///d:/Veloop%20data%20Analysis/04_deliverables/deliverable_09_data_dictionary/Data_Dictionary.xlsx), [MD](file:///d:/Veloop%20data%20Analysis/04_deliverables/deliverable_09_data_dictionary/Data_Dictionary.md) | **Verified 100%** |
+| **10** | `DEL-10` | Logical Data Model & Physical DDL | [Logical_Data_Model_and_ER_Diagram.md](file:///d:/Veloop%20data%20Analysis/04_deliverables/deliverable_10_logical_data_model/Logical_Data_Model_and_ER_Diagram.md), [schema.sql](file:///d:/Veloop%20data%20Analysis/04_deliverables/deliverable_10_logical_data_model/schema.sql) | **Verified 100%** |
+| **11** | `DEL-11` | Enterprise KPI Catalogue (35 KPIs) | [KPI_Catalogue.xlsx](file:///d:/Veloop%20data%20Analysis/04_deliverables/deliverable_11_kpi_catalogue/KPI_Catalogue.xlsx), [MD](file:///d:/Veloop%20data%20Analysis/04_deliverables/deliverable_11_kpi_catalogue/KPI_Catalogue.md) | **Verified 100%** |
+| **12** | `DEL-12` | Simulated Data Profiling Report | [Simulated_Data_Profiling_Workbook.xlsx](file:///d:/Veloop%20data%20Analysis/04_deliverables/deliverable_12_simulated_data_profiling/Simulated_Data_Profiling_Workbook.xlsx), [MD](file:///d:/Veloop%20data%20Analysis/04_deliverables/deliverable_12_simulated_data_profiling/Simulated_Data_Profiling_Report.md) | **Verified 100%** |
+| **13** | `DEL-13` | Data Quality Audit & QC Framework | [Data_Quality_Audit_Workbook.xlsx](file:///d:/Veloop%20data%20Analysis/04_deliverables/deliverable_13_data_quality_audit/Data_Quality_Audit_Workbook.xlsx), [MD](file:///d:/Veloop%20data%20Analysis/04_deliverables/deliverable_13_data_quality_audit/Data_Quality_Audit_Report.md), [PDF](file:///d:/Veloop%20data%20Analysis/04_deliverables/deliverable_13_data_quality_audit/Data_Quality_Audit_Report.pdf) | **Verified 100%** |
+| **14** | `DEL-14` | Dashboard Blueprint Specification | [Dashboard_Blueprint_Specifications.md](file:///d:/Veloop%20data%20Analysis/04_deliverables/deliverable_14_dashboard_blueprint/Dashboard_Blueprint_Specifications.md) | **Verified 100%** |
+| **15** | `DEL-15` | Developer Analytics Handoff | [Developer_Analytics_Handoff.md](file:///d:/Veloop%20data%20Analysis/04_deliverables/deliverable_15_developer_handoff/Developer_Analytics_Handoff.md) | **Verified 100%** |
+| **16** | `DEL-16` | Data Pipeline Proposal & Architecture | [Data_Pipeline_Proposal.md](file:///d:/Veloop%20data%20Analysis/04_deliverables/deliverable_16_data_pipeline_proposal/Data_Pipeline_Proposal.md) | **Verified 100%** |
+| **17** | `DEL-17` | Privacy, Governance & Change Mgmt | [Privacy_Governance_and_Change_Management.md](file:///d:/Veloop%20data%20Analysis/04_deliverables/deliverable_17_privacy_and_governance/Privacy_Governance_and_Change_Management.md) | **Verified 100%** |
+| **18** | `DEL-18` | Analytics Readiness Assessment | [Analytics_Readiness_Assessment.md](file:///d:/Veloop%20data%20Analysis/04_deliverables/deliverable_18_analytics_readiness_assessment/Analytics_Readiness_Assessment.md), [PDF](file:///d:/Veloop%20data%20Analysis/04_deliverables/deliverable_18_analytics_readiness_assessment/Analytics_Readiness_Assessment.pdf) | **Verified 100%** |
+| **19** | `DEL-19` | Source & Verification Register | [Source_and_Verification_Register.xlsx](file:///d:/Veloop%20data%20Analysis/04_deliverables/deliverable_19_assumption_and_verification_register/Source_and_Verification_Register.xlsx), [MD](file:///d:/Veloop%20data%20Analysis/04_deliverables/deliverable_19_assumption_and_verification_register/Source_and_Verification_Register.md) | **Verified 100%** |
+| **20** | `DEL-20` | Implementation Backlog | [Implementation_Backlog.md](file:///d:/Veloop%20data%20Analysis/04_deliverables/deliverable_20_implementation_backlog/Implementation_Backlog.md) | **Verified 100%** |
+| **21** | `DEL-21` | Final Consolidated Report | [Final_Consolidated_Report.md](file:///d:/Veloop%20data%20Analysis/04_deliverables/deliverable_21_final_consolidated_report/Final_Consolidated_Report.md), [PDF](file:///d:/Veloop%20data%20Analysis/04_deliverables/deliverable_21_final_consolidated_report/Final_Consolidated_Report.pdf) | **Verified 100%** |

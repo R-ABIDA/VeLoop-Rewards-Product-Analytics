@@ -81,7 +81,7 @@ In accordance with strict project integrity directives, all requirements, specif
 | Deliverable | Technology / Format | Path | Status |
 | :--- | :--- | :--- | :---: |
 | Interactive BI Dashboard | Python, Streamlit, Plotly | [`05_dashboard/app.py`](file:///d:/Veloop%20data%20Analysis/05_dashboard/app.py) | **100% Operational** |
-| Automated Test Suite | Python `unittest` | [`07_tests_and_validation/test_all_deliverables.py`](file:///d:/Veloop%20data%20Analysis/07_tests_and_validation/test_all_deliverables.py) | **7/7 Tests Passed** |
+| Automated Test Suite | Python `unittest` | [`07_tests_and_validation/`](file:///d:/Veloop%20data%20Analysis/07_tests_and_validation/) | **26/26 Tests Passed (100%)** |
 | Environment Dependencies | Pip Requirements | [`requirements.txt`](file:///d:/Veloop%20data%20Analysis/requirements.txt) | **Complete** |
 | Project Master README | Markdown | [`README.md`](file:///d:/Veloop%20data%20Analysis/README.md) | **Complete** |
 | Executive Slide Deck | Markdown Speaker Deck | [`08_presentation/VELOOP_Rewards_Final_Presentation.md`](file:///d:/Veloop%20data%20Analysis/08_presentation/VELOOP_Rewards_Final_Presentation.md) | **14 Slides Ready** |

@@ -1,0 +1,21 @@
+event_id,user_id,session_id,event_datetime,feature_name,event_name,event_status,device,platform,acquisition_source,sequence_number,reward_related_flag,xp_related_flag
+EVT00006040,VLUSR000168,SESS0001332,2026-05-05 23:07:02,Missions,mission_viewed,Started,Android,Web,Referral,4,Yes,Yes
+EVT00006040,VLUSR000168,SESS0001332,2026-05-05 23:07:02,Missions,mission_viewed,Started,Android,Web,Referral,4,Yes,Yes
+EVT00006379,VLUSR000181,SESS0001408,2026-05-11 17:36:00,Daily Reward,daily_reward_viewed,Started,Android,Web,WhatsApp,2,Yes,No
+EVT00006379,VLUSR000181,SESS0001408,2026-05-11 17:36:00,Daily Reward,daily_reward_viewed,Started,Android,Web,WhatsApp,2,Yes,No
+EVT00011275,VLUSR000316,SESS0002527,2026-07-09 07:51:20,Mining Rewards,mining_stopped,Success,Windows,Web,Referral,4,Yes,No
+EVT00011275,VLUSR000316,SESS0002527,2026-07-09 07:51:20,Mining Rewards,mining_stopped,Success,Windows,Web,Referral,4,Yes,No
+EVT00014772,VLUSR000416,SESS0003348,2026-08-04 18:31:40,Level System,level_viewed,Started,iOS,Web,Organic Search,2,No,Yes
+EVT00014772,VLUSR000416,SESS0003348,2026-08-04 18:31:40,Level System,level_viewed,Started,iOS,Web,Organic Search,2,No,Yes
+EVT00017051,VLUSR000490,SESS0003871,2026-07-01 03:20:34,Mining Rewards,mining_stopped,Success,macOS,Web,Direct,4,Yes,No
+EVT00017051,VLUSR000490,SESS0003871,2026-07-01 03:20:34,Mining Rewards,mining_stopped,Success,macOS,Web,Direct,4,Yes,No
+EVT00021600,VLUSR000616,SESS0004843,2026-08-31 06:32:30,Exchange Center,exchange_viewed,Started,Android,Web,Direct,2,No,No
+EVT00021600,VLUSR000616,SESS0004843,2026-08-31 06:32:30,Exchange Center,exchange_viewed,Started,Android,Web,Direct,2,No,No
+EVT00025552,VLUSR000722,SESS0005642,2026-08-31 21:57:08,Watch Ads,ad_started,Started,iOS,Web,WhatsApp,2,Yes,No
+EVT00025552,VLUSR000722,SESS0005642,2026-08-31 21:57:08,Watch Ads,ad_started,Started,iOS,Web,WhatsApp,2,Yes,No
+EVT00028196,VLUSR000791,SESS0006225,2026-07-27 06:53:25,Mining Rewards,mining_stopped,Success,Windows,Web,Social Media,12,Yes,No
+EVT00028196,VLUSR000791,SESS0006225,2026-07-27 06:53:25,Mining Rewards,mining_stopped,Success,Windows,Web,Social Media,12,Yes,No
+EVT00030205,VLUSR000848,SESS0006671,2026-08-03 00:39:18,Spin the Wheel,spin_started,Started,macOS,Web,Direct,2,Yes,No
+EVT00030205,VLUSR000848,SESS0006671,2026-08-03 00:39:18,Spin the Wheel,spin_started,Started,macOS,Web,Direct,2,Yes,No
+EVT00034075,VLUSR000952,SESS0007574,2026-09-08 13:49:25,Streak Rewards,streak_claimed,Success,Windows,Web,Direct,9,Yes,Yes
+EVT00034075,VLUSR000952,SESS0007574,2026-09-08 13:49:25,Streak Rewards,streak_claimed,Success,Windows,Web,Direct,9,Yes,Yes

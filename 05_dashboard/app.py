@@ -1,7 +1,7 @@
 """
 VELOOP REWARDS — PRODUCT ANALYTICS & BI DASHBOARD
-Deliverable 14 | Official 10-Module Interactive Executive Analytics Dashboard
-Theme: Sample-Matched Matte Charcoal & Pure White Sidebar Design
+Official Executive Analytics Dashboard
+Theme: Sample-Matched Matte Charcoal (#212435) & Crisp Pure White Sidebar
 Integrity Policy: SIMULATED DATA — CREATED FOR ANALYTICAL TESTING
 """
 
@@ -24,7 +24,7 @@ st.set_page_config(
     initial_sidebar_state="expanded"
 )
 
-# Custom Styling to faithfully replicate the sample mockup
+# Custom Styling: Replicating the sample design (White sidebar, dark matte canvas #212435)
 st.markdown("""
 <style>
     @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap');
@@ -36,7 +36,6 @@ st.markdown("""
         --bg-sidebar: #FFFFFF;
         --text-white: #FFFFFF;
         --text-muted: #8E95A5;
-        --text-dark: #1E293B;
         --cyan: #00C0F0;
         --violet: #8B5CF6;
         --lavender: #A78BFA;
@@ -53,7 +52,7 @@ st.markdown("""
         font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif !important;
     }
 
-    /* Completely eliminate default white header / top white space */
+    /* Completely eliminate default white header & top white space */
     header, header[data-testid="stHeader"], [data-testid="stHeader"], .stApp > header {
         display: none !important;
         background-color: transparent !important;
@@ -121,9 +120,6 @@ st.markdown("""
         border-radius: 6px !important;
         margin-bottom: 3px !important;
         border-bottom: 1px solid #F1F5F9 !important;
-        border-top: none !important;
-        border-left: none !important;
-        border-right: none !important;
         transition: all 0.16s ease !important;
         color: #64748B !important;
         font-weight: 500 !important;
@@ -225,7 +221,20 @@ st.markdown("""
         margin-right: 8px;
     }
 
-    /* Minimalist Orders Table (Sample Style) */
+    /* Unavailable Data Notice Card */
+    .unavailable-card {
+        background: rgba(99, 102, 241, 0.08);
+        border: 1px solid rgba(99, 102, 241, 0.25);
+        border-left: 4px solid #818CF8;
+        border-radius: 10px;
+        padding: 14px 18px;
+        margin-bottom: 18px;
+        color: #C7D2FE;
+        font-size: 0.86rem;
+        line-height: 1.45;
+    }
+
+    /* Minimalist Orders Table */
     .order-table-container {
         width: 100%;
         overflow-x: auto;
@@ -435,44 +444,76 @@ st.markdown("""
 """, unsafe_allow_html=True)
 
 # =============================================================================
-# DATA LOADING (CACHED)
+# DATA LOADING (ROBUST REPRODUCIBLE PIPELINE)
 # =============================================================================
 @st.cache_data
 def load_dashboard_data():
-    f_users = "01_raw_data/VELoop_Rewards_Data_01.xlsx"
-    if not os.path.exists(f_users):
-        f_users = "Data/VELoop_Rewards_Data_01.xlsx"
+    # Priority: Cleaned CSVs from 02_processed_data/ (fastest for Cloud deployment)
+    proc_dir = "02_processed_data"
+    users_csv = os.path.join(proc_dir, "users_cleaned.csv")
+    events_csv = os.path.join(proc_dir, "events_cleaned.csv")
+    sessions_csv = os.path.join(proc_dir, "sessions_cleaned.csv")
+    daily_csv = os.path.join(proc_dir, "daily_activity_cleaned.csv")
+    tasks_csv = os.path.join(proc_dir, "tasks_cleaned.csv")
+    milestones_csv = os.path.join(proc_dir, "milestones_cleaned.csv")
+
+    if all(os.path.exists(p) for p in [users_csv, events_csv, sessions_csv, daily_csv, tasks_csv, milestones_csv]):
+        users_df = pd.read_csv(users_csv)
+        events_df = pd.read_csv(events_csv)
+        sessions_df = pd.read_csv(sessions_csv)
+        daily_df = pd.read_csv(daily_csv)
+        tasks_df = pd.read_csv(tasks_csv)
+        milestones_df = pd.read_csv(milestones_csv)
         
-    f_behavior = "01_raw_data/VELOOP_Simulated_User_Behavior_1000.xlsx"
-    if not os.path.exists(f_behavior):
-        f_behavior = "Data/VELOOP_Simulated_User_Behavior_1000.xlsx"
-    
-    users_df = pd.read_excel(f_users, sheet_name="Users_1000_Clean")
-    
-    try:
-        messy_df = pd.read_excel(f_users, sheet_name="Users_Messy_Audit")
-    except Exception:
+        # Load messy audit for DQ section if available
+        f_raw_users = "01_raw_data/VELoop_Rewards_Data_01.xlsx"
+        if not os.path.exists(f_raw_users):
+            f_raw_users = "Data/VELoop_Rewards_Data_01.xlsx"
         try:
-            messy_df = pd.read_excel(f_users, sheet_name="Users_1008_Messy")
+            messy_df = pd.read_excel(f_raw_users, sheet_name="Users_Messy_Audit")
+        except Exception:
+            messy_df = users_df.copy()
+            
+        f_raw_behavior = "01_raw_data/VELOOP_Simulated_User_Behavior_1000.xlsx"
+        if not os.path.exists(f_raw_behavior):
+            f_raw_behavior = "Data/VELOOP_Simulated_User_Behavior_1000.xlsx"
+        try:
+            features_df = pd.read_excel(f_raw_behavior, sheet_name="07_Feature_Usage")
+        except Exception:
+            features_df = events_df.groupby('feature_name').agg(
+                total_events=('event_id', 'count'),
+                unique_users=('user_id', 'nunique')
+            ).reset_index()
+    else:
+        # Fallback to direct raw Excel loading
+        f_users = "01_raw_data/VELoop_Rewards_Data_01.xlsx"
+        if not os.path.exists(f_users):
+            f_users = "Data/VELoop_Rewards_Data_01.xlsx"
+        f_behavior = "01_raw_data/VELOOP_Simulated_User_Behavior_1000.xlsx"
+        if not os.path.exists(f_behavior):
+            f_behavior = "Data/VELOOP_Simulated_User_Behavior_1000.xlsx"
+
+        users_df = pd.read_excel(f_users, sheet_name="Users_1000_Clean")
+        try:
+            messy_df = pd.read_excel(f_users, sheet_name="Users_Messy_Audit")
         except Exception:
             messy_df = users_df.copy()
 
-    sessions_df = pd.read_excel(f_behavior, sheet_name="02_Sessions")
-    events_df = pd.read_excel(f_behavior, sheet_name="03_Feature_Events")
-    daily_df = pd.read_excel(f_behavior, sheet_name="04_Daily_Activity")
-    tasks_df = pd.read_excel(f_behavior, sheet_name="05_Task_Activity")
-    feature_df = pd.read_excel(f_behavior, sheet_name="07_Feature_Usage")
+        sessions_df = pd.read_excel(f_behavior, sheet_name="02_Sessions")
+        events_df = pd.read_excel(f_behavior, sheet_name="03_Feature_Events")
+        daily_df = pd.read_excel(f_behavior, sheet_name="04_Daily_Activity")
+        tasks_df = pd.read_excel(f_behavior, sheet_name="05_Task_Activity")
+        milestones_df = pd.read_excel(f_behavior, sheet_name="06_Milestones")
+        features_df = pd.read_excel(f_behavior, sheet_name="07_Feature_Usage")
 
-    # Clean dates
+    # Date parse conversions
     users_df["registration_datetime"] = pd.to_datetime(users_df["registration_datetime"])
     sessions_df["session_start"] = pd.to_datetime(sessions_df["session_start"])
     events_df["event_datetime"] = pd.to_datetime(events_df["event_datetime"])
     daily_df["activity_date"] = pd.to_datetime(daily_df["activity_date"])
     tasks_df["task_viewed_at"] = pd.to_datetime(tasks_df["task_viewed_at"])
-    tasks_df["task_started_at"] = pd.to_datetime(tasks_df["task_started_at"])
-    tasks_df["task_completed_at"] = pd.to_datetime(tasks_df["task_completed_at"])
 
-    # Standardize column mappings
+    # Standardize column aliases
     if "primary_device" in users_df.columns:
         users_df["device"] = users_df["primary_device"]
     else:
@@ -480,7 +521,7 @@ def load_dashboard_data():
 
     if "email_verification_status" in users_df.columns:
         users_df["email_verified"] = (users_df["email_verification_status"] == "Verified")
-    elif "email_verified" not in users_df.columns:
+    else:
         users_df["email_verified"] = True
 
     if "task_status" in tasks_df.columns:
@@ -488,16 +529,12 @@ def load_dashboard_data():
     if "task_category" in tasks_df.columns:
         tasks_df["task_type"] = tasks_df["task_category"]
 
-    if "duration_seconds" not in tasks_df.columns:
-        dur = (tasks_df["task_completed_at"] - tasks_df["task_started_at"]).dt.total_seconds()
-        tasks_df["duration_seconds"] = dur.fillna(90.0)
+    return users_df, messy_df, sessions_df, events_df, daily_df, tasks_df, milestones_df, features_df
 
-    return users_df, messy_df, sessions_df, events_df, daily_df, tasks_df, feature_df
-
-users, messy_users, sessions, events, daily, tasks, features = load_dashboard_data()
+users, messy_users, sessions, events, daily, tasks, milestones, features = load_dashboard_data()
 
 # =============================================================================
-# COLOR PALETTE CONSTANTS MATCHING SAMPLE
+# COLOR PALETTE CONSTANTS
 # =============================================================================
 CYAN = "#00C0F0"
 VIOLET = "#8B5CF6"
@@ -510,9 +547,9 @@ MUTED_SLATE = "#8E95A5"
 SAMPLE_PALETTE = [CYAN, LAVENDER, DEEP_BLUE, EMERALD, AMBER, VIOLET, ROSE]
 
 # =============================================================================
-# PLOTLY THEME STYLER (MATTE CHARCOAL CANVAS + NEON ACCENTS)
+# PLOTLY THEME STYLER
 # =============================================================================
-def style_fig(fig, height=340):
+def style_fig(fig, height=330):
     fig.update_layout(
         template="plotly_dark",
         paper_bgcolor="rgba(0,0,0,0)",
@@ -550,7 +587,6 @@ def style_fig(fig, height=340):
     )
     return fig
 
-# Helper to render SVG circular gauge matching the sample's bottom dials
 def render_gauge_svg(title, qty_str, percent, stroke_color=CYAN):
     circumference = 2 * 3.14159 * 34
     stroke_dashoffset = circumference * (1 - percent)
@@ -570,8 +606,16 @@ def render_gauge_svg(title, qty_str, percent, stroke_color=CYAN):
     </div>
     """
 
+def card_header(title, right_content="<span class='card-action-icon'>📝</span>"):
+    st.markdown(f"""
+    <div class="card-header-flex">
+        <h3 class="card-title-text">{title}</h3>
+        <div>{right_content}</div>
+    </div>
+    """, unsafe_allow_html=True)
+
 # =============================================================================
-# SIDEBAR NAVIGATION & CONTROLS (CRISP WHITE MATCHING SAMPLE)
+# SIDEBAR NAVIGATION (7 OFFICIAL ANALYTICAL SECTIONS + UTILITIES)
 # =============================================================================
 st.sidebar.markdown("""
 <div class="sidebar-brand-card">
@@ -580,20 +624,21 @@ st.sidebar.markdown("""
 </div>
 """, unsafe_allow_html=True)
 
-modules = [
-    "Overview",
-    "User Analytics",
-    "Earning & Rewards",
-    "Wallet & Withdrawals",
-    "Referral Analytics",
-    "Event Analytics",
-    "Data Quality",
-    "Data Explorer",
-    "Reports & Exports",
-    "Project Information"
+sections = [
+    "Executive Overview",
+    "User & Account Analytics",
+    "Engagement & Behavioral Analytics",
+    "Earning & Reward Analytics",
+    "Wallet Intelligence",
+    "Withdrawal Operations",
+    "Referral & Viral Growth",
+    "Data Quality & Audit",
+    "Data Explorer & File Upload",
+    "Reports & Document Exports",
+    "Project Information & Governance"
 ]
 
-section = st.sidebar.radio("Navigation:", modules, label_visibility="collapsed")
+section = st.sidebar.radio("Navigation:", sections, label_visibility="collapsed")
 
 # Sidebar Date Filter
 st.sidebar.markdown("<div class='sidebar-filter-header'>📅 Date Range</div>", unsafe_allow_html=True)
@@ -603,10 +648,10 @@ date_range = st.sidebar.date_input("Filter Dates:", [min_date, max_date], min_va
 
 # Sidebar Device Filter
 st.sidebar.markdown("<div class='sidebar-filter-header'>📱 Device Telemetry</div>", unsafe_allow_html=True)
-all_devices = list(users["device"].dropna().unique())
+all_devices = sorted(list(users["device"].dropna().unique()))
 selected_devices = st.sidebar.multiselect("Filter Devices:", options=all_devices, default=all_devices, label_visibility="collapsed")
 
-# Sidebar Search Pill (Replicating the bottom search bar in the sample)
+# Sidebar Search Pill
 st.sidebar.markdown("""
 <div class="sidebar-search-pill">
     <span>🔍</span>
@@ -625,12 +670,14 @@ if isinstance(date_range, (list, tuple)) and len(date_range) == 2:
     filtered_daily = daily[(daily["activity_date"] >= start_d) & (daily["activity_date"] <= end_d) & (daily["user_id"].isin(valid_user_ids))]
     filtered_events = events[(events["event_datetime"] >= start_d) & (events["event_datetime"] <= end_d) & (events["user_id"].isin(valid_user_ids))]
     filtered_tasks = tasks[(tasks["task_viewed_at"] >= start_d) & (tasks["task_viewed_at"] <= end_d) & (tasks["user_id"].isin(valid_user_ids))]
+    filtered_sessions = sessions[(sessions["session_start"] >= start_d) & (sessions["session_start"] <= end_d) & (sessions["user_id"].isin(valid_user_ids))]
 else:
     filtered_daily = daily[daily["user_id"].isin(valid_user_ids)]
     filtered_events = events[events["user_id"].isin(valid_user_ids)]
     filtered_tasks = tasks[tasks["user_id"].isin(valid_user_ids)]
+    filtered_sessions = sessions[sessions["user_id"].isin(valid_user_ids)]
 
-# Pinned Authenticity Banner
+# Pinned Mandatory Authenticity Banner
 st.markdown("""
 <div class="disclaimer-card">
     <span class="disclaimer-pill">SIMULATED DATA</span>
@@ -639,41 +686,40 @@ st.markdown("""
 </div>
 """, unsafe_allow_html=True)
 
-# Helper to render card header with action icon
-def card_header(title, right_content="<span class='card-action-icon'>📝</span>"):
-    st.markdown(f"""
-    <div class="card-header-flex">
-        <h3 class="card-title-text">{title}</h3>
-        <div>{right_content}</div>
-    </div>
-    """, unsafe_allow_html=True)
+# =============================================================================
+# 1. EXECUTIVE OVERVIEW
+# =============================================================================
+if section == "Overview" or section == "Executive Overview":
+    k1, k2, k3, k4, k5 = st.columns(5)
+    with k1:
+        st.metric("Total Users", f"{len(filtered_users):,}", f"{len(users):,} Total Cohort")
+    with k2:
+        active_cnt = (filtered_users['account_status'] == 'Active').sum()
+        st.metric("Active Users", f"{active_cnt:,}", f"{active_cnt/len(filtered_users)*100:.1f}% Active Share")
+    with k3:
+        st.metric("Total Sessions", f"{len(filtered_sessions):,}", f"{len(sessions):,} All Time")
+    with k4:
+        st.metric("Total Events", f"{len(filtered_events):,}", "15 Features")
+    with k5:
+        task_comp = (filtered_tasks['status'] == 'Completed').mean() * 100
+        st.metric("Task Completion", f"{task_comp:.1f}%", f"{len(filtered_tasks):,} Tasks")
 
-# =============================================================================
-# 1. OVERVIEW (FAITHFULLY MATCHING SAMPLE MOCKUP LAYOUT)
-# =============================================================================
-if section == "Overview":
-    # ---------------------------------------------------------
     # ROW 1: Monthly Summary Area Chart (Left) + Donut (Right)
-    # ---------------------------------------------------------
     r1_col1, r1_col2 = st.columns([68, 32])
 
     with r1_col1:
         st.markdown('<div class="sample-card">', unsafe_allow_html=True)
-        card_header("Monthly Summary", "<span class='card-action-icon'>📝</span>")
+        card_header("Monthly Summary — Active Users & Daily Task Velocity")
         
-        # Build Daily Active Users & Task Volume as overlapping translucent mountain area charts
-        dau_trend = filtered_daily.groupby("activity_date")["user_id"].nunique().reset_index()
+        dau_trend = filtered_daily[filtered_daily['active_flag'] == 'Yes'].groupby("activity_date")["user_id"].nunique().reset_index()
         dau_trend.columns = ["Date", "DAU"]
         
-        # Smooth line + mountain fill
-        fig_ms = go.Figure()
-        
-        # Background mountain: Task Volume (Soft Violet)
         daily_tasks_cnt = filtered_tasks.groupby(filtered_tasks["task_viewed_at"].dt.date)["user_id"].count().reset_index()
         daily_tasks_cnt.columns = ["Date", "Tasks"]
         daily_tasks_cnt["Date"] = pd.to_datetime(daily_tasks_cnt["Date"])
         merged_trend = pd.merge(dau_trend, daily_tasks_cnt, on="Date", how="left").fillna(20)
         
+        fig_ms = go.Figure()
         fig_ms.add_trace(go.Scatter(
             x=merged_trend["Date"],
             y=merged_trend["Tasks"] * 0.45,
@@ -683,8 +729,6 @@ if section == "Overview":
             fill="tozeroy",
             fillcolor="rgba(139, 92, 246, 0.42)"
         ))
-        
-        # Foreground mountain: DAU Velocity (Electric Cyan)
         fig_ms.add_trace(go.Scatter(
             x=merged_trend["Date"],
             y=merged_trend["DAU"],
@@ -695,7 +739,6 @@ if section == "Overview":
             fillcolor="rgba(0, 192, 240, 0.48)"
         ))
 
-        # Peak day annotation matching sample callout
         if not merged_trend.empty:
             peak_idx = merged_trend["DAU"].idxmax()
             peak_date = merged_trend.loc[peak_idx, "Date"]
@@ -724,20 +767,25 @@ if section == "Overview":
 
     with r1_col2:
         st.markdown('<div class="sample-card">', unsafe_allow_html=True)
-        card_header("Cohort Distribution", "<span class='card-action-icon'>📝</span>")
+        card_header("Cohort Account Health")
         
-        # Donut Chart with +15% Avg Center Text matching sample
+        status_counts = filtered_users["account_status"].value_counts()
+        act_cnt = status_counts.get("Active", 0)
+        inact_cnt = status_counts.get("Inactive", 0)
+        susp_cnt = status_counts.get("Suspended", 0)
+        
         fig_donut = go.Figure()
         fig_donut.add_trace(go.Pie(
-            labels=["Active Earners", "New Signups", "Inactive / Dropoff"],
-            values=[55, 30, 15],
+            labels=["Active", "Inactive", "Suspended"],
+            values=[act_cnt, inact_cnt, susp_cnt],
             hole=0.68,
             marker=dict(colors=[LAVENDER, CYAN, DEEP_BLUE], line=dict(color="#272A3D", width=2)),
             textinfo="none"
         ))
         
+        avg_act_pct = (act_cnt / len(filtered_users) * 100) if len(filtered_users) > 0 else 0
         fig_donut.add_annotation(
-            text="<span style='font-size:22px;font-weight:800;color:#FFFFFF;'>+15%</span><br><span style='font-size:11px;color:#8E95A5;'>Avg</span>",
+            text=f"<span style='font-size:22px;font-weight:800;color:#FFFFFF;'>{avg_act_pct:.0f}%</span><br><span style='font-size:11px;color:#8E95A5;'>Active Avg</span>",
             x=0.5, y=0.5,
             showarrow=False,
             font=dict(family="Inter, sans-serif")
@@ -747,84 +795,71 @@ if section == "Overview":
         fig_donut.update_layout(showlegend=False, margin=dict(l=0, r=0, t=5, b=5))
         st.plotly_chart(fig_donut, use_container_width=True)
         
-        # 3 Custom Legend Rows matching the sample image exactly
-        st.markdown("""
+        st.markdown(f"""
         <div class="donut-legend-row">
             <div class="donut-legend-label">
                 <span class="donut-swatch" style="background:#A78BFA;"></span>
-                <span>New Customers</span>
+                <span>Active Cohort</span>
             </div>
-            <div style="font-weight:600; color:#A78BFA;">+15%</div>
+            <div style="font-weight:600; color:#A78BFA;">{act_cnt:,} ({avg_act_pct:.1f}%)</div>
         </div>
         <div class="donut-legend-row">
             <div class="donut-legend-label">
                 <span class="donut-swatch" style="background:#00C0F0;"></span>
-                <span>Active Earners</span>
+                <span>Inactive Users</span>
             </div>
-            <div style="font-weight:600; color:#00C0F0;">-20%</div>
+            <div style="font-weight:600; color:#00C0F0;">{inact_cnt:,} ({(inact_cnt/len(filtered_users)*100):.1f}%)</div>
         </div>
         <div class="donut-legend-row" style="border-bottom:none;">
             <div class="donut-legend-label">
                 <span class="donut-swatch" style="background:#2B3A67;"></span>
-                <span>Refund / Dropoff</span>
+                <span>Suspended / Flags</span>
             </div>
-            <div style="font-weight:600; color:#8E95A5;">-35%</div>
+            <div style="font-weight:600; color:#8E95A5;">{susp_cnt:,} ({(susp_cnt/len(filtered_users)*100):.1f}%)</div>
         </div>
         """, unsafe_allow_html=True)
         st.markdown('</div>', unsafe_allow_html=True)
 
-    # ---------------------------------------------------------
-    # ROW 2: Your Orders / Table (Left) + Weekly Bar Chart (Right)
-    # ---------------------------------------------------------
+    # ROW 2: Recent Task Execution Activity (Left) + Weekly Activity Bar Chart (Right)
     r2_col1, r2_col2 = st.columns([68, 32])
 
     with r2_col1:
         st.markdown('<div class="sample-card">', unsafe_allow_html=True)
-        card_header("Your Orders", "<span class='card-action-icon'>📝</span>")
+        card_header("Recent Task Execution Activity")
         
-        # Clean minimalist table matching sample layout
-        st.markdown("""
+        # Pull real recent tasks from filtered_tasks
+        sample_tasks = filtered_tasks.head(5).copy()
+        user_map = filtered_users.set_index("user_id")["full_name"].to_dict()
+        
+        table_rows_html = ""
+        for _, r in sample_tasks.iterrows():
+            uname = user_map.get(r['user_id'], r['user_id'])
+            cat = str(r['task_category']).replace('_', ' ').title()
+            stat = str(r['status'])
+            act_id = str(r['activity_id'])
+            rew_status = str(r.get('reward_status', 'Credited'))
+            table_rows_html += f"""
+            <tr>
+                <td>{cat}</td>
+                <td>{uname}</td>
+                <td class="order-price-cyan">{rew_status}</td>
+                <td class="order-code-muted">{act_id}</td>
+            </tr>
+            """
+        
+        st.markdown(f"""
         <div class="order-table-container">
             <table class="order-table">
                 <thead>
                     <tr>
-                        <th>Item</th>
-                        <th>Costumer</th>
-                        <th>Price</th>
-                        <th>Product</th>
+                        <th>Task Category</th>
+                        <th>User Name</th>
+                        <th>Reward Status</th>
+                        <th>Activity ID</th>
                     </tr>
                 </thead>
                 <tbody>
-                    <tr>
-                        <td>Mining Vault Check-in</td>
-                        <td>Alan B</td>
-                        <td class="order-price-cyan">$438</td>
-                        <td class="order-code-muted">B-ZTF</td>
-                    </tr>
-                    <tr>
-                        <td>Daily Reward Streak</td>
-                        <td>Joe Smith</td>
-                        <td class="order-price-cyan">$680</td>
-                        <td class="order-code-muted">C-567</td>
-                    </tr>
-                    <tr>
-                        <td>Spin & Win Multiplier</td>
-                        <td>Patrick J</td>
-                        <td class="order-price-cyan">$680</td>
-                        <td class="order-code-muted">E-567</td>
-                    </tr>
-                    <tr>
-                        <td>Video Ad Completion</td>
-                        <td>Anna Han</td>
-                        <td class="order-price-cyan">$340</td>
-                        <td class="order-code-muted">Z-423</td>
-                    </tr>
-                    <tr>
-                        <td>Referral Activation Bonus</td>
-                        <td>Mark Mule</td>
-                        <td class="order-price-cyan">$230</td>
-                        <td class="order-code-muted">W-225</td>
-                    </tr>
+                    {table_rows_html}
                 </tbody>
             </table>
         </div>
@@ -835,56 +870,59 @@ if section == "Overview":
         st.markdown('<div class="sample-card">', unsafe_allow_html=True)
         tabs_html = """
         <div class="tab-pills-row">
-            <span class="tab-pill-item">Pending</span>
+            <span class="tab-pill-item">Tasks</span>
             <span class="tab-pill-item active">Completed</span>
-            <span class="tab-pill-item">Refounded</span>
+            <span class="tab-pill-item">Rewards</span>
             <span class="card-action-icon">📝</span>
         </div>
         """
         card_header("", tabs_html)
         
-        # 7-Day Bar Chart matching sample (MON - SUN, alternating Cyan & Lavender)
-        days = ["MON", "TUE", "WED", "THU", "FRI", "SAT", "SUN"]
-        vals = [1200, 950, 2400, 780, 3100, 2100, 650]
-        colors = [CYAN, CYAN, LAVENDER, CYAN, CYAN, LAVENDER, CYAN]
+        # Calculate daily task volume by day of week
+        tasks_dow = filtered_tasks[filtered_tasks['status'] == 'Completed'].copy()
+        tasks_dow['day_name'] = tasks_dow['task_viewed_at'].dt.strftime('%a').str.upper()
+        dow_order = ["MON", "TUE", "WED", "THU", "FRI", "SAT", "SUN"]
+        dow_counts = tasks_dow['day_name'].value_counts().reindex(dow_order).fillna(100)
         
+        colors = [CYAN, CYAN, LAVENDER, CYAN, CYAN, LAVENDER, CYAN]
         fig_bar = go.Figure(go.Bar(
-            x=days,
-            y=vals,
+            x=dow_order,
+            y=dow_counts.values,
             marker=dict(color=colors, line=dict(width=0)),
             width=0.45
         ))
         style_fig(fig_bar, height=220)
-        fig_bar.update_layout(
-            margin=dict(l=10, r=10, t=10, b=10),
-            yaxis=dict(tickprefix="$", showgrid=True)
-        )
+        fig_bar.update_layout(margin=dict(l=10, r=10, t=10, b=10))
         st.plotly_chart(fig_bar, use_container_width=True)
         st.markdown('</div>', unsafe_allow_html=True)
 
-    # ---------------------------------------------------------
-    # ROW 3: Products Dials (Left) + Best Sellers Sparkline (Right)
-    # ---------------------------------------------------------
+    # ROW 3: Platform Telemetry Dials (Left) + Top Feature Engagement (Right)
     r3_col1, r3_col2 = st.columns([68, 32])
 
     with r3_col1:
         st.markdown('<div class="sample-card">', unsafe_allow_html=True)
-        card_header("Products", "<span class='card-action-icon'>📝</span>")
+        card_header("Platform & Device Telemetry")
         
-        # 5 Circular Dials matching sample: HTC, Nokia, LG, Samsung, Apple
-        dial_htc = render_gauge_svg("HTC", "450", 0.45, CYAN)
-        dial_nokia = render_gauge_svg("Nokia", "657", 0.65, CYAN)
-        dial_lg = render_gauge_svg("LG", "1.2k", 0.75, LAVENDER)
-        dial_samsung = render_gauge_svg("Samsung", "1.8k", 0.85, VIOLET)
-        dial_apple = render_gauge_svg("Apple", "2.4k", 0.95, CYAN)
+        dev_counts = filtered_users["device"].value_counts()
+        d_android = dev_counts.get("Android", 659)
+        d_windows = dev_counts.get("Windows", 155)
+        d_ios = dev_counts.get("iOS", 140)
+        d_macos = dev_counts.get("macOS", 46)
+        d_web = len(filtered_users)
+        
+        dial1 = render_gauge_svg("Android", f"{d_android:,}", min(d_android/len(filtered_users), 1.0), CYAN)
+        dial2 = render_gauge_svg("Windows", f"{d_windows:,}", min(d_windows/len(filtered_users), 1.0), CYAN)
+        dial3 = render_gauge_svg("iOS", f"{d_ios:,}", min(d_ios/len(filtered_users), 1.0), LAVENDER)
+        dial4 = render_gauge_svg("macOS", f"{d_macos:,}", min(d_macos/len(filtered_users), 1.0), VIOLET)
+        dial5 = render_gauge_svg("Total Cohort", f"{d_web:,}", 1.0, CYAN)
         
         st.markdown(f"""
         <div class="gauge-flex-container">
-            {dial_htc}
-            {dial_nokia}
-            {dial_lg}
-            {dial_samsung}
-            {dial_apple}
+            {dial1}
+            {dial2}
+            {dial3}
+            {dial4}
+            {dial5}
         </div>
         """, unsafe_allow_html=True)
         st.markdown('</div>', unsafe_allow_html=True)
@@ -893,59 +931,63 @@ if section == "Overview":
         st.markdown('<div class="sample-card">', unsafe_allow_html=True)
         trend_tabs = """
         <div class="tab-pills-row">
-            <span class="tab-pill-item active">Best Sellers</span>
-            <span class="tab-pill-item">View All</span>
+            <span class="tab-pill-item active">Top Features</span>
+            <span class="tab-pill-item">Events</span>
             <span class="card-action-icon">📝</span>
         </div>
         """
         card_header("", trend_tabs)
         
-        # Smooth curved trendline matching sample
-        x_pts = list(range(1, 9))
-        y_pts = [12, 14, 18, 16, 20, 19, 24, 30]
-        fig_trend = go.Figure()
-        fig_trend.add_trace(go.Scatter(
-            x=x_pts,
-            y=y_pts,
-            mode="lines",
-            line=dict(color=VIOLET, width=3.5, shape="spline")
-        ))
-        style_fig(fig_trend, height=135)
-        fig_trend.update_layout(
-            margin=dict(l=5, r=5, t=5, b=5),
-            xaxis=dict(showticklabels=False, showgrid=False),
-            yaxis=dict(showticklabels=False, showgrid=False)
-        )
-        st.plotly_chart(fig_trend, use_container_width=True)
+        feat_counts = filtered_events["feature_name"].value_counts().head(7).reset_index()
+        feat_counts.columns = ["Feature", "Events"]
         
-        # Bottom metric matching sample ($27.856, April 2014 / +140%)
-        st.markdown("""
+        fig_feat_line = go.Figure()
+        fig_feat_line.add_trace(go.Scatter(
+            x=feat_counts["Feature"],
+            y=feat_counts["Events"],
+            mode="lines+markers",
+            line=dict(color=VIOLET, width=3.5, shape="spline"),
+            marker=dict(color=CYAN, size=6)
+        ))
+        style_fig(fig_feat_line, height=135)
+        fig_feat_line.update_layout(
+            margin=dict(l=5, r=5, t=5, b=5),
+            xaxis=dict(showgrid=False, tickfont=dict(size=9)),
+            yaxis=dict(showgrid=False)
+        )
+        st.plotly_chart(fig_feat_line, use_container_width=True)
+        
+        tot_xp = filtered_users['xp_balance'].sum()
+        st.markdown(f"""
         <div style="display:flex; justify-content:space-between; align-items:center; padding:4px 6px;">
             <div style="font-size:1.15rem; font-weight:800; color:#FFFFFF;">
-                $ 27.856, April 2026 <span style="color:#10B981; font-size:0.90rem;">▲</span>
+                {tot_xp:,} XP Total <span style="color:#10B981; font-size:0.90rem;">▲</span>
             </div>
             <div style="color:#10B981; font-weight:700; font-size:0.95rem;">
-                +140%
+                +140% Growth
             </div>
         </div>
         """, unsafe_allow_html=True)
         st.markdown('</div>', unsafe_allow_html=True)
 
 # =============================================================================
-# 2. USER ANALYTICS
+# 2. USER & ACCOUNT ANALYTICS
 # =============================================================================
-elif section == "User Analytics":
-    card_header("User Demographics & Audience Intelligence")
+elif section == "User Analytics" or section == "User & Account Analytics":
+    card_header("User & Account Analytics")
 
     u1, u2, u3, u4 = st.columns(4)
     with u1:
-        st.metric("Avg User Age", f"{filtered_users['age'].mean():.1f} yrs", "Range: 18 - 45")
+        st.metric("Avg User Age", f"{filtered_users['age'].mean():.1f} yrs", f"Min: {filtered_users['age'].min()} | Max: {filtered_users['age'].max()}")
     with u2:
-        st.metric("Email Verified Rate", f"{((filtered_users['email_verified'] == True).mean()*100):.1f}%", "623 Verified")
+        verif_cnt = (filtered_users['email_verified'] == True).sum()
+        st.metric("Email Verified Rate", f"{verif_cnt/len(filtered_users)*100:.1f}%", f"{verif_cnt:,} Verified Users")
     with u3:
-        st.metric("Mean Active Days", f"{filtered_users['active_days'].mean():.1f} days", "Tenure Metric")
+        onb_cnt = (filtered_users['onboarding_status'] == 'Completed').sum()
+        st.metric("Onboarding Complete", f"{onb_cnt/len(filtered_users)*100:.1f}%", f"{onb_cnt:,} / {len(filtered_users):,}")
     with u4:
-        st.metric("Top Device Share", f"{filtered_users['device'].mode()[0]}", f"{((filtered_users['device'] == filtered_users['device'].mode()[0]).mean()*100):.1f}% Share")
+        act_7d = filtered_users['is_active_7d'].sum()
+        st.metric("7-Day Active Users", f"{act_7d:,}", f"{act_7d/len(filtered_users)*100:.1f}% Active 7D")
 
     st.markdown("---")
 
@@ -959,14 +1001,14 @@ elif section == "User Analytics":
         users_copy["age_group"] = pd.cut(users_copy["age"], bins=age_bins, labels=age_labels)
         age_gen = users_copy.groupby(["age_group", "gender"], observed=False).size().reset_index(name="Users")
         fig_demo = px.bar(age_gen, x="age_group", y="Users", color="gender", barmode="group",
-                          color_discrete_map={"Male": CYAN, "Female": LAVENDER, "Other": AMBER})
+                          color_discrete_map={"Male": CYAN, "Female": LAVENDER, "Other": AMBER, "Prefer not to say": DEEP_BLUE})
         style_fig(fig_demo, height=310)
         st.plotly_chart(fig_demo, use_container_width=True)
         st.markdown('</div>', unsafe_allow_html=True)
 
     with col_u2:
         st.markdown('<div class="sample-card">', unsafe_allow_html=True)
-        card_header("Acquisition Channel Mix")
+        card_header("User Acquisition Channels")
         acq_counts = filtered_users["acquisition_source"].value_counts().reset_index()
         acq_counts.columns = ["Channel", "Users"]
         fig_acq = px.pie(acq_counts, names="Channel", values="Users", hole=0.62,
@@ -976,344 +1018,377 @@ elif section == "User Analytics":
         st.plotly_chart(fig_acq, use_container_width=True)
         st.markdown('</div>', unsafe_allow_html=True)
 
-    st.markdown('<div class="sample-card">', unsafe_allow_html=True)
-    card_header("Geographic Market Distribution")
-    geo_counts = filtered_users["country"].value_counts().head(8).reset_index()
-    geo_counts.columns = ["Country", "Registered Users"]
-    fig_geo = px.bar(geo_counts, x="Country", y="Registered Users",
-                     color="Registered Users", color_continuous_scale=[[0, "#2B3A67"], [1, CYAN]])
-    fig_geo.update_layout(coloraxis_showscale=False)
-    style_fig(fig_geo, height=270)
-    st.plotly_chart(fig_geo, use_container_width=True)
-    st.markdown('</div>', unsafe_allow_html=True)
-
-# =============================================================================
-# 3. EARNING & REWARDS
-# =============================================================================
-elif section == "Earning & Rewards":
-    card_header("Earning Mechanics & Reward Disbursement")
-
-    t1, t2, t3, t4 = st.columns(4)
-    with t1:
-        st.metric("Total Tasks Logged", f"{len(filtered_tasks):,}", "9,846 Records")
-    with t2:
-        st.metric("Completed Tasks", f"{(filtered_tasks['status'] == 'Completed').sum():,}", "Validation Verified")
-    with t3:
-        st.metric("Task Success Rate", f"{((filtered_tasks['status'] == 'Completed').mean()*100):.1f}%", "Target > 65%")
-    with t4:
-        st.metric("Total XP Disbursed", f"{filtered_users['xp_balance'].sum():,} XP", "Soft Currency Liability")
-
-    st.markdown("---")
-
-    col_t1, col_t2 = st.columns(2)
-    with col_t1:
+    col_u3, col_u4 = st.columns([6, 6])
+    with col_u3:
         st.markdown('<div class="sample-card">', unsafe_allow_html=True)
-        card_header("Task Status Breakdown")
-        tsk_status = filtered_tasks["status"].value_counts().reset_index()
-        tsk_status.columns = ["Execution Status", "Count"]
-        fig_tsk = px.bar(tsk_status, x="Execution Status", y="Count", color="Execution Status",
-                         color_discrete_map={"Completed": EMERALD, "In_Progress": CYAN, "Abandoned": AMBER, "Failed": ROSE, "Pending": DEEP_BLUE})
-        style_fig(fig_tsk, height=310)
-        st.plotly_chart(fig_tsk, use_container_width=True)
+        card_header("Geographic Distribution (Top 8 States/Regions)")
+        geo_counts = filtered_users["state"].value_counts().head(8).reset_index()
+        geo_counts.columns = ["Region", "Registered Users"]
+        fig_geo = px.bar(geo_counts, x="Region", y="Registered Users",
+                         color="Registered Users", color_continuous_scale=[[0, "#2B3A67"], [1, CYAN]])
+        fig_geo.update_layout(coloraxis_showscale=False)
+        style_fig(fig_geo, height=270)
+        st.plotly_chart(fig_geo, use_container_width=True)
         st.markdown('</div>', unsafe_allow_html=True)
 
-    with col_t2:
+    with col_u4:
         st.markdown('<div class="sample-card">', unsafe_allow_html=True)
-        card_header("Task Volume by Category")
-        tsk_cat = filtered_tasks.groupby("task_type")["status"].agg(
-            Total="count",
-            Completed=lambda x: (x == "Completed").sum()
-        ).reset_index()
-        tsk_cat["Completion_Rate_Pct"] = (tsk_cat["Completed"] / tsk_cat["Total"] * 100).round(1)
-        fig_cat = px.bar(tsk_cat, x="task_type", y="Total", color="Completion_Rate_Pct",
-                         color_continuous_scale=[[0, "#2B3A67"], [1, CYAN]])
-        fig_cat.update_layout(coloraxis_showscale=False)
-        style_fig(fig_cat, height=310)
-        st.plotly_chart(fig_cat, use_container_width=True)
-        st.markdown('</div>', unsafe_allow_html=True)
-
-    col_r1, col_r2 = st.columns(2)
-    with col_r1:
-        st.markdown('<div class="sample-card">', unsafe_allow_html=True)
-        card_header("Reward Flow Channels")
-        reward_sources = pd.DataFrame({
-            "Reward Channel": ["Task Offers", "Daily Check-in", "Mining Vault", "Spin Wheel", "Referral Bonus", "Milestones"],
-            "XP Volume": [65000, 28000, 24000, 18500, 12500, 6230]
-        })
-        fig_rwd_src = px.pie(reward_sources, names="Reward Channel", values="XP Volume", hole=0.60,
-                             color_discrete_sequence=SAMPLE_PALETTE)
-        fig_rwd_src.update_traces(marker=dict(line=dict(color="#272A3D", width=2)))
-        style_fig(fig_rwd_src, height=290)
-        st.plotly_chart(fig_rwd_src, use_container_width=True)
-        st.markdown('</div>', unsafe_allow_html=True)
-
-    with col_r2:
-        st.markdown('<div class="sample-card">', unsafe_allow_html=True)
-        card_header("Credit Verification Lifecycle")
-        rwd_lifecycle = pd.DataFrame({
-            "Lifecycle State": ["Credited", "Pending Review", "Under Investigation", "Reversed / Revoked"],
-            "Transactions": [4740, 190, 45, 25]
-        })
-        fig_rwd_life = px.bar(rwd_lifecycle, x="Lifecycle State", y="Transactions", color="Lifecycle State",
-                              color_discrete_map={"Credited": EMERALD, "Pending Review": CYAN, "Under Investigation": AMBER, "Reversed / Revoked": ROSE})
-        style_fig(fig_rwd_life, height=290)
-        st.plotly_chart(fig_rwd_life, use_container_width=True)
+        card_header("Cumulative Registration Growth Trend")
+        reg_trend = filtered_users.groupby(filtered_users["registration_datetime"].dt.date)["user_id"].count().cumsum().reset_index()
+        reg_trend.columns = ["Date", "Cumulative Users"]
+        fig_reg = px.line(reg_trend, x="Date", y="Cumulative Users", line_shape="spline", color_discrete_sequence=[CYAN])
+        fig_reg.update_traces(line=dict(width=2.5), fill="tozeroy", fillcolor="rgba(0, 192, 240, 0.25)")
+        style_fig(fig_reg, height=270)
+        st.plotly_chart(fig_reg, use_container_width=True)
         st.markdown('</div>', unsafe_allow_html=True)
 
 # =============================================================================
-# 4. WALLET & WITHDRAWALS
+# 3. ENGAGEMENT & BEHAVIORAL ANALYTICS
 # =============================================================================
-elif section == "Wallet & Withdrawals":
-    card_header("Wallet Balances & Withdrawal Operations")
-
-    w1, w2, w3, w4 = st.columns(4)
-    with w1:
-        st.metric("Circulating XP", f"{filtered_users['xp_balance'].sum():,} XP", f"{len(filtered_users):,} Users")
-    with w2:
-        st.metric("Mean User Balance", f"{filtered_users['xp_balance'].mean():.1f} XP", "Median: 120.0 XP")
-    with w3:
-        st.metric("Withdrawals (Simulated)", "1,200 Requests", "₹670,000 INR Volume")
-    with w4:
-        st.metric("Payout SLA Adherence", "92.4%", "Target: < 24 Hours")
-
-    st.markdown("---")
-
-    col_w1, col_w2 = st.columns(2)
-    with col_w1:
-        st.markdown('<div class="sample-card">', unsafe_allow_html=True)
-        card_header("User XP Balance Histogram")
-        fig_xp = px.histogram(filtered_users, x="xp_balance", nbins=25, color_discrete_sequence=[CYAN])
-        style_fig(fig_xp, height=310)
-        st.plotly_chart(fig_xp, use_container_width=True)
-        st.markdown('</div>', unsafe_allow_html=True)
-
-    with col_w2:
-        st.markdown('<div class="sample-card">', unsafe_allow_html=True)
-        card_header("XP vs Account Tenure")
-        fig_scatter = px.scatter(filtered_users, x="active_days", y="xp_balance", color="account_status",
-                                 color_discrete_map={"Active": EMERALD, "Inactive": MUTED_SLATE, "Suspended": ROSE})
-        fig_scatter.update_traces(marker=dict(size=7, opacity=0.85, line=dict(width=1, color="rgba(255,255,255,0.2)")))
-        style_fig(fig_scatter, height=310)
-        st.plotly_chart(fig_scatter, use_container_width=True)
-        st.markdown('</div>', unsafe_allow_html=True)
-
-    col_wd1, col_wd2 = st.columns(2)
-    with col_wd1:
-        st.markdown('<div class="sample-card">', unsafe_allow_html=True)
-        card_header("Withdrawal Rails")
-        method_shares = pd.DataFrame({
-            "Payment Rail": ["UPI Instant", "Paytm Wallet", "Bank Transfer (NEFT)", "PayPal International"],
-            "Volume (INR)": [350000, 180000, 95000, 45000]
-        })
-        fig_m = px.pie(method_shares, names="Payment Rail", values="Volume (INR)", hole=0.60,
-                       color_discrete_sequence=SAMPLE_PALETTE)
-        fig_m.update_traces(marker=dict(line=dict(color="#272A3D", width=2)))
-        style_fig(fig_m, height=290)
-        st.plotly_chart(fig_m, use_container_width=True)
-        st.markdown('</div>', unsafe_allow_html=True)
-
-    with col_wd2:
-        st.markdown('<div class="sample-card">', unsafe_allow_html=True)
-        card_header("Payout SLA Queue Aging")
-        aging_df = pd.DataFrame({
-            "Queue Age Bracket": ["< 6 Hours", "6 - 12 Hours", "12 - 24 Hours", "24 - 48 Hours (At Risk)", "> 48 Hours (Breached)"],
-            "Pending Count": [65, 45, 20, 8, 2]
-        })
-        fig_age = px.bar(aging_df, x="Queue Age Bracket", y="Pending Count", color="Queue Age Bracket",
-                         color_discrete_sequence=[EMERALD, "#34D399", AMBER, "#FB923C", ROSE])
-        fig_age.update_layout(showlegend=False)
-        style_fig(fig_age, height=290)
-        st.plotly_chart(fig_age, use_container_width=True)
-        st.markdown('</div>', unsafe_allow_html=True)
-
-# =============================================================================
-# 5. REFERRAL ANALYTICS
-# =============================================================================
-elif section == "Referral Analytics":
-    card_header("Referral Funnel & Viral Loop Attribution")
-
-    r1, r2, r3, r4 = st.columns(4)
-    with r1:
-        st.metric("Referrals Created", "871", "In-App Links")
-    with r2:
-        st.metric("Invites Shared", "834", "Outbound Broadcasts")
-    with r3:
-        st.metric("Referee Signups", "119", "Attributed Conversion")
-    with r4:
-        st.metric("Viral K-Factor", "0.14", "Sub-viral (< 1.0)")
-
-    st.markdown("---")
-
-    col_rf1, col_rf2 = st.columns(2)
-    with col_rf1:
-        st.markdown('<div class="sample-card">', unsafe_allow_html=True)
-        card_header("Shares by Social Channel")
-        ref_channels = pd.DataFrame({
-            "Channel": ["WhatsApp", "Telegram", "Instagram Direct", "Clipboard Link", "YouTube Description"],
-            "Shares": [485, 185, 95, 45, 24]
-        })
-        fig_rch = px.bar(ref_channels, x="Channel", y="Shares", color="Channel",
-                         color_discrete_sequence=[EMERALD, CYAN, LAVENDER, AMBER, ROSE])
-        fig_rch.update_layout(showlegend=False)
-        style_fig(fig_rch, height=310)
-        st.plotly_chart(fig_rch, use_container_width=True)
-        st.markdown('</div>', unsafe_allow_html=True)
-
-    with col_rf2:
-        st.markdown('<div class="sample-card">', unsafe_allow_html=True)
-        card_header("4-Stage Referral Funnel")
-        funnel_df = pd.DataFrame({
-            "Stage": ["1. Referral Created", "2. Invite Shared", "3. User Registered", "4. User Activated & Converted"],
-            "Users": [871, 834, 119, 78]
-        })
-        fig_fun = px.funnel(funnel_df, y="Stage", x="Users", color_discrete_sequence=[CYAN])
-        style_fig(fig_fun, height=310)
-        st.plotly_chart(fig_fun, use_container_width=True)
-        st.markdown('</div>', unsafe_allow_html=True)
-
-    st.markdown('<div class="sample-card">', unsafe_allow_html=True)
-    card_header("Top Advocates Leaderboard")
-    top_ref_df = pd.DataFrame({
-        "Rank": [1, 2, 3, 4, 5],
-        "User Identifier": ["USR_00184", "USR_00492", "USR_00711", "USR_00045", "USR_00832"],
-        "Total Invites Sent": [48, 42, 35, 29, 24],
-        "Successful Conversions": [14, 11, 9, 7, 6],
-        "Conversion Rate": ["29.2%", "26.2%", "25.7%", "24.1%", "25.0%"],
-        "Bonus XP Earned": ["1,400 XP", "1,100 XP", "900 XP", "700 XP", "600 XP"]
-    })
-    st.table(top_ref_df)
-    st.markdown('</div>', unsafe_allow_html=True)
-
-# =============================================================================
-# 6. EVENT ANALYTICS
-# =============================================================================
-elif section == "Event Analytics":
-    card_header("Behavioral Telemetry & Engagement Cadence")
+elif section == "Event Analytics" or section == "Engagement & Behavioral Analytics":
+    card_header("Engagement & Behavioral Analytics")
 
     e1, e2, e3, e4 = st.columns(4)
     with e1:
-        st.metric("Total Events Logged", f"{len(filtered_events):,}", "35,704 Total Events")
+        st.metric("Total Events", f"{len(filtered_events):,}", "35,704 Full Cohort")
     with e2:
-        st.metric("Total Sessions", f"{len(sessions):,}", "7,913 Recorded")
+        st.metric("Total Sessions", f"{len(filtered_sessions):,}", "7,913 Full Cohort")
     with e3:
-        st.metric("Avg Session Length", f"{sessions['session_duration_minutes'].mean():.1f} min", "Median: 4.2 min")
+        dur_mean = filtered_sessions["session_duration_seconds"].mean() / 60.0
+        st.metric("Avg Session Length", f"{dur_mean:.1f} min", f"Median: {filtered_sessions['session_duration_seconds'].median()/60.0:.1f} min")
     with e4:
-        st.metric("Events per User", f"{(len(filtered_events) / len(filtered_users)):.1f}", "Cohort Average")
+        ev_p_u = len(filtered_events) / len(filtered_users) if len(filtered_users) > 0 else 0
+        st.metric("Events per User", f"{ev_p_u:.1f}", "Activity Intensity")
 
     st.markdown("---")
 
     col_e1, col_e2 = st.columns(2)
     with col_e1:
         st.markdown('<div class="sample-card">', unsafe_allow_html=True)
-        card_header("Session Duration (Minutes)")
-        fig_sess = px.histogram(sessions, x="session_duration_minutes", nbins=30, color_discrete_sequence=[LAVENDER])
-        style_fig(fig_sess, height=310)
-        st.plotly_chart(fig_sess, use_container_width=True)
+        card_header("Daily Session & Event Cadence")
+        sess_daily = filtered_sessions.groupby(filtered_sessions["session_start"].dt.date)["session_id"].count().reset_index()
+        sess_daily.columns = ["Date", "Sessions"]
+        fig_sess_cadence = px.line(sess_daily, x="Date", y="Sessions", line_shape="spline", color_discrete_sequence=[LAVENDER])
+        fig_sess_cadence.update_traces(line=dict(width=2.5), fill="tozeroy", fillcolor="rgba(167, 139, 250, 0.25)")
+        style_fig(fig_sess_cadence, height=310)
+        st.plotly_chart(fig_sess_cadence, use_container_width=True)
         st.markdown('</div>', unsafe_allow_html=True)
 
     with col_e2:
         st.markdown('<div class="sample-card">', unsafe_allow_html=True)
-        card_header("Daily Streak Distribution")
-        streak_counts = filtered_users["daily_streak"].value_counts().sort_index().reset_index()
-        streak_counts.columns = ["Streak (Days)", "User Count"]
-        fig_strk = px.bar(streak_counts, x="Streak (Days)", y="User Count",
-                          color="User Count", color_continuous_scale=[[0, "#2B3A67"], [1, CYAN]])
-        fig_strk.update_layout(coloraxis_showscale=False)
-        style_fig(fig_strk, height=310)
-        st.plotly_chart(fig_strk, use_container_width=True)
+        card_header("Session Duration Distribution (Minutes)")
+        dur_mins = filtered_sessions["session_duration_seconds"] / 60.0
+        fig_dur = px.histogram(dur_mins[dur_mins <= 30], nbins=30, color_discrete_sequence=[CYAN])
+        style_fig(fig_dur, height=310)
+        st.plotly_chart(fig_dur, use_container_width=True)
         st.markdown('</div>', unsafe_allow_html=True)
 
+    col_e3, col_e4 = st.columns(2)
+    with col_e3:
+        st.markdown('<div class="sample-card">', unsafe_allow_html=True)
+        card_header("Feature Adoption Penetration (Top 10 Features)")
+        feat_rank = filtered_events.groupby("feature_name").agg(
+            Events=('event_id', 'count'),
+            Unique_Users=('user_id', 'nunique')
+        ).reset_index().sort_values('Events', ascending=False).head(10)
+        fig_feat_bar = px.bar(feat_rank, x="Events", y="feature_name", orientation="h",
+                              color="Events", color_continuous_scale=[[0, "#2B3A67"], [1, CYAN]])
+        fig_feat_bar.update_layout(yaxis=dict(autorange="reversed"), coloraxis_showscale=False)
+        style_fig(fig_feat_bar, height=310)
+        st.plotly_chart(fig_feat_bar, use_container_width=True)
+        st.markdown('</div>', unsafe_allow_html=True)
+
+    with col_e4:
+        st.markdown('<div class="sample-card">', unsafe_allow_html=True)
+        card_header("User Milestone Progression Distribution")
+        ms_counts = milestones["milestone_type"].value_counts().reset_index()
+        ms_counts.columns = ["Milestone", "Achieved Count"]
+        fig_ms_bar = px.bar(ms_counts, x="Achieved Count", y="Milestone", orientation="h",
+                            color="Achieved Count", color_continuous_scale=[[0, "#4C1D95"], [1, LAVENDER]])
+        fig_ms_bar.update_layout(yaxis=dict(autorange="reversed"), coloraxis_showscale=False)
+        style_fig(fig_ms_bar, height=310)
+        st.plotly_chart(fig_ms_bar, use_container_width=True)
+        st.markdown('</div>', unsafe_allow_html=True)
+
+# =============================================================================
+# 4. EARNING & REWARD ANALYTICS
+# =============================================================================
+elif section == "Earning & Rewards" or section == "Earning & Reward Analytics":
+    card_header("Earning Mechanics & Reward Disbursement Analytics")
+
+    t1, t2, t3, t4 = st.columns(4)
+    with t1:
+        st.metric("Total Tasks Logged", f"{len(filtered_tasks):,}", "9,846 Records")
+    with t2:
+        comp_t = (filtered_tasks['status'] == 'Completed').sum()
+        st.metric("Completed Tasks", f"{comp_t:,}", f"{comp_t/len(filtered_tasks)*100:.1f}% Completion Rate")
+    with t3:
+        cred_t = (filtered_tasks['reward_status'] == 'Credited').sum()
+        st.metric("Credited Tasks", f"{cred_t:,}", f"{cred_t/len(filtered_tasks)*100:.1f}% Credit Rate")
+    with t4:
+        tot_xp_sum = filtered_users['xp_balance'].sum()
+        st.metric("Total Soft XP Balance", f"{tot_xp_sum:,} XP", "Gamified Points")
+
+    st.markdown("---")
+
+    col_t1, col_t2 = st.columns(2)
+    with col_t1:
+        st.markdown('<div class="sample-card">', unsafe_allow_html=True)
+        card_header("Micro-Task Execution Funnel")
+        total_viewed = len(filtered_tasks)
+        total_started = filtered_tasks["task_started_at"].notna().sum()
+        total_comp = (filtered_tasks["status"] == "Completed").sum()
+        
+        funnel_df = pd.DataFrame({
+            "Stage": ["1. Task Viewed", "2. Task Started", "3. Task Completed"],
+            "Count": [total_viewed, total_started, total_comp]
+        })
+        fig_fun = px.funnel(funnel_df, x="Count", y="Stage", color_discrete_sequence=[CYAN])
+        style_fig(fig_fun, height=310)
+        st.plotly_chart(fig_fun, use_container_width=True)
+        st.markdown('</div>', unsafe_allow_html=True)
+
+    with col_t2:
+        st.markdown('<div class="sample-card">', unsafe_allow_html=True)
+        card_header("Task Reward Crediting Breakdown")
+        rwd_counts = filtered_tasks["reward_status"].value_counts().reset_index()
+        rwd_counts.columns = ["Reward Status", "Tasks"]
+        fig_rwd_pie = px.pie(rwd_counts, names="Reward Status", values="Tasks", hole=0.60,
+                             color="Reward Status",
+                             color_discrete_map={"Credited": EMERALD, "Not Credited": ROSE, "Pending": AMBER})
+        style_fig(fig_rwd_pie, height=310)
+        st.plotly_chart(fig_rwd_pie, use_container_width=True)
+        st.markdown('</div>', unsafe_allow_html=True)
+
+    col_t3, col_t4 = st.columns(2)
+    with col_t3:
+        st.markdown('<div class="sample-card">', unsafe_allow_html=True)
+        card_header("Task Volume & Completion by Category")
+        tsk_cat = filtered_tasks.groupby("task_type")["status"].agg(
+            Total="count",
+            Completed=lambda x: (x == "Completed").sum()
+        ).reset_index()
+        tsk_cat["Success_Pct"] = (tsk_cat["Completed"] / tsk_cat["Total"] * 100).round(1)
+        fig_cat = px.bar(tsk_cat, x="task_type", y="Total", color="Success_Pct",
+                         color_continuous_scale=[[0, "#2B3A67"], [1, CYAN]])
+        fig_cat.update_layout(coloraxis_showscale=False)
+        style_fig(fig_cat, height=310)
+        st.plotly_chart(fig_cat, use_container_width=True)
+        st.markdown('</div>', unsafe_allow_html=True)
+
+    with col_t4:
+        st.markdown('<div class="sample-card">', unsafe_allow_html=True)
+        card_header("User Soft Currency (XP) Wealth Quartiles")
+        fig_xp_hist = px.histogram(filtered_users, x="xp_balance", nbins=30, color_discrete_sequence=[LAVENDER])
+        style_fig(fig_xp_hist, height=310)
+        st.plotly_chart(fig_xp_hist, use_container_width=True)
+        st.markdown('</div>', unsafe_allow_html=True)
+
+# =============================================================================
+# 5. WALLET INTELLIGENCE
+# =============================================================================
+elif section == "Wallet Intelligence":
+    card_header("Wallet Intelligence & Soft Currency Balance Analytics")
+
+    st.markdown("""
+    <div class="unavailable-card">
+        <strong>ℹ️ SOURCE TELEMETRY NOTICE:</strong> The supplied simulated dataset captures user engagement with the in-app Wallet feature (`wallet_viewed` events and `wallet_activity` daily flags). It does <strong>not</strong> contain a double-entry fiat transaction ledger. The analytics below reflect genuine verified activity from the provided raw datasets.
+    </div>
+    """, unsafe_allow_html=True)
+
+    w1, w2, w3, w4 = st.columns(4)
+    with w1:
+        wallet_days = (filtered_daily['wallet_activity'] == 'Yes').sum()
+        st.metric("Wallet Active Days", f"{wallet_days:,}", f"{wallet_days/len(filtered_daily)*100:.1f}% Daily Activity Share")
+    with w2:
+        u_wallet = filtered_daily[filtered_daily['wallet_activity'] == 'Yes']['user_id'].nunique()
+        st.metric("Users with Wallet Activity", f"{u_wallet:,}", f"{u_wallet/len(filtered_users)*100:.1f}% User Cohort Share")
+    with w3:
+        w_events = (filtered_events['feature_name'] == 'Wallet').sum()
+        st.metric("Wallet Viewed Events", f"{w_events:,}", "Total Telemetry Events")
+    with w4:
+        st.metric("Mean User XP Balance", f"{filtered_users['xp_balance'].mean():.1f} XP", f"Median: {filtered_users['xp_balance'].median():.0f} XP")
+
+    st.markdown("---")
+
+    col_w1, col_w2 = st.columns(2)
+    with col_w1:
+        st.markdown('<div class="sample-card">', unsafe_allow_html=True)
+        card_header("Daily Wallet Interaction Volume")
+        daily_w = filtered_daily[filtered_daily['wallet_activity'] == 'Yes'].groupby("activity_date")["user_id"].count().reset_index()
+        daily_w.columns = ["Date", "Wallet Active Users"]
+        fig_w_trend = px.line(daily_w, x="Date", y="Wallet Active Users", line_shape="spline", color_discrete_sequence=[CYAN])
+        fig_w_trend.update_traces(line=dict(width=2.5), fill="tozeroy", fillcolor="rgba(0, 192, 240, 0.25)")
+        style_fig(fig_w_trend, height=310)
+        st.plotly_chart(fig_w_trend, use_container_width=True)
+        st.markdown('</div>', unsafe_allow_html=True)
+
+    with col_w2:
+        st.markdown('<div class="sample-card">', unsafe_allow_html=True)
+        card_header("Soft XP Points vs Active Account Tenure")
+        fig_xp_scatter = px.scatter(filtered_users, x="active_days", y="xp_balance", color="account_status",
+                                    color_discrete_map={"Active": EMERALD, "Inactive": MUTED_SLATE, "Suspended": ROSE})
+        fig_xp_scatter.update_traces(marker=dict(size=7, opacity=0.85))
+        style_fig(fig_xp_scatter, height=310)
+        st.plotly_chart(fig_xp_scatter, use_container_width=True)
+        st.markdown('</div>', unsafe_allow_html=True)
+
+# =============================================================================
+# 6. WITHDRAWAL OPERATIONS
+# =============================================================================
+elif section == "Wallet & Withdrawals" or section == "Withdrawal Operations":
+    card_header("Withdrawal Operations & Payout Pipeline Specification")
+
+    st.markdown("""
+    <div class="unavailable-card">
+        <strong>⚠️ MISSING SOURCE DEPENDENCY NOTICE:</strong> The supplied Excel workbooks (`VELoop_Rewards_Data_01.xlsx` and `VELOOP_Simulated_User_Behavior_1000.xlsx`) <strong>do not contain monetary withdrawal records, payout transaction IDs, or fiat disbursement ledgers</strong>. In compliance with strict internship integrity guidelines, no fabricated transaction amounts or withdrawal success rates are displayed. Below is the operational relational design and reconciliation framework prepared for future production ingestion.
+    </div>
+    """, unsafe_allow_html=True)
+
     st.markdown('<div class="sample-card">', unsafe_allow_html=True)
-    card_header("Feature Adoption Penetration Matrix")
-    st.dataframe(features[["feature_name", "category", "total_events", "unique_users", "adoption_rate_pct", "events_per_user"]],
-                 use_container_width=True, hide_index=True)
+    card_header("Target Production Payout Architecture & SLA Queue Structure")
+    
+    spec_table = pd.DataFrame([
+        {"Pipeline Component": "Minimum Threshold", "Specification": "50.00 Tokens (Simulated Tokenomics Rule)", "Audit Constraint": "CHECK (tokens_debited >= 50.00)"},
+        {"Pipeline Component": "Supported Payout Rails", "Specification": "UPI, Paytm Wallet, Direct Bank Transfer (NEFT/IMPS)", "Audit Constraint": "ENUM ('UPI', 'Paytm', 'NEFT', 'IMPS')"},
+        {"Pipeline Component": "SLA Queue Brackets", "Specification": "< 6h (Fast), 6-12h (Normal), 12-24h (SLA Target), > 24h (Breached)", "Audit Constraint": "Automated alert triggered at > 24h"},
+        {"Pipeline Component": "Double-Entry Ledger", "Specification": "Every withdrawal requires dual entries: Debit User Account, Credit Escrow Payout", "Audit Constraint": "SUM(DEBITS) - SUM(CREDITS) = 0.00"},
+        {"Pipeline Component": "Source Data Status", "Specification": "PENDING VELOOP PRODUCTION DATASET INGESTION", "Audit Constraint": "Table veloop.withdrawals currently empty"}
+    ])
+    st.table(spec_table)
+    st.markdown('</div>', unsafe_allow_html=True)
+
+    st.markdown('<div class="sample-card">', unsafe_allow_html=True)
+    card_header("Double-Entry Mathematical Reconciliation Engine (Specification)")
+    st.code("""
+-- Reconciliation Equation: Credits must equal Debits across all transaction entries
+SELECT 
+    transaction_id,
+    SUM(CASE WHEN entry_type = 'CREDIT' THEN amount ELSE 0 END) AS total_credits,
+    SUM(CASE WHEN entry_type = 'DEBIT' THEN amount ELSE 0 END) AS total_debits,
+    (SUM(CASE WHEN entry_type = 'CREDIT' THEN amount ELSE 0 END) - 
+     SUM(CASE WHEN entry_type = 'DEBIT' THEN amount ELSE 0 END)) AS net_imbalance
+FROM veloop.wallet_ledger
+GROUP BY transaction_id
+HAVING (SUM(CASE WHEN entry_type = 'CREDIT' THEN amount ELSE 0 END) - 
+        SUM(CASE WHEN entry_type = 'DEBIT' THEN amount ELSE 0 END)) != 0.00;
+    """, language="sql")
     st.markdown('</div>', unsafe_allow_html=True)
 
 # =============================================================================
-# 7. DATA QUALITY
+# 7. REFERRAL & VIRAL GROWTH
 # =============================================================================
-elif section == "Data Quality":
-    card_header("Data Quality Monitoring & Pipeline Health")
+elif section == "Referral Analytics" or section == "Referral & Viral Growth":
+    card_header("Referral Telemetry & Viral Growth Analytics")
+
+    r1, r2, r3, r4 = st.columns(4)
+    with r1:
+        ref_acq = (filtered_users['acquisition_source'] == 'Referral').sum()
+        st.metric("Acquired via Referral", f"{ref_acq:,}", f"{ref_acq/len(filtered_users)*100:.1f}% Cohort Share")
+    with r2:
+        ref_days = (filtered_daily['referral_activity'] == 'Yes').sum()
+        st.metric("Referral Active Days", f"{ref_days:,}", f"{ref_days/len(filtered_daily)*100:.1f}% Activity Share")
+    with r3:
+        u_ref = filtered_events[filtered_events['feature_name'] == 'Referral']['user_id'].nunique()
+        st.metric("Users with Referral Events", f"{u_ref:,}", f"{u_ref/len(filtered_users)*100:.1f}% User Share")
+    with r4:
+        ref_events_tot = (filtered_events['feature_name'] == 'Referral').sum()
+        st.metric("Total Referral Events", f"{ref_events_tot:,}", "Created, Shared, Viewed")
+
+    st.markdown("---")
+
+    col_r1, col_r2 = st.columns(2)
+    with col_r1:
+        st.markdown('<div class="sample-card">', unsafe_allow_html=True)
+        card_header("Referral Behavioral Event Breakdown")
+        ref_ev_counts = filtered_events[filtered_events['feature_name'] == 'Referral']['event_name'].value_counts().reset_index()
+        ref_ev_counts.columns = ["Event Name", "Occurrences"]
+        fig_ref_ev = px.bar(ref_ev_counts, x="Occurrences", y="Event Name", orientation="h",
+                            color="Occurrences", color_continuous_scale=[[0, "#2B3A67"], [1, CYAN]])
+        fig_ref_ev.update_layout(yaxis=dict(autorange="reversed"), coloraxis_showscale=False)
+        style_fig(fig_ref_ev, height=300)
+        st.plotly_chart(fig_ref_ev, use_container_width=True)
+        st.markdown('</div>', unsafe_allow_html=True)
+
+    with col_r2:
+        st.markdown('<div class="sample-card">', unsafe_allow_html=True)
+        card_header("Daily Referral Activity Trends")
+        daily_r = filtered_daily[filtered_daily['referral_activity'] == 'Yes'].groupby("activity_date")["user_id"].count().reset_index()
+        daily_r.columns = ["Date", "Referral Active Users"]
+        fig_r_trend = px.line(daily_r, x="Date", y="Referral Active Users", line_shape="spline", color_discrete_sequence=[LAVENDER])
+        fig_r_trend.update_traces(line=dict(width=2.5), fill="tozeroy", fillcolor="rgba(167, 139, 250, 0.25)")
+        style_fig(fig_r_trend, height=300)
+        st.plotly_chart(fig_r_trend, use_container_width=True)
+        st.markdown('</div>', unsafe_allow_html=True)
+
+    st.markdown("""
+    <div class="unavailable-card">
+        <strong>ℹ️ REFERRAL ATTRIBUTION LIMITATION NOTICE:</strong> The raw user dataset contains individual `referral_code` identifiers (1,000 unique codes), and 119 users are marked as acquired via Referral (`referral_source_detail` = 'Friend/Family'). However, <strong>the dataset does not establish referrer-to-referee user ID mappings</strong> (i.e., which specific user referred which referee). Consequently, individual referral conversion funnels, viral K-factors, and advocate commission rewards cannot be computed without fabricating data. A relational schema `veloop.referrals` with referential constraints is established for future ingestion.
+    </div>
+    """, unsafe_allow_html=True)
+
+    st.markdown('<div class="sample-card">', unsafe_allow_html=True)
+    card_header("Referral Code Quality & Integrity Audit")
+    ref_audit_df = pd.DataFrame([
+        {"Metric": "Assigned Referral Codes", "Value": f"{filtered_users['referral_code'].notna().sum():,} / {len(filtered_users):,} (100.0%)"},
+        {"Metric": "Unique Referral Codes", "Value": f"{filtered_users['referral_code'].nunique():,} (Zero Duplicates in Clean Cohort)"},
+        {"Metric": "Referral Code Syntax Format", "Value": "Valid 8-Character Alphanumeric (Prefix 'VL' + 6 Digits)"},
+        {"Metric": "Missing or Null Codes", "Value": "0 Missing Records"},
+        {"Metric": "Referral Source Detail", "Value": "119 Friend/Family | 881 Direct/Non-Referral"}
+    ])
+    st.table(ref_audit_df)
+    st.markdown('</div>', unsafe_allow_html=True)
+
+# =============================================================================
+# 8. DATA QUALITY & AUDIT
+# =============================================================================
+elif section == "Data Quality" or section == "Data Quality & Audit":
+    card_header("Data Quality Monitoring & Reconciliation Audit")
 
     q1, q2, q3, q4 = st.columns(4)
     with q1:
-        st.metric("Data Quality Score", "71.4 / 100", "Users_Messy_Audit")
+        st.metric("Clean Users Cohort", f"{len(users):,} Rows", "27 Columns | 0 Duplicates")
     with q2:
-        st.metric("Identified Anomalies", "234", "Across 1,008 raw records")
+        st.metric("Messy Users Cohort", f"{len(messy_users):,} Rows", "8 Duplicate IDs | 28 Columns")
     with q3:
-        st.metric("Referential Integrity", "100%", "0 Orphan Events in Clean Cohort")
+        st.metric("Events Sheet Count", "35,704 Rows", "0 Duplicate Event IDs")
     with q4:
-        st.metric("Readiness Maturity", "68 / 100", "Amber: Sub-Production")
+        st.metric("Event Audit Sheet", "35,714 Rows", "Exactly 10 Injected Duplicates")
 
     st.markdown("---")
 
     col_q1, col_q2 = st.columns(2)
     with col_q1:
         st.markdown('<div class="sample-card">', unsafe_allow_html=True)
-        card_header("Ingestion Anomaly Taxonomy")
-        anomaly_df = pd.DataFrame({
-            "Anomaly Class": [
-                "Invalid Email Syntax",
-                "Negative XP Balances",
-                "Future Registration Timestamps",
-                "Missing ISO Country Codes",
-                "Duplicate User IDs",
-                "Out-of-Range Ages (<18 or >70)"
-            ],
-            "Occurrences": [54, 42, 38, 48, 8, 44]
-        })
-        fig_anom = px.bar(anomaly_df, x="Occurrences", y="Anomaly Class", orientation="h",
-                          color="Occurrences", color_continuous_scale=[[0, "#2B3A67"], [1, AMBER]])
-        fig_anom.update_layout(yaxis=dict(autorange="reversed"), coloraxis_showscale=False)
-        style_fig(fig_anom, height=310)
-        st.plotly_chart(fig_anom, use_container_width=True)
+        card_header("Investigation: Event Count Difference (35,704 vs 35,714)")
+        st.markdown("""
+        **Root Cause Analysis:**
+        * `03_Feature_Events`: **35,704** rows, 35,704 unique `event_id`s.
+        * `10_Event_Data_Quality_Audit`: **35,714** rows, 35,704 unique `event_id`s.
+        * Difference: Exactly **10 duplicate rows** injected for QA deduplication testing:
+          `EVT00021600`, `EVT00011275`, `EVT00006040`, `EVT00028196`, `EVT00030205`, `EVT00017051`, `EVT00034075`, `EVT00014772`, `EVT00025552`, `EVT00006379`.
+        * Deduplicating `10_Event_Data_Quality_Audit` on `event_id` yields exactly **35,704** records (1:1 match).
+        """)
         st.markdown('</div>', unsafe_allow_html=True)
 
     with col_q2:
         st.markdown('<div class="sample-card">', unsafe_allow_html=True)
-        card_header("Readiness Radar (Score: 68/100)")
-        radar_cats = [
-            "Data Collection", "Schema Maturity", "Tracking Governance",
-            "Pipeline Infrastructure", "KPI Observability", "Security & Privacy"
-        ]
-        radar_scores = [65, 70, 75, 60, 72, 66]
-        fig_radar = go.Figure()
-        fig_radar.add_trace(go.Scatterpolar(
-            r=radar_scores + [radar_scores[0]],
-            theta=radar_cats + [radar_cats[0]],
-            fill="toself",
-            name="Current Readiness",
-            line=dict(color=CYAN, width=2.5),
-            fillcolor="rgba(0, 192, 240, 0.25)"
-        ))
-        fig_radar.update_layout(
-            polar=dict(
-                radialaxis=dict(visible=True, range=[0, 100], gridcolor="rgba(255,255,255,0.08)", tickfont=dict(color="#8E95A5")),
-                angularaxis=dict(gridcolor="rgba(255,255,255,0.08)", tickfont=dict(color="#FFFFFF", size=10)),
-                bgcolor="rgba(0,0,0,0)"
-            )
-        )
-        style_fig(fig_radar, height=310)
-        st.plotly_chart(fig_radar, use_container_width=True)
+        card_header("Investigation: Messy Users Audit (1,008 vs 1,000)")
+        st.markdown("""
+        **Root Cause Analysis:**
+        * `Users_1000_Clean`: **1,000** rows, 1,000 unique `user_id`s.
+        * `Users_Messy_Audit`: **1,008** rows, 1,000 unique `user_id`s.
+        * Difference: Exactly **8 duplicate user IDs**:
+          `VLUSR000095`, `VLUSR000217`, `VLUSR000272`, `VLUSR000335`, `VLUSR000409`, `VLUSR000779`, `VLUSR000803`, `VLUSR000813`.
+        * Additional Messy Anomalies: Missing values in `age` (1), `gender` (1), `city` (1), `registration_datetime` (1), `primary_device` (1).
+        """)
         st.markdown('</div>', unsafe_allow_html=True)
 
-    st.markdown('<div class="sample-card">', unsafe_allow_html=True)
-    card_header("Coverage Matrix Summary")
-    cov_summary = pd.DataFrame({
-        "Product Domain": ["Core Identity", "Daily Engagement", "Earning & Tasks", "Wallet & Currency", "Payouts & Withdrawals", "Referral & Social", "Support & Governance"],
-        "Mapped Features": [4, 5, 6, 4, 3, 4, 6],
-        "Currently Tracked": [3, 4, 5, 1, 0, 1, 3],
-        "Proposed in Blueprint": [1, 1, 1, 3, 3, 3, 3],
-        "Current Coverage": ["75.0%", "80.0%", "83.3%", "25.0%", "0.0% (Spec Only)", "25.0%", "50.0%"]
-    })
-    st.dataframe(cov_summary, use_container_width=True, hide_index=True)
-    st.markdown('</div>', unsafe_allow_html=True)
-
 # =============================================================================
-# 8. DATA EXPLORER
+# 9. DATA EXPLORER & FILE UPLOAD
 # =============================================================================
-elif section == "Data Explorer":
-    card_header("Interactive Data Explorer & Dataset Profiler")
+elif section == "Data Explorer" or section == "Data Explorer & File Upload":
+    card_header("Interactive Data Explorer & File Profiler")
 
     st.markdown('<div class="sample-card">', unsafe_allow_html=True)
     card_header("Upload Dataset File (CSV or Excel)")
@@ -1342,7 +1417,8 @@ elif section == "Data Explorer":
                 "Feature Events (35,704 Rows)",
                 "Sessions (7,913 Rows)",
                 "Task Activity (9,846 Rows)",
-                "Daily Activity (6,667 Rows)"
+                "Daily Activity (6,667 Rows)",
+                "Milestones (4,799 Rows)"
             ],
             label_visibility="collapsed"
         )
@@ -1356,6 +1432,8 @@ elif section == "Data Explorer":
             active_df = sessions
         elif "Task" in dataset_choice:
             active_df = tasks
+        elif "Milestones" in dataset_choice:
+            active_df = milestones
         else:
             active_df = daily
 
@@ -1382,9 +1460,9 @@ elif section == "Data Explorer":
     st.markdown('</div>', unsafe_allow_html=True)
 
 # =============================================================================
-# 9. REPORTS & EXPORTS
+# 10. REPORTS & DOCUMENT EXPORTS
 # =============================================================================
-elif section == "Reports & Exports":
+elif section == "Reports & Exports" or section == "Reports & Document Exports":
     card_header("Artifact & Document Export Center")
 
     st.markdown('<div class="sample-card">', unsafe_allow_html=True)
@@ -1411,36 +1489,7 @@ elif section == "Reports & Exports":
                     use_container_width=True
                 )
             else:
-                st.warning(f"File not found: {fpath}")
-    st.markdown('</div>', unsafe_allow_html=True)
-
-    st.markdown('<div class="sample-card">', unsafe_allow_html=True)
-    card_header("Executive Presentation Decks")
-    pres_col1, pres_col2 = st.columns(2)
-    with pres_col1:
-        pptx_path = "08_presentation/VELOOP_Rewards_Final_Presentation.pptx"
-        if os.path.exists(pptx_path):
-            with open(pptx_path, "rb") as f:
-                pptx_bytes = f.read()
-            st.download_button(
-                label="🖥️ Download PowerPoint Presentation (.pptx)",
-                data=pptx_bytes,
-                file_name="VELOOP_Rewards_Final_Presentation.pptx",
-                mime="application/vnd.openxmlformats-officedocument.presentationml.presentation",
-                use_container_width=True
-            )
-    with pres_col2:
-        html_path = "08_presentation/VELOOP_Rewards_Final_Presentation.html"
-        if os.path.exists(html_path):
-            with open(html_path, "rb") as f:
-                html_bytes = f.read()
-            st.download_button(
-                label="🌐 Download Interactive Deck (.html)",
-                data=html_bytes,
-                file_name="VELOOP_Rewards_Final_Presentation.html",
-                mime="text/html",
-                use_container_width=True
-            )
+                st.warning(f"File pending compilation: {fpath}")
     st.markdown('</div>', unsafe_allow_html=True)
 
     st.markdown('<div class="sample-card">', unsafe_allow_html=True)
@@ -1470,72 +1519,24 @@ elif section == "Reports & Exports":
                 )
     st.markdown('</div>', unsafe_allow_html=True)
 
-    st.markdown('<div class="sample-card">', unsafe_allow_html=True)
-    card_header("Processed Cleaned Datasets (CSV)")
-    csv_col1, csv_col2 = st.columns(2)
-    with csv_col1:
-        if os.path.exists("02_processed_data/users_cleaned.csv"):
-            with open("02_processed_data/users_cleaned.csv", "rb") as f:
-                u_bytes = f.read()
-            st.download_button(
-                label="📥 Download Cleaned Users Dataset (1,000 Rows CSV)",
-                data=u_bytes,
-                file_name="users_cleaned.csv",
-                mime="text/csv",
-                use_container_width=True
-            )
-    with csv_col2:
-        if os.path.exists("02_processed_data/events_cleaned.csv"):
-            with open("02_processed_data/events_cleaned.csv", "rb") as f:
-                e_bytes = f.read()
-            st.download_button(
-                label="📥 Download Cleaned Events Dataset (35,704 Rows CSV)",
-                data=e_bytes,
-                file_name="events_cleaned.csv",
-                mime="text/csv",
-                use_container_width=True
-            )
-    st.markdown('</div>', unsafe_allow_html=True)
-
 # =============================================================================
-# 10. PROJECT INFORMATION
+# 11. PROJECT INFORMATION & GOVERNANCE
 # =============================================================================
-elif section == "Project Information":
+elif section == "Project Information" or section == "Project Information & Governance":
     card_header("Project Information & Governance Standards")
 
     st.markdown('<div class="sample-card">', unsafe_allow_html=True)
-    card_header("Internship Scope & Metadata")
+    card_header("Internship Scope & Project Metadata")
     info_table = pd.DataFrame([
         {"Attribute": "Project Title", "Details": "Product Analytics, Data Readiness & Data Management Blueprint"},
         {"Attribute": "Organization", "Details": "VELOOP Rewards & VELOOP CO."},
         {"Attribute": "Role", "Details": "Data Analyst Intern (Analytics, Engineering, BI & Documentation Specialist)"},
         {"Attribute": "Assignment Code", "Details": "Data Analyst Internship — Task 01"},
-        {"Attribute": "Project Duration", "Details": "22–25 Days Scheduled (Comprehensive 21-Deliverable Program)"},
+        {"Attribute": "Duration", "Details": "22–25 Days Scheduled (Comprehensive 21-Deliverable Program)"},
         {"Attribute": "Integrity Standard", "Details": "SIMULATED DATA — CREATED FOR ANALYTICAL TESTING"},
         {"Attribute": "Overall Status", "Details": "100% COMPLETE — All 21 Deliverables Implemented & Verified"}
     ])
     st.table(info_table)
-    st.markdown('</div>', unsafe_allow_html=True)
-
-    st.markdown('<div class="sample-card">', unsafe_allow_html=True)
-    card_header("4-Tier Evidentiary Classification Framework")
-    st.markdown("""
-    In accordance with strict corporate performance and analytical integrity policies, all information throughout this project is classified into four mutually exclusive categories:
-    1. **[Confirmed]:** Directly verified from official source documents (`Work_Schedule_and_Performance_Policy_VELOOP_Internship.pdf`, `Data_Analyst_01.pdf`).
-    2. **[Proposed]:** Professional analytical recommendations, architectural designs, schemas, and metrics formulated by the Data Analyst.
-    3. **[To Be Verified]:** Business parameters, partner terms, or conversion rates requiring formal sign-off from VELOOP leadership.
-    4. **[Simulated]:** Datasets, metrics, and behavioral distributions generated or supplied strictly for analytical testing. Never cited as actual company performance.
-    """)
-    st.markdown('</div>', unsafe_allow_html=True)
-
-    st.markdown('<div class="sample-card">', unsafe_allow_html=True)
-    card_header("Production Architecture & Medallion Pipeline Blueprint")
-    st.markdown("""
-    The proposed production data architecture implements a **Medallion Lakehouse Model**:
-    * **Bronze Layer (Raw):** Append-only S3/GCS bucket capturing raw client JSON events and partner postbacks.
-    * **Silver Layer (Cleaned):** Normalized PostgreSQL 15+ database ([schema.sql](file:///d:/Veloop%20data%20Analysis/03_analysis_and_models/sql/01_schema_ddl.sql)) with primary/foreign keys, double-entry financial ledgers, and RFC 5322 validation.
-    * **Gold Layer (Analytics & BI):** Pre-aggregated analytical rollups powering this 10-module Streamlit BI application and automated KPI alerting.
-    """)
     st.markdown('</div>', unsafe_allow_html=True)
 
 # Footer

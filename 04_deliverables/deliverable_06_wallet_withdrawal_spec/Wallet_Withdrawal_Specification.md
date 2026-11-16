@@ -236,3 +236,19 @@ The 10 mandatory withdrawal KPIs are formally defined below:
 * **Business Purpose:** Guides payment gateway commercial negotiations and identifies user channel preferences.
 * **Limitation:** Influenced by platform UI placement and minimum threshold differences across payment channels.
 
+---
+
+## 5. Source Data Provenance & Production Implementation Notice
+
+> [!WARNING]
+> **Data Authenticity Notice (`SIMULATED DATA — CREATED FOR ANALYTICAL TESTING`):**
+> In the supplied raw workbooks (`VELoop_Rewards_Data_01.xlsx` and `VELOOP_Simulated_User_Behavior_1000.xlsx`), **no financial transaction records, withdrawal payouts, or payment gateway tables exist**.
+> 
+> * **Available Observed Telemetry:** The supplied data provides:
+>   1. User-level static soft balance: `xp_balance` in `Users_1000_Clean` (mean: ~1,566 XP).
+>   2. Daily user engagement flag: `wallet_activity = 'Yes'` on 1,686 user-days out of 6,667 (25.3%) in `04_Daily_Activity`.
+>   3. Feature events: 2,172 `wallet_viewed` events logged across 810 distinct users in `03_Feature_Events`.
+> * **Zero Fabricated Financials Policy:** Under strict Data Authenticity rules, no fake fiat currencies, fake cash balances, or simulated withdrawal requests (such as ₹125,000 in payouts) have been fabricated in this analysis.
+> * **Production Implementation Blueprint:** The relational schemas `wallet_accounts`, `wallet_ledger`, and `withdrawals` specified in Section 2 & 3, alongside the PostgreSQL double-entry reconciliation queries in `03_analysis_and_models/sql/04_wallet_and_withdrawal_analytics.sql`, provide the engineering-ready blueprint for platform deployment.
+
+

@@ -1,202 +1,259 @@
 -- =============================================================================
--- VELOOP REWARDS — PRODUCT ANALYTICS & LOGICAL DATA MODEL (DDL)
--- Work Package H & Deliverable 10
--- Integrity Policy: SIMULATED DATA — CREATED FOR ANALYTICAL TESTING
+-- VELOOP REWARDS — PRODUCT ANALYTICS & RELATIONAL SCHEMA DDL
 -- Dialect: PostgreSQL 15+
+-- Integrity Policy: SIMULATED DATA — CREATED FOR ANALYTICAL TESTING
+-- Document: Deliverable 10 | Logical Data Model & Physical DDL
 -- =============================================================================
 
 CREATE SCHEMA IF NOT EXISTS veloop;
 SET search_path TO veloop, public;
 
 -- -----------------------------------------------------------------------------
--- 1. USERS & ACCOUNT IDENTITY
+-- 1. CORE IDENTITY: USERS
+-- Mapped from original worksheet Users_1000_Clean (1,000 records)
 -- -----------------------------------------------------------------------------
 CREATE TABLE IF NOT EXISTS users (
-    user_id VARCHAR(64) PRIMARY KEY,
-    username VARCHAR(100) NOT NULL UNIQUE,
+    user_id VARCHAR(32) PRIMARY KEY,
+    full_name VARCHAR(150) NOT NULL,
     email VARCHAR(255) NOT NULL UNIQUE,
-    registration_datetime TIMESTAMPTZ NOT NULL,
     age INT CHECK (age >= 18 AND age <= 100),
-    gender VARCHAR(20) CHECK (gender IN ('Male', 'Female', 'Other', 'Prefer Not to Say')),
-    country CHAR(2) NOT NULL,
-    platform VARCHAR(20) NOT NULL CHECK (platform IN ('Android', 'iOS', 'Web')),
-    app_version VARCHAR(20) NOT NULL,
-    account_status VARCHAR(20) NOT NULL DEFAULT 'Active' CHECK (account_status IN ('Active', 'Inactive', 'Suspended', 'Deleted')),
-    email_verified BOOLEAN NOT NULL DEFAULT FALSE,
-    phone_verified BOOLEAN NOT NULL DEFAULT FALSE,
-    xp_balance INT NOT NULL DEFAULT 0 CHECK (xp_balance >= 0),
-    gems_balance INT NOT NULL DEFAULT 0 CHECK (gems_balance >= 0),
-    tokens_balance NUMERIC(12, 2) NOT NULL DEFAULT 0.00 CHECK (tokens_balance >= 0),
-    daily_streak INT NOT NULL DEFAULT 0 CHECK (daily_streak >= 0),
-    active_days INT NOT NULL DEFAULT 1 CHECK (active_days >= 1),
+    gender VARCHAR(20) CHECK (gender IN ('Male', 'Female', 'Other', 'Prefer not to say')),
+    state VARCHAR(100),
+    city VARCHAR(100),
+    registration_datetime TIMESTAMPTZ NOT NULL,
     acquisition_source VARCHAR(50) NOT NULL,
-    created_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP
+    referral_source_detail VARCHAR(100),
+    primary_device VARCHAR(30) NOT NULL,
+    platform VARCHAR(20) NOT NULL,
+    account_status VARCHAR(20) NOT NULL DEFAULT 'Active' CHECK (account_status IN ('Active', 'Inactive', 'Suspended', 'Deleted')),
+    email_verification_status VARCHAR(20) NOT NULL DEFAULT 'Pending' CHECK (email_verification_status IN ('Verified', 'Pending', 'Unverified')),
+    onboarding_status VARCHAR(20) NOT NULL DEFAULT 'Incomplete' CHECK (onboarding_status IN ('Completed', 'Incomplete', 'Skipped')),
+    last_login_datetime TIMESTAMPTZ,
+    lifetime_sessions INT NOT NULL DEFAULT 0 CHECK (lifetime_sessions >= 0),
+    active_days INT NOT NULL DEFAULT 1 CHECK (active_days >= 0),
+    xp_balance INT NOT NULL DEFAULT 0 CHECK (xp_balance >= 0),
+    referral_code VARCHAR(32) NOT NULL UNIQUE,
+    days_since_registration INT NOT NULL DEFAULT 0 CHECK (days_since_registration >= 0),
+    is_active_7d BOOLEAN NOT NULL DEFAULT FALSE,
+    is_active_30d BOOLEAN NOT NULL DEFAULT FALSE,
+    consent_status VARCHAR(20) NOT NULL DEFAULT 'Granted',
+    marketing_opt_in BOOLEAN NOT NULL DEFAULT FALSE,
+    account_created_via VARCHAR(50),
+    country CHAR(2) NOT NULL DEFAULT 'IN',
+    created_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
 
-CREATE INDEX IF NOT EXISTS idx_users_account_status ON users(account_status);
+CREATE INDEX IF NOT EXISTS idx_users_status ON users(account_status);
 CREATE INDEX IF NOT EXISTS idx_users_platform ON users(platform);
-CREATE INDEX IF NOT EXISTS idx_users_registration_dt ON users(registration_datetime);
+CREATE INDEX IF NOT EXISTS idx_users_device ON users(primary_device);
+CREATE INDEX IF NOT EXISTS idx_users_reg_dt ON users(registration_datetime);
+CREATE INDEX IF NOT EXISTS idx_users_acq_source ON users(acquisition_source);
 
 -- -----------------------------------------------------------------------------
--- 2. USER SESSIONS
+-- 2. ENGAGEMENT: SESSIONS
+-- Mapped from original worksheet 02_Sessions (7,913 records)
 -- -----------------------------------------------------------------------------
 CREATE TABLE IF NOT EXISTS sessions (
-    session_id VARCHAR(64) PRIMARY KEY,
-    user_id VARCHAR(64) NOT NULL REFERENCES users(user_id) ON DELETE CASCADE,
+    session_id VARCHAR(32) PRIMARY KEY,
+    user_id VARCHAR(32) NOT NULL,
     session_start TIMESTAMPTZ NOT NULL,
     session_end TIMESTAMPTZ,
-    session_duration_minutes NUMERIC(8, 2) CHECK (session_duration_minutes >= 0),
-    events_count INT NOT NULL DEFAULT 0 CHECK (events_count >= 0),
-    device_model VARCHAR(100),
-    os_version VARCHAR(50),
-    ip_hash VARCHAR(64),
-    created_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP
+    session_duration_seconds INT CHECK (session_duration_seconds >= 0),
+    device VARCHAR(30) NOT NULL,
+    platform VARCHAR(20) NOT NULL,
+    entry_point VARCHAR(50),
+    exit_feature VARCHAR(50),
+    events_in_session INT NOT NULL DEFAULT 0 CHECK (events_in_session >= 0),
+    features_used_count INT NOT NULL DEFAULT 0 CHECK (features_used_count >= 0),
+    session_status VARCHAR(20) NOT NULL DEFAULT 'Completed' CHECK (session_status IN ('Completed', 'Abandoned', 'Timeout', 'Active')),
+    created_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    CONSTRAINT fk_sessions_user FOREIGN KEY (user_id) REFERENCES users(user_id) ON DELETE CASCADE
 );
 
 CREATE INDEX IF NOT EXISTS idx_sessions_user_id ON sessions(user_id);
 CREATE INDEX IF NOT EXISTS idx_sessions_start ON sessions(session_start);
 
 -- -----------------------------------------------------------------------------
--- 3. BEHAVIORAL FEATURE EVENTS
+-- 3. BEHAVIORAL TELEMETRY: FEATURE_EVENTS
+-- Mapped from original worksheet 03_Feature_Events (35,704 records)
 -- -----------------------------------------------------------------------------
 CREATE TABLE IF NOT EXISTS feature_events (
-    event_id VARCHAR(64) PRIMARY KEY,
-    session_id VARCHAR(64) REFERENCES sessions(session_id) ON DELETE SET NULL,
-    user_id VARCHAR(64) NOT NULL REFERENCES users(user_id) ON DELETE CASCADE,
-    event_name VARCHAR(100) NOT NULL,
-    feature_name VARCHAR(100) NOT NULL,
+    event_id VARCHAR(32) PRIMARY KEY,
+    user_id VARCHAR(32) NOT NULL,
+    session_id VARCHAR(32) NOT NULL,
     event_datetime TIMESTAMPTZ NOT NULL,
-    status VARCHAR(20) NOT NULL CHECK (status IN ('Started', 'Completed', 'Failed', 'Cancelled')),
-    properties JSONB DEFAULT '{}'::jsonb,
-    created_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP
+    feature_name VARCHAR(50) NOT NULL,
+    action_type VARCHAR(50) NOT NULL,
+    event_status VARCHAR(20) NOT NULL CHECK (event_status IN ('Success', 'Failed', 'Cancelled', 'Incomplete')),
+    xp_earned INT NOT NULL DEFAULT 0 CHECK (xp_earned >= 0),
+    event_duration_seconds INT CHECK (event_duration_seconds >= 0),
+    device VARCHAR(30) NOT NULL,
+    platform VARCHAR(20) NOT NULL,
+    network_type VARCHAR(20),
+    sequence_number INT NOT NULL DEFAULT 1 CHECK (sequence_number >= 1),
+    created_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    CONSTRAINT fk_events_user FOREIGN KEY (user_id) REFERENCES users(user_id) ON DELETE CASCADE,
+    CONSTRAINT fk_events_session FOREIGN KEY (session_id) REFERENCES sessions(session_id) ON DELETE CASCADE
 );
 
-CREATE INDEX IF NOT EXISTS idx_events_user_feature ON feature_events(user_id, feature_name);
+CREATE INDEX IF NOT EXISTS idx_events_user_id ON feature_events(user_id);
+CREATE INDEX IF NOT EXISTS idx_events_session_id ON feature_events(session_id);
+CREATE INDEX IF NOT EXISTS idx_events_feature ON feature_events(feature_name);
 CREATE INDEX IF NOT EXISTS idx_events_datetime ON feature_events(event_datetime);
-CREATE INDEX IF NOT EXISTS idx_events_name ON feature_events(event_name);
+CREATE INDEX IF NOT EXISTS idx_events_action ON feature_events(action_type);
 
 -- -----------------------------------------------------------------------------
--- 4. TASK CATALOG & TASK EXECUTION
+-- 4. DAILY USER ACTIVITY ROLLUPS: DAILY_ACTIVITY
+-- Mapped from original worksheet 04_Daily_Activity (6,667 records)
 -- -----------------------------------------------------------------------------
-CREATE TABLE IF NOT EXISTS task_catalog (
-    task_id VARCHAR(64) PRIMARY KEY,
-    task_name VARCHAR(150) NOT NULL,
-    task_type VARCHAR(50) NOT NULL,
-    partner_id VARCHAR(64) NOT NULL,
-    payout_xp INT NOT NULL CHECK (payout_xp >= 0),
-    payout_gems INT NOT NULL DEFAULT 0,
-    estimated_duration_seconds INT CHECK (estimated_duration_seconds > 0),
-    is_active BOOLEAN NOT NULL DEFAULT TRUE,
-    created_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP
+CREATE TABLE IF NOT EXISTS daily_activity (
+    activity_id BIGSERIAL PRIMARY KEY,
+    user_id VARCHAR(32) NOT NULL,
+    activity_date DATE NOT NULL,
+    active_flag VARCHAR(5) NOT NULL DEFAULT 'Yes' CHECK (active_flag IN ('Yes', 'No')),
+    sessions_count INT NOT NULL DEFAULT 0 CHECK (sessions_count >= 0),
+    events_count INT NOT NULL DEFAULT 0 CHECK (events_count >= 0),
+    features_accessed_count INT NOT NULL DEFAULT 0 CHECK (features_accessed_count >= 0),
+    total_duration_minutes NUMERIC(8, 2) NOT NULL DEFAULT 0.0 CHECK (total_duration_minutes >= 0.0),
+    daily_reward_claimed VARCHAR(5) NOT NULL DEFAULT 'No' CHECK (daily_reward_claimed IN ('Yes', 'No')),
+    streak_activity VARCHAR(5) NOT NULL DEFAULT 'No' CHECK (streak_activity IN ('Yes', 'No')),
+    tasks_started INT NOT NULL DEFAULT 0 CHECK (tasks_started >= 0),
+    tasks_completed INT NOT NULL DEFAULT 0 CHECK (tasks_completed >= 0),
+    spin_activity VARCHAR(5) NOT NULL DEFAULT 'No' CHECK (spin_activity IN ('Yes', 'No')),
+    mining_activity VARCHAR(5) NOT NULL DEFAULT 'No' CHECK (mining_activity IN ('Yes', 'No')),
+    referral_activity VARCHAR(5) NOT NULL DEFAULT 'No' CHECK (referral_activity IN ('Yes', 'No')),
+    wallet_activity VARCHAR(5) NOT NULL DEFAULT 'No' CHECK (wallet_activity IN ('Yes', 'No')),
+    daily_xp_earned INT NOT NULL DEFAULT 0 CHECK (daily_xp_earned >= 0),
+    created_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    CONSTRAINT uq_user_activity_date UNIQUE (user_id, activity_date),
+    CONSTRAINT fk_daily_user FOREIGN KEY (user_id) REFERENCES users(user_id) ON DELETE CASCADE
 );
 
+CREATE INDEX IF NOT EXISTS idx_daily_user_id ON daily_activity(user_id);
+CREATE INDEX IF NOT EXISTS idx_daily_date ON daily_activity(activity_date);
+CREATE INDEX IF NOT EXISTS idx_daily_active_flag ON daily_activity(active_flag);
+
+-- -----------------------------------------------------------------------------
+-- 5. EARNINGS & TASKS: TASK_ACTIVITY
+-- Mapped from original worksheet 05_Task_Activity (9,846 records)
+-- -----------------------------------------------------------------------------
 CREATE TABLE IF NOT EXISTS task_activity (
-    task_activity_id VARCHAR(64) PRIMARY KEY,
-    task_id VARCHAR(64) NOT NULL REFERENCES task_catalog(task_id) ON DELETE RESTRICT,
-    user_id VARCHAR(64) NOT NULL REFERENCES users(user_id) ON DELETE CASCADE,
-    status VARCHAR(30) NOT NULL CHECK (status IN ('Viewed', 'Started', 'Completed', 'Failed', 'Abandoned')),
-    task_viewed_at TIMESTAMPTZ NOT NULL,
-    task_started_at TIMESTAMPTZ,
-    task_completed_at TIMESTAMPTZ,
+    activity_id VARCHAR(32) PRIMARY KEY,
+    user_id VARCHAR(32) NOT NULL,
+    task_id VARCHAR(32) NOT NULL,
+    task_name VARCHAR(100) NOT NULL,
+    category VARCHAR(50) NOT NULL,
+    started_datetime TIMESTAMPTZ NOT NULL,
+    completed_datetime TIMESTAMPTZ,
+    task_status VARCHAR(20) NOT NULL CHECK (task_status IN ('Completed', 'Abandoned', 'Failed', 'Pending')),
+    reward_points_allocated INT NOT NULL DEFAULT 0 CHECK (reward_points_allocated >= 0),
+    reward_status VARCHAR(20) NOT NULL CHECK (reward_status IN ('Credited', 'Not Credited', 'Pending')),
     duration_seconds INT CHECK (duration_seconds >= 0),
-    partner_callback_status VARCHAR(30) CHECK (partner_callback_status IN ('Pending', 'Verified', 'Rejected')),
-    created_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP
+    device VARCHAR(30) NOT NULL,
+    created_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    CONSTRAINT fk_tasks_user FOREIGN KEY (user_id) REFERENCES users(user_id) ON DELETE CASCADE
 );
 
-CREATE INDEX IF NOT EXISTS idx_task_activity_user ON task_activity(user_id);
-CREATE INDEX IF NOT EXISTS idx_task_activity_status ON task_activity(status);
+CREATE INDEX IF NOT EXISTS idx_tasks_user_id ON task_activity(user_id);
+CREATE INDEX IF NOT EXISTS idx_tasks_category ON task_activity(category);
+CREATE INDEX IF NOT EXISTS idx_tasks_status ON task_activity(task_status);
+CREATE INDEX IF NOT EXISTS idx_tasks_reward_status ON task_activity(reward_status);
 
 -- -----------------------------------------------------------------------------
--- 5. REWARDS LEDGER
+-- 6. PROGRESSION & GAMIFICATION: MILESTONES
+-- Mapped from original worksheet 06_Milestones (4,799 records)
 -- -----------------------------------------------------------------------------
-CREATE TABLE IF NOT EXISTS rewards_ledger (
-    reward_id VARCHAR(64) PRIMARY KEY,
-    user_id VARCHAR(64) NOT NULL REFERENCES users(user_id) ON DELETE CASCADE,
-    task_activity_id VARCHAR(64) REFERENCES task_activity(task_activity_id) ON DELETE SET NULL,
-    reward_type VARCHAR(30) NOT NULL CHECK (reward_type IN ('XP', 'GEMS', 'TOKENS')),
-    amount NUMERIC(12, 2) NOT NULL CHECK (amount > 0),
-    source_feature VARCHAR(50) NOT NULL,
-    verification_status VARCHAR(30) NOT NULL CHECK (verification_status IN ('Credited', 'Pending', 'Under_Review', 'Reversed')),
-    credited_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP
+CREATE TABLE IF NOT EXISTS milestones (
+    milestone_id VARCHAR(32) PRIMARY KEY,
+    user_id VARCHAR(32) NOT NULL,
+    milestone_type VARCHAR(50) NOT NULL,
+    milestone_name VARCHAR(100) NOT NULL,
+    achieved_datetime TIMESTAMPTZ NOT NULL,
+    bonus_xp INT NOT NULL DEFAULT 0 CHECK (bonus_xp >= 0),
+    created_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    CONSTRAINT fk_milestones_user FOREIGN KEY (user_id) REFERENCES users(user_id) ON DELETE CASCADE
 );
 
-CREATE INDEX IF NOT EXISTS idx_rewards_user ON rewards_ledger(user_id);
-CREATE INDEX IF NOT EXISTS idx_rewards_status ON rewards_ledger(verification_status);
+CREATE INDEX IF NOT EXISTS idx_milestones_user ON milestones(user_id);
+CREATE INDEX IF NOT EXISTS idx_milestones_type ON milestones(milestone_type);
 
 -- -----------------------------------------------------------------------------
--- 6. WALLET TRANSACTIONS
+-- 7. WALLET ACCOUNTS (FUTURE DOUBLE-ENTRY LEDGER DESIGN)
 -- -----------------------------------------------------------------------------
-CREATE TABLE IF NOT EXISTS wallet_transactions (
-    transaction_id VARCHAR(64) PRIMARY KEY,
-    user_id VARCHAR(64) NOT NULL REFERENCES users(user_id) ON DELETE CASCADE,
-    currency VARCHAR(20) NOT NULL CHECK (currency IN ('XP', 'GEMS', 'TOKENS')),
-    transaction_type VARCHAR(30) NOT NULL CHECK (transaction_type IN ('Credit', 'Debit', 'Escrow_Hold', 'Reversal')),
-    amount NUMERIC(12, 2) NOT NULL CHECK (amount > 0),
-    balance_after NUMERIC(12, 2) NOT NULL CHECK (balance_after >= 0),
-    reference_entity VARCHAR(50) NOT NULL,
+CREATE TABLE IF NOT EXISTS wallet_accounts (
+    account_id VARCHAR(64) PRIMARY KEY,
+    user_id VARCHAR(32) NOT NULL,
+    currency_code VARCHAR(10) NOT NULL CHECK (currency_code IN ('XP', 'GEMS', 'TOKENS', 'INR')),
+    account_type VARCHAR(20) NOT NULL CHECK (account_type IN ('USER_AVAILABLE', 'USER_LOCKED', 'SYSTEM_LIABILITY', 'RESERVE_CASH')),
+    current_balance NUMERIC(14, 2) NOT NULL DEFAULT 0.00 CHECK (current_balance >= 0.00),
+    status VARCHAR(20) NOT NULL DEFAULT 'ACTIVE' CHECK (status IN ('ACTIVE', 'FROZEN', 'CLOSED')),
+    updated_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    CONSTRAINT uq_user_currency_acctype UNIQUE (user_id, currency_code, account_type),
+    CONSTRAINT fk_wallet_user FOREIGN KEY (user_id) REFERENCES users(user_id) ON DELETE CASCADE
+);
+
+CREATE INDEX IF NOT EXISTS idx_wallet_user_id ON wallet_accounts(user_id);
+
+-- -----------------------------------------------------------------------------
+-- 8. IMMUTABLE WALLET LEDGER (DOUBLE-ENTRY ACCOUNTING)
+-- -----------------------------------------------------------------------------
+CREATE TABLE IF NOT EXISTS wallet_ledger (
+    entry_id BIGSERIAL PRIMARY KEY,
+    transaction_id VARCHAR(64) NOT NULL,
+    account_id VARCHAR(64) NOT NULL,
+    entry_type VARCHAR(10) NOT NULL CHECK (entry_type IN ('DEBIT', 'CREDIT')),
+    amount NUMERIC(14, 2) NOT NULL CHECK (amount > 0.00),
+    balance_after NUMERIC(14, 2) NOT NULL CHECK (balance_after >= 0.00),
+    reference_type VARCHAR(50) NOT NULL CHECK (reference_type IN ('TASK_REWARD', 'DAILY_CHECKIN', 'WITHDRAWAL', 'REFERRAL_BONUS', 'ADMIN_ADJUSTMENT')),
     reference_id VARCHAR(64) NOT NULL,
-    status VARCHAR(20) NOT NULL CHECK (status IN ('Settled', 'Pending', 'Failed', 'Cancelled')),
-    created_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP
+    narration TEXT,
+    created_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    CONSTRAINT fk_ledger_account FOREIGN KEY (account_id) REFERENCES wallet_accounts(account_id) ON DELETE RESTRICT
 );
 
-CREATE INDEX IF NOT EXISTS idx_wallet_user_currency ON wallet_transactions(user_id, currency);
+CREATE INDEX IF NOT EXISTS idx_ledger_tx ON wallet_ledger(transaction_id);
+CREATE INDEX IF NOT EXISTS idx_ledger_acc ON wallet_ledger(account_id);
 
 -- -----------------------------------------------------------------------------
--- 7. WITHDRAWALS PIPELINE
+-- 9. WITHDRAWALS PIPELINE (FUTURE MONETARY PAYOUT DESIGN)
 -- -----------------------------------------------------------------------------
 CREATE TABLE IF NOT EXISTS withdrawals (
     withdrawal_id VARCHAR(64) PRIMARY KEY,
-    user_id VARCHAR(64) NOT NULL REFERENCES users(user_id) ON DELETE CASCADE,
-    tokens_amount NUMERIC(12, 2) NOT NULL CHECK (tokens_amount >= 50.00),
+    user_id VARCHAR(32) NOT NULL,
+    tokens_debited NUMERIC(14, 2) NOT NULL CHECK (tokens_debited >= 50.00),
     fiat_currency CHAR(3) NOT NULL DEFAULT 'INR',
-    fiat_amount NUMERIC(12, 2) NOT NULL CHECK (fiat_amount > 0),
-    payout_method VARCHAR(30) NOT NULL CHECK (payout_method IN ('UPI', 'Paytm', 'Bank_Transfer', 'PayPal')),
-    payout_destination_mask VARCHAR(100) NOT NULL,
-    status VARCHAR(30) NOT NULL CHECK (status IN ('Requested', 'Processing', 'Completed', 'Rejected', 'Reversed')),
+    fiat_amount NUMERIC(12, 2) NOT NULL CHECK (fiat_amount > 0.00),
+    payout_rail VARCHAR(30) NOT NULL CHECK (payout_rail IN ('UPI', 'Paytm', 'NEFT', 'IMPS')),
+    beneficiary_account_masked VARCHAR(100) NOT NULL,
+    status VARCHAR(30) NOT NULL DEFAULT 'Requested' CHECK (status IN ('Requested', 'Processing', 'Settled', 'Rejected', 'Reversed')),
     requested_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
     processed_at TIMESTAMPTZ,
-    settlement_reference VARCHAR(100),
-    rejection_reason VARCHAR(255)
+    payout_reference VARCHAR(100) UNIQUE,
+    failure_reason VARCHAR(255),
+    CONSTRAINT fk_withdrawals_user FOREIGN KEY (user_id) REFERENCES users(user_id) ON DELETE CASCADE
 );
 
 CREATE INDEX IF NOT EXISTS idx_withdrawals_status ON withdrawals(status);
 CREATE INDEX IF NOT EXISTS idx_withdrawals_user ON withdrawals(user_id);
 
 -- -----------------------------------------------------------------------------
--- 8. REFERRAL ATTRIBUTION
+-- 10. REFERRAL RELATIONSHIPS (FUTURE ATTRIBUTION DESIGN)
 -- -----------------------------------------------------------------------------
 CREATE TABLE IF NOT EXISTS referrals (
     referral_id VARCHAR(64) PRIMARY KEY,
-    referrer_user_id VARCHAR(64) NOT NULL REFERENCES users(user_id) ON DELETE CASCADE,
-    referee_user_id VARCHAR(64) UNIQUE REFERENCES users(user_id) ON DELETE SET NULL,
+    referrer_user_id VARCHAR(32) NOT NULL,
+    referee_user_id VARCHAR(32) UNIQUE,
     referral_code VARCHAR(32) NOT NULL,
-    channel VARCHAR(50) NOT NULL,
-    status VARCHAR(30) NOT NULL CHECK (status IN ('Link_Created', 'Invite_Shared', 'User_Registered', 'User_Activated', 'Bonus_Credited')),
+    channel VARCHAR(50) NOT NULL DEFAULT 'In-App Share',
+    status VARCHAR(30) NOT NULL DEFAULT 'Link_Created' CHECK (status IN ('Link_Created', 'Invite_Sent', 'Registered', 'Activated', 'Reward_Disbursed')),
     created_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
     registered_at TIMESTAMPTZ,
-    activated_at TIMESTAMPTZ
+    activated_at TIMESTAMPTZ,
+    reward_xp_credited INT DEFAULT 0 CHECK (reward_xp_credited >= 0),
+    CONSTRAINT chk_referrer_referee_distinct CHECK (referrer_user_id != referee_user_id),
+    CONSTRAINT fk_referrals_referrer FOREIGN KEY (referrer_user_id) REFERENCES users(user_id) ON DELETE CASCADE,
+    CONSTRAINT fk_referrals_referee FOREIGN KEY (referee_user_id) REFERENCES users(user_id) ON DELETE SET NULL
 );
 
 CREATE INDEX IF NOT EXISTS idx_referrals_referrer ON referrals(referrer_user_id);
-CREATE INDEX IF NOT EXISTS idx_referrals_status ON referrals(status);
-
--- -----------------------------------------------------------------------------
--- 9. PRE-AGGREGATED DAILY ROLLUPS
--- -----------------------------------------------------------------------------
-CREATE TABLE IF NOT EXISTS daily_activity (
-    daily_activity_id VARCHAR(64) PRIMARY KEY,
-    user_id VARCHAR(64) NOT NULL REFERENCES users(user_id) ON DELETE CASCADE,
-    activity_date DATE NOT NULL,
-    session_count INT NOT NULL DEFAULT 0,
-    total_duration_minutes NUMERIC(8, 2) NOT NULL DEFAULT 0.00,
-    events_triggered INT NOT NULL DEFAULT 0,
-    tasks_completed INT NOT NULL DEFAULT 0,
-    xp_earned INT NOT NULL DEFAULT 0,
-    qualifying_event BOOLEAN NOT NULL DEFAULT FALSE,
-    created_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    CONSTRAINT uq_user_date UNIQUE (user_id, activity_date)
-);
-
-CREATE INDEX IF NOT EXISTS idx_daily_activity_date ON daily_activity(activity_date);
-
+CREATE INDEX IF NOT EXISTS idx_referrals_referee ON referrals(referee_user_id);

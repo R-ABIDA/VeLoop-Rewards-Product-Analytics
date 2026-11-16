@@ -1,0 +1,120 @@
+{
+  "project": "VELOOP Rewards Product Analytics",
+  "evidentiary_standard": "SIMULATED DATA \u2014 CREATED FOR ANALYTICAL TESTING",
+  "execution_timestamp": "2026-11-16T15:24:34.446251",
+  "event_reconciliation": {
+    "source_feature_events_count": 35704,
+    "audit_feature_events_count": 35714,
+    "row_difference": 10,
+    "unique_event_ids_in_events": 35704,
+    "unique_event_ids_in_audit": 35704,
+    "duplicate_event_ids_in_audit_count": 10,
+    "duplicate_event_ids": [
+      "EVT00021600",
+      "EVT00011275",
+      "EVT00006040",
+      "EVT00028196",
+      "EVT00030205",
+      "EVT00017051",
+      "EVT00034075",
+      "EVT00014772",
+      "EVT00025552",
+      "EVT00006379"
+    ],
+    "audit_exact_duplicates": true,
+    "root_cause_explanation": "The 10-record difference between 03_Feature_Events (35,704) and 10_Event_Data_Quality_Audit (35,714) is caused by exactly 10 duplicate rows present in the audit worksheet for intentional data quality testing. When 10_Event_Data_Quality_Audit is deduplicated on event_id, its unique record count is exactly 35,704, matching 03_Feature_Events 1:1."
+  },
+  "users_reconciliation": {
+    "clean_users_count": 1000,
+    "messy_users_count": 1008,
+    "row_difference": 8,
+    "unique_user_ids_clean": 1000,
+    "unique_user_ids_messy": 1000,
+    "duplicate_user_ids_count": 8,
+    "duplicate_user_ids": [
+      "VLUSR000779",
+      "VLUSR000335",
+      "VLUSR000272",
+      "VLUSR000803",
+      "VLUSR000217",
+      "VLUSR000409",
+      "VLUSR000813",
+      "VLUSR000095"
+    ],
+    "missing_values_by_column": {
+      "age": 1,
+      "gender": 1,
+      "city": 1,
+      "registration_datetime": 1,
+      "acquisition_source": 1,
+      "referral_source_detail": 885,
+      "primary_device": 1,
+      "email_verification_status": 1,
+      "onboarding_status": 1,
+      "last_login_datetime": 73
+    },
+    "root_cause_explanation": "Users_Messy_Audit contains 1,008 records representing 1,000 unique users. The 8-record excess is caused by 8 duplicate user records, along with missing values in age, gender, city, registration_datetime, and primary_device."
+  },
+  "dataset_inventory": {
+    "users_1000_clean": {
+      "rows": 1000,
+      "cols": 27
+    },
+    "users_messy_audit": {
+      "rows": 1008,
+      "cols": 28
+    },
+    "sessions": {
+      "rows": 7913,
+      "cols": 12
+    },
+    "feature_events": {
+      "rows": 35704,
+      "cols": 13
+    },
+    "event_data_quality_audit": {
+      "rows": 35714,
+      "cols": 13
+    },
+    "daily_activity": {
+      "rows": 6667,
+      "cols": 17
+    },
+    "task_activity": {
+      "rows": 9846,
+      "cols": 12
+    },
+    "milestones": {
+      "rows": 4799,
+      "cols": 6
+    },
+    "feature_usage": {
+      "rows": 15,
+      "cols": 7
+    }
+  },
+  "wallet_source_findings": {
+    "wallet_activity_daily_records": 1686,
+    "wallet_activity_unique_users": 810,
+    "wallet_viewed_events": 2172,
+    "wallet_viewed_unique_users": 810,
+    "monetary_withdrawal_records_found": 0,
+    "monetary_withdrawal_note": "No monetary withdrawal or fiat payout records exist in the supplied Excel workbooks. Tables and metrics must reflect schema/reconciliation only."
+  },
+  "referral_source_findings": {
+    "users_acquired_via_referral": 119,
+    "referral_source_detail_breakdown": {
+      "NaN": 881,
+      "Friend/Family": 119
+    },
+    "referral_activity_daily_records": 1913,
+    "referral_events_total": 2521,
+    "referral_events_by_name": {
+      "referral_created": 871,
+      "referral_shared": 834,
+      "referral_page_viewed": 816
+    },
+    "referrer_referee_pairs_found": 0,
+    "referral_relationship_note": "No referrer-to-referee user ID mapping exists in source workbooks. Referral conversions cannot be calculated without relational links."
+  }
+}

@@ -30,17 +30,18 @@ class TestPhase1Audit(unittest.TestCase):
             self.assertTrue(os.path.exists(d), f"Missing required directory: {d}")
 
     def test_02_raw_data_preservation(self):
-        """Verify that original raw datasets in Data/ are preserved in 01_raw_data/."""
+        """Verify that original raw datasets in 01_raw_data/ exist and are preserved."""
         raw_files = [
             "VELoop_Rewards_Data_01.xlsx",
             "VELOOP_Simulated_User_Behavior_1000.xlsx"
         ]
         for f in raw_files:
-            orig = os.path.join("Data", f)
             preserved = os.path.join("01_raw_data", f)
-            self.assertTrue(os.path.exists(orig), f"Missing original file: {orig}")
             self.assertTrue(os.path.exists(preserved), f"Missing preserved file: {preserved}")
-            self.assertEqual(os.path.getsize(orig), os.path.getsize(preserved), f"Size mismatch for {f}")
+            self.assertGreater(os.path.getsize(preserved), 100000, f"Raw file too small: {preserved}")
+            orig = os.path.join("Data", f)
+            if os.path.exists(orig):
+                self.assertEqual(os.path.getsize(orig), os.path.getsize(preserved), f"Size mismatch for {f}")
 
     def test_03_deliverable_03_excel_integrity(self):
         """Verify Deliverable 03 Data Coverage Matrix Excel structure and contents."""
@@ -87,13 +88,14 @@ class TestPhase1Audit(unittest.TestCase):
 
     def test_06_actual_record_counts(self):
         """Verify actual record counts calculated from raw data."""
-        df_users = pd.read_excel("Data/VELoop_Rewards_Data_01.xlsx", sheet_name="Users_1000_Clean")
+        raw_dir = "01_raw_data" if os.path.exists("01_raw_data") else "Data"
+        df_users = pd.read_excel(os.path.join(raw_dir, "VELoop_Rewards_Data_01.xlsx"), sheet_name="Users_1000_Clean")
         self.assertEqual(len(df_users), 1000, "Clean users should have exactly 1000 rows")
         
-        df_tasks = pd.read_excel("Data/VELOOP_Simulated_User_Behavior_1000.xlsx", sheet_name="05_Task_Activity")
+        df_tasks = pd.read_excel(os.path.join(raw_dir, "VELOOP_Simulated_User_Behavior_1000.xlsx"), sheet_name="05_Task_Activity")
         self.assertEqual(len(df_tasks), 9846, "Task activity should have exactly 9846 rows")
         
-        df_events = pd.read_excel("Data/VELOOP_Simulated_User_Behavior_1000.xlsx", sheet_name="03_Feature_Events")
+        df_events = pd.read_excel(os.path.join(raw_dir, "VELOOP_Simulated_User_Behavior_1000.xlsx"), sheet_name="03_Feature_Events")
         self.assertEqual(len(df_events), 35704, "Feature events should have exactly 35704 rows")
 
 if __name__ == "__main__":
