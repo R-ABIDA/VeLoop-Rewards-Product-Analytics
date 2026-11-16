@@ -1,6 +1,6 @@
-﻿======================================================================
+======================================================================
 VELOP REWARDS — AUTOMATED TEST SUITE EXECUTION LOG
-Generated: 2026-11-16T16:56:00+05:30
+Generated: 2026-11-16T17:31:45+05:30
 Python Version: 3.12 (Anaconda Environment)
 Framework: Python unittest
 Discovery Directory: 07_tests_and_validation
@@ -38,6 +38,8 @@ test_04_csv_and_excel_upload_parsing (test_dashboard_interactive.TestDashboardIn
 Verify CSV and Excel upload parsing pipeline. ... ok
 test_05_download_payloads_exist (test_dashboard_interactive.TestDashboardInteractivity.test_05_download_payloads_exist)
 Verify all download buttons have valid, non-empty binary files on disk. ... ok
+test_06_seven_main_business_sections_defined (test_dashboard_interactive.TestDashboardInteractivity.test_06_seven_main_business_sections_defined)
+Verify that app.py defines exactly the 7 consolidated main business sections. ... ok
 test_01_all_32_events_documented (test_event_tracking_schemas.TestEventTrackingSchemas.test_01_all_32_events_documented)
 Verify that exactly 32 distinct production events are defined. ... ok
 test_02_all_events_have_required_sections (test_event_tracking_schemas.TestEventTrackingSchemas.test_02_all_events_have_required_sections)
@@ -58,6 +60,10 @@ test_05_deliverable_02_markdown_report (test_phase1_audit.TestPhase1Audit.test_0
 Verify Deliverable 02 Product Data Readiness Audit report. ... ok
 test_06_actual_record_counts (test_phase1_audit.TestPhase1Audit.test_06_actual_record_counts)
 Verify actual record counts calculated from raw data. ... ok
+test_07_event_discrepancy_forensic_metrics (test_phase1_audit.TestPhase1Audit.test_07_event_discrepancy_forensic_metrics)
+Verify the 10-dimension forensic comparison between 03_Feature_Events and 10_Event_Data_Quality_Audit. ... ok
+test_08_csv_ingestion_referential_integrity (test_phase1_audit.TestPhase1Audit.test_08_csv_ingestion_referential_integrity)
+Verify that all cleaned CSV files have 100% referential integrity without orphan records. ... ok
 test_01_all_sql_scripts_exist_and_non_empty (test_sql_and_reconciliation.TestSqlAndReconciliation.test_01_all_sql_scripts_exist_and_non_empty)
 Verify that all 6 modular SQL files exist and have substantial content. ... ok
 test_02_schema_ddl_tables_and_constraints (test_sql_and_reconciliation.TestSqlAndReconciliation.test_02_schema_ddl_tables_and_constraints)
@@ -68,11 +74,25 @@ test_04_data_quality_audit_queries (test_sql_and_reconciliation.TestSqlAndReconc
 Verify that 06_data_quality_audit_checks.sql targets known anomalies. ... ok
 test_05_views_defined_across_analytics_scripts (test_sql_and_reconciliation.TestSqlAndReconciliation.test_05_views_defined_across_analytics_scripts)
 Verify that analytical views are formulated for reporting. ... ok
+test_06_balanced_transaction_acceptance_behavior (test_sql_and_reconciliation.TestSqlAndReconciliation.test_06_balanced_transaction_acceptance_behavior)
+Behavioral Test: Prove that a balanced double-entry transaction ... ok
+test_07_unbalanced_transaction_rejected_by_accounting_trigger (test_sql_and_reconciliation.TestSqlAndReconciliation.test_07_unbalanced_transaction_rejected_by_accounting_trigger)
+Behavioral Test: Prove that an unbalanced transaction with VALID account records ... ok
+test_08_invalid_account_rejected_by_foreign_key_distinct_from_trigger (test_sql_and_reconciliation.TestSqlAndReconciliation.test_08_invalid_account_rejected_by_foreign_key_distinct_from_trigger)
+Behavioral Test: Prove that an invalid account_id is rejected by Foreign Key ... ok
+test_09_withdrawal_status_state_machine_transitions (test_sql_and_reconciliation.TestSqlAndReconciliation.test_09_withdrawal_status_state_machine_transitions)
+Behavioral Test: Prove that fn_enforce_withdrawal_status_transition enforces ... ok
+test_10_database_transaction_rollback_integrity (test_sql_and_reconciliation.TestSqlAndReconciliation.test_10_database_transaction_rollback_integrity)
+Behavioral Test: Prove that failed operations roll back atomically, ... ok
+test_11_csv_to_postgres_ingestion_mappings (test_sql_and_reconciliation.TestSqlAndReconciliation.test_11_csv_to_postgres_ingestion_mappings)
+Behavioral Test: Verify that load_to_postgres ingestion preparation functions ... ok
+test_12_idempotent_ingestion_logic (test_sql_and_reconciliation.TestSqlAndReconciliation.test_12_idempotent_ingestion_logic)
+Behavioral Test: Verify that repeat execution logic with primary key deduplication ... ok
 
 ----------------------------------------------------------------------
-Ran 30 tests in 25.883s
+Ran 40 tests in 41.895s
 
 OK
 ======================================================================
-TEST RUN VERDICT: 100% PASSED (30 passed, 0 failed, 0 errors)
+TEST RUN VERDICT: 100% PASSED (40 passed, 0 failed, 0 errors)
 ======================================================================

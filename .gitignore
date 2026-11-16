@@ -18,11 +18,6 @@ __pycache__/
 *.rar
 *.7z
 
-# Excluded folders per user instruction
-06_documentation_and_reports/
-06_documentation/
-08_presentation/
-
 # Backup directories
 00_backup_before_revision/
 

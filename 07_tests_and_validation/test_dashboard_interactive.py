@@ -142,5 +142,23 @@ class TestDashboardInteractivity(unittest.TestCase):
             self.assertTrue(os.path.exists(p), f"Download target missing: {p}")
             self.assertGreater(os.path.getsize(p), 100, f"Download target empty: {p}")
 
+    def test_06_seven_main_business_sections_defined(self):
+        """Verify that app.py defines exactly the 7 consolidated main business sections."""
+        with open("05_dashboard/app.py", "r", encoding="utf-8") as f:
+            code = f.read()
+
+        seven_sections = [
+            "Overview",
+            "User Analytics",
+            "Earning & Rewards",
+            "Wallet & Withdrawal",
+            "Referral & Virality",
+            "Feature & Engagement",
+            "Data Quality & Audit"
+        ]
+        # Check that sections list in app.py contains all 7 sections
+        for s in seven_sections:
+            self.assertIn(f'"{s}"', code, f"Missing business section: {s}")
+
 if __name__ == "__main__":
     unittest.main()

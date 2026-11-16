@@ -86,6 +86,6 @@ A representative sample of proposed KPIs was tested directly against the supplie
 
 ## 5. Artifact References
 
-* **Deliverable 12 Excel Workbook:** [`04_deliverables/deliverable_12_simulated_data_profiling/Simulated_Data_Profiling_Workbook.xlsx`](file:///d:/Veloop%20data%20Analysis/04_deliverables/deliverable_12_simulated_data_profiling/Simulated_Data_Profiling_Workbook.xlsx)
-* **Underlying Raw Datasets:** [`01_raw_data/VELoop_Rewards_Data_01.xlsx`](file:///d:/Veloop%20data%20Analysis/01_raw_data/VELoop_Rewards_Data_01.xlsx) and [`01_raw_data/VELOOP_Simulated_User_Behavior_1000.xlsx`](file:///d:/Veloop%20data%20Analysis/01_raw_data/VELOOP_Simulated_User_Behavior_1000.xlsx)
+* **Deliverable 12 Excel Workbook:** [`04_deliverables/deliverable_12_simulated_data_profiling/Simulated_Data_Profiling_Workbook.xlsx`](04_deliverables/deliverable_12_simulated_data_profiling/Simulated_Data_Profiling_Workbook.xlsx)
+* **Underlying Raw Datasets:** [`01_raw_data/VELoop_Rewards_Data_01.xlsx`](01_raw_data/VELoop_Rewards_Data_01.xlsx) and [`01_raw_data/VELOOP_Simulated_User_Behavior_1000.xlsx`](01_raw_data/VELOOP_Simulated_User_Behavior_1000.xlsx)
 

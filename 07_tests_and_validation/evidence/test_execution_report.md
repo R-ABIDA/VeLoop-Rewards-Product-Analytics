@@ -3,18 +3,18 @@
 **Role:** Data Analyst Intern (QA & Automation Specialist)  
 **Execution Date:** 2026-11-16  
 **Test Framework:** Python `unittest` (Discovery mode)  
-**Execution Status:** `100% PASSED` (30 Passed, 0 Failed, 0 Errors)  
+**Execution Status:** `100% PASSED` (40 Passed, 0 Failed, 0 Errors)  
 **Integrity Policy:** `SIMULATED DATA — CREATED FOR ANALYTICAL TESTING`  
 
 ---
 
 ## 1. Executive Summary
 
-This testing evidence document records the automated validation and verification of the **VELOOP Rewards — Product Analytics Dashboard & Data Readiness Blueprint**. The test suite tests the integrity of all **21 official deliverables**, raw and cleaned datasets, interactive Streamlit dashboard modules, PostgreSQL schemas, double-entry mathematical reconciliation formulas, 32 production event JSON schemas and payloads, and mandatory data authenticity disclaimers.
+This testing evidence document records the automated validation and verification of the **VELOOP Rewards — Product Analytics Dashboard & Data Readiness Blueprint**. The test suite tests the integrity of all **21 official deliverables**, raw and cleaned datasets, interactive Streamlit dashboard modules, PostgreSQL schemas, double-entry mathematical reconciliation formulas, 32 production event JSON schemas and payloads, CSV-to-PostgreSQL ingestion pipelines, idempotent deduplication, foreign-key integrity, withdrawal status state transitions, and mandatory data authenticity disclaimers.
 
 ```mermaid
-pie title Automated Test Pass Rate (30 / 30)
-    "Passed (100%)" : 30
+pie title Automated Test Pass Rate (40 / 40)
+    "Passed (100%)" : 40
     "Failed (0%)" : 0
 ```
 
@@ -35,11 +35,12 @@ pie title Automated Test Pass Rate (30 / 30)
 * **Test 10:** `test_10_data_dictionary_and_event_plan_counts` $\rightarrow$ **PASSED** (Data dictionary confirmed with 81 fields; event tracking plan confirmed with 32 events).
 
 ### Suite 2: Interactive Dashboard & UI Functionality (`test_dashboard_interactive.py`)
-* **Test 01:** `test_01_all_10_modules_defined` $\rightarrow$ **PASSED** (All 7 core analytical sections + utility sections fully wired).
+* **Test 01:** `test_01_all_10_modules_defined` $\rightarrow$ **PASSED** (All analytical sections and module branches explicitly coded in `app.py`).
 * **Test 02:** `test_02_filters_logic` $\rightarrow$ **PASSED** (Date range interval slicing and device multiselect filter logic validated without zero-division or indexing errors).
 * **Test 03:** `test_03_charts_generation` $\rightarrow$ **PASSED** (All Plotly Express and Graph Objects figures render valid figure objects).
 * **Test 04:** `test_04_csv_and_excel_upload_parsing` $\rightarrow$ **PASSED** (Dynamic upload pipeline successfully parses uploaded CSV and Excel dataframes).
 * **Test 05:** `test_05_download_payloads_exist` $\rightarrow$ **PASSED** (All download payload targets exist as valid binary files).
+* **Test 06:** `test_06_seven_main_business_sections_defined` $\rightarrow$ **PASSED** (Navigation verified with exactly the 7 consolidated business sections).
 
 ### Suite 3: Event Tracking Schemas & Production Payloads (`test_event_tracking_schemas.py`)
 * **Test 01:** `test_01_all_32_events_documented` $\rightarrow$ **PASSED** (All 32 distinct production events confirmed in `Event_Tracking_Plan.md`).
@@ -47,20 +48,29 @@ pie title Automated Test Pass Rate (30 / 30)
 * **Test 03:** `test_03_json_schema_and_payload_validation` $\rightarrow$ **PASSED** (Every event payload extracted and validated against its corresponding JSON Schema using `jsonschema.validate()`).
 * **Test 04:** `test_04_distinguish_observed_vs_proposed` $\rightarrow$ **PASSED** (Every event classified as either `Observed in Data` or `Proposed Future Spec`).
 
-### Suite 4: Phase 1 Foundations & Raw Data Audit (`test_phase1_audit.py`)
-* **Test 01:** `test_01_directory_scaffolding` $\rightarrow$ **PASSED** (All 12 standardized project folders confirmed).
-* **Test 02:** `test_02_raw_data_preservation` $\rightarrow$ **PASSED** (Original workbooks in `01_raw_data/` and `Data/` verified untouched and preserved).
+### Suite 4: Phase 1 Foundations, Forensic Discrepancy & Referential Integrity (`test_phase1_audit.py`)
+* **Test 01:** `test_01_directory_scaffolding` $\rightarrow$ **PASSED** (All core project directories confirmed).
+* **Test 02:** `test_02_raw_data_preservation` $\rightarrow$ **PASSED** (Original workbooks in `01_raw_data/` verified untouched and byte-preserved).
 * **Test 03:** `test_03_deliverable_03_excel_integrity` $\rightarrow$ **PASSED** (Coverage Matrix verified with 32 features and 15 strategic gaps).
-* **Test 04:** `test_04_deliverable_19_register_integrity` $\rightarrow$ **PASSED** (Source and Verification Register verified with tracked unknown items).
+* **Test 04:** `test_04_deliverable_19_register_integrity` $\rightarrow$ **PASSED** (Source and Verification Register verified with tracked items).
 * **Test 05:** `test_05_deliverable_02_markdown_report` $\rightarrow$ **PASSED** (Product Data Readiness Audit verified with 18 domains and Gap 1 Critical).
 * **Test 06:** `test_06_actual_record_counts` $\rightarrow$ **PASSED** (Raw data record counts verified: 1,000 clean users, 9,846 tasks, 35,704 feature events).
+* **Test 07:** `test_07_event_discrepancy_forensic_metrics` $\rightarrow$ **PASSED** (Granular verification of 35,704 vs 35,714 events, 10 duplicate pairs, 5 feature name casing diffs, 4 event status diffs).
+* **Test 08:** `test_08_csv_ingestion_referential_integrity` $\rightarrow$ **PASSED** (100% of foreign keys resolve without orphaned records across all 6 datasets).
 
-### Suite 5: PostgreSQL DDL, Views & Double-Entry Reconciliation (`test_sql_and_reconciliation.py`)
+### Suite 5: PostgreSQL DDL, Double-Entry Triggers, State Machines & Ingestion (`test_sql_and_reconciliation.py`)
 * **Test 01:** `test_01_all_sql_scripts_exist_and_non_empty` $\rightarrow$ **PASSED** (All 6 SQL files exist and exceed 500 bytes).
 * **Test 02:** `test_02_schema_ddl_tables_and_constraints` $\rightarrow$ **PASSED** (All 10 tables defined with PK, FK, CHECK constraints, accounting triggers, and indexes).
 * **Test 03:** `test_03_double_entry_reconciliation_logic` $\rightarrow$ **PASSED** (Double-entry equation `SUM(debits) - SUM(credits) = 0` verified mathematically).
 * **Test 04:** `test_04_data_quality_audit_queries` $\rightarrow$ **PASSED** (Views targeting duplicate events, duplicate users, orphan records, and time anomalies verified).
 * **Test 05:** `test_05_views_defined_across_analytics_scripts` $\rightarrow$ **PASSED** (Analytical views `v_daily_active_users`, `v_user_retention_cohorts`, `v_task_conversion_funnel`, `v_wallet_engagement_summary`, `v_referral_acquisition_summary` confirmed).
+* **Test 06:** `test_06_balanced_transaction_acceptance_behavior` $\rightarrow$ **PASSED** (Balanced dual entry transaction with valid account records accepted with zero variance).
+* **Test 07:** `test_07_unbalanced_transaction_rejected_by_accounting_trigger` $\rightarrow$ **PASSED** (Unbalanced transaction with valid accounts rejected specifically by accounting trigger rule).
+* **Test 08:** `test_08_invalid_account_rejected_by_foreign_key_distinct_from_trigger` $\rightarrow$ **PASSED** (Invalid account rejected independently by foreign key constraint `fk_ledger_account`).
+* **Test 09:** `test_09_withdrawal_status_state_machine_transitions` $\rightarrow$ **PASSED** (State transitions validated; invalid jumps and mutations of terminal states rejected).
+* **Test 10:** `test_10_database_transaction_rollback_integrity` $\rightarrow$ **PASSED** (Failed transactions roll back cleanly leaving 0 orphaned entries).
+* **Test 11:** `test_11_csv_to_postgres_ingestion_mappings` $\rightarrow$ **PASSED** (All 6 ingestion preparation functions verified against target columns and counts).
+* **Test 12:** `test_12_idempotent_ingestion_logic` $\rightarrow$ **PASSED** (Repeat execution prevents duplicate primary key insertions).
 
 ---
 
@@ -68,11 +78,13 @@ pie title Automated Test Pass Rate (30 / 30)
 
 | Metric | Target | Actual Result | Status |
 | :--- | :---: | :---: | :---: |
-| Total Automated Tests | $\ge 20$ | **30** | **PASSED** |
-| Tests Passing | 100% | **30 / 30 (100.0%)** | **PASSED** |
-| Execution Time | $< 60\text{ s}$ | **25.88 s** | **PASSED** |
+| Total Automated Tests | $\ge 20$ | **40** | **PASSED** |
+| Tests Passing | 100% | **40 / 40 (100.0%)** | **PASSED** |
+| Execution Time | $< 60\text{ s}$ | **41.90 s** | **PASSED** |
 | Deliverables Coverage | 21 / 21 | **21 / 21 (100.0%)** | **PASSED** |
 | Raw Data Preservation | 100% | **100% Intact** | **PASSED** |
 | Data Authenticity Standard | Enforced | **Strictly Labeled** | **PASSED** |
 | Production Event Coverage | 32 / 32 | **32 / 32 Validated** | **PASSED** |
 | Double-Entry Invariant | $\Delta = 0.00$ | **Exact Balance Enforced** | **PASSED** |
+| Referential Integrity | 100% | **0 Orphan Records** | **PASSED** |
+| Consolidated Navigation | 7 Sections | **Exactly 7 Sections** | **PASSED** |

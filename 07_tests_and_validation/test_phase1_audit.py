@@ -98,6 +98,57 @@ class TestPhase1Audit(unittest.TestCase):
         df_events = pd.read_excel(os.path.join(raw_dir, "VELOOP_Simulated_User_Behavior_1000.xlsx"), sheet_name="03_Feature_Events")
         self.assertEqual(len(df_events), 35704, "Feature events should have exactly 35704 rows")
 
+    def test_07_event_discrepancy_forensic_metrics(self):
+        """Verify the 10-dimension forensic comparison between 03_Feature_Events and 10_Event_Data_Quality_Audit."""
+        raw_dir = "01_raw_data" if os.path.exists("01_raw_data") else "Data"
+        behavior_wb = os.path.join(raw_dir, "VELOOP_Simulated_User_Behavior_1000.xlsx")
+        
+        df_events = pd.read_excel(behavior_wb, sheet_name="03_Feature_Events")
+        df_audit = pd.read_excel(behavior_wb, sheet_name="10_Event_Data_Quality_Audit")
+
+        # 1. Row counts
+        self.assertEqual(len(df_events), 35704)
+        self.assertEqual(len(df_audit), 35714)
+
+        # 2. Unique event IDs
+        self.assertEqual(df_events["event_id"].nunique(), 35704)
+        self.assertEqual(df_audit["event_id"].nunique(), 35704)
+
+        # 3. Duplicate event IDs in audit sheet
+        audit_dupes = df_audit[df_audit.duplicated(subset=["event_id"], keep=False)]
+        self.assertEqual(len(audit_dupes), 20, "Audit sheet must have exactly 10 duplicate pairs (20 rows)")
+        self.assertEqual(audit_dupes["event_id"].nunique(), 10, "Audit sheet must have exactly 10 unique duplicate event IDs")
+
+        # 4. Compare deduplicated audit against original on feature_name and event_status
+        audit_dedup = df_audit.drop_duplicates(subset=["event_id"], keep="first").set_index("event_id")
+        orig_indexed = df_events.set_index("event_id")
+
+        feature_diffs = (orig_indexed["feature_name"] != audit_dedup.loc[orig_indexed.index, "feature_name"]).sum()
+        self.assertEqual(feature_diffs, 5, "Must have exactly 5 feature_name casing differences")
+
+        status_diffs = (orig_indexed["event_status"] != audit_dedup.loc[orig_indexed.index, "event_status"]).sum()
+        self.assertEqual(status_diffs, 4, "Must have exactly 4 event_status differences")
+
+    def test_08_csv_ingestion_referential_integrity(self):
+        """Verify that all cleaned CSV files have 100% referential integrity without orphan records."""
+        users = pd.read_csv("02_processed_data/users_cleaned.csv")
+        sessions = pd.read_csv("02_processed_data/sessions_cleaned.csv")
+        events = pd.read_csv("02_processed_data/events_cleaned.csv")
+        daily = pd.read_csv("02_processed_data/daily_activity_cleaned.csv")
+        tasks = pd.read_csv("02_processed_data/tasks_cleaned.csv")
+        milestones = pd.read_csv("02_processed_data/milestones_cleaned.csv")
+
+        user_ids = set(users["user_id"])
+        session_ids = set(sessions["session_id"])
+
+        # Referential assertions
+        self.assertTrue(sessions["user_id"].isin(user_ids).all(), "Orphan user in sessions")
+        self.assertTrue(events["user_id"].isin(user_ids).all(), "Orphan user in events")
+        self.assertTrue(events["session_id"].isin(session_ids).all(), "Orphan session in events")
+        self.assertTrue(daily["user_id"].isin(user_ids).all(), "Orphan user in daily activity")
+        self.assertTrue(tasks["user_id"].isin(user_ids).all(), "Orphan user in tasks")
+        self.assertTrue(milestones["user_id"].isin(user_ids).all(), "Orphan user in milestones")
+
 if __name__ == "__main__":
     unittest.main()
 

@@ -1,0 +1,10 @@
+event_id,category,column_name,orig_value,audit_value,user_id,session_id
+EVT00000001,feature_name_casing,feature_name,Missions,missions,VLUSR000001,SESS0000001
+EVT00000002,feature_name_casing,feature_name,Leaderboard,leaderboard,VLUSR000001,SESS0000001
+EVT00000003,feature_name_casing,feature_name,Wallet,wallet,VLUSR000001,SESS0000001
+EVT00000004,feature_name_casing,feature_name,Daily Reward,daily reward,VLUSR000001,SESS0000001
+EVT00000005,feature_name_casing,feature_name,Watch Ads,watch ads,VLUSR000001,SESS0000001
+EVT00000006,event_status_difference,event_status,Success,success ,VLUSR000001,SESS0000001
+EVT00000007,event_status_difference,event_status,Started,success ,VLUSR000001,SESS0000001
+EVT00000008,event_status_difference,event_status,Started,success ,VLUSR000001,SESS0000001
+EVT00000009,event_status_difference,event_status,Success,success ,VLUSR000001,SESS0000001

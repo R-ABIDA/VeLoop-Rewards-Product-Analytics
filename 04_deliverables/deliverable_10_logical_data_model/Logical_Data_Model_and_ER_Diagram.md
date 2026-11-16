@@ -19,7 +19,7 @@ To prevent data silos and inconsistencies, the model is architected across four 
 3. **Financial Accounting Cluster:** `wallet_transactions`, `rewards_ledger`, `withdrawals`.
 4. **Growth & Virality Cluster:** `referrals`.
 
-The complete schema is written in PostgreSQL 15+ compatible DDL and saved at [`04_deliverables/deliverable_10_logical_data_model/schema.sql`](file:///d:/Veloop%20data%20Analysis/04_deliverables/deliverable_10_logical_data_model/schema.sql).
+The complete schema is written in PostgreSQL 15+ compatible DDL and saved at [`04_deliverables/deliverable_10_logical_data_model/schema.sql`](04_deliverables/deliverable_10_logical_data_model/schema.sql).
 
 ---
 

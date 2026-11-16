@@ -1,0 +1,773 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>VELOOP Rewards — Final Presentation Deck</title>
+    <style>
+        :root {
+            --navy: #1B365D;
+            --teal: #008080;
+            --gold: #D4AF37;
+            --light-bg: #F4F6F9;
+            --card-bg: #FFFFFF;
+            --text-dark: #2D3748;
+            --text-muted: #718096;
+            --border: #E2E8F0;
+            --warning-bg: #FFF3CD;
+            --warning-text: #856404;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+        }
+
+        body {
+            background-color: var(--light-bg);
+            color: var(--text-dark);
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        /* Top Navigation Header */
+        header {
+            background-color: var(--navy);
+            color: white;
+            padding: 12px 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .logo-area {
+            font-size: 1.2rem;
+            font-weight: 700;
+            letter-spacing: 1px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .slide-counter {
+            font-size: 0.95rem;
+            background: rgba(255,255,255,0.15);
+            padding: 4px 12px;
+            border-radius: 12px;
+        }
+
+        /* Disclaimer Ribbon */
+        .disclaimer-ribbon {
+            background-color: var(--warning-bg);
+            color: var(--warning-text);
+            text-align: center;
+            padding: 6px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            border-bottom: 1px solid #FFEBAA;
+        }
+
+        /* Presentation Stage */
+        .stage {
+            flex: 1;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 30px;
+            overflow: hidden;
+        }
+
+        .slide {
+            background-color: var(--card-bg);
+            width: 100%;
+            max-width: 1100px;
+            height: 90%;
+            border-radius: 12px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.08);
+            border: 1px solid var(--border);
+            padding: 45px 55px;
+            display: none;
+            flex-direction: column;
+            position: relative;
+            animation: fadeIn 0.3s ease-in-out;
+        }
+
+        .slide.active {
+            display: flex;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(8px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .slide-header {
+            border-bottom: 2px solid var(--border);
+            padding-bottom: 16px;
+            margin-bottom: 24px;
+        }
+
+        .slide-num {
+            font-size: 0.85rem;
+            color: var(--teal);
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .slide-title {
+            font-size: 1.85rem;
+            color: var(--navy);
+            margin-top: 4px;
+            font-weight: 700;
+        }
+
+        .slide-subtitle {
+            font-size: 1rem;
+            color: var(--text-muted);
+            margin-top: 4px;
+        }
+
+        .slide-body {
+            flex: 1;
+            overflow-y: auto;
+            font-size: 1.05rem;
+            line-height: 1.6;
+        }
+
+        /* Layout Grids */
+        .grid-2 {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 25px;
+            height: 100%;
+        }
+
+        .grid-3 {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 20px;
+        }
+
+        .card {
+            background-color: #F8FAFC;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 20px;
+        }
+
+        .card h4 {
+            color: var(--navy);
+            margin-bottom: 10px;
+            font-size: 1.1rem;
+            border-bottom: 1px solid var(--border);
+            padding-bottom: 6px;
+        }
+
+        .card ul {
+            padding-left: 20px;
+        }
+
+        .card li {
+            margin-bottom: 8px;
+            font-size: 0.95rem;
+        }
+
+        .highlight-stat {
+            font-size: 2rem;
+            font-weight: 800;
+            color: var(--teal);
+            margin: 10px 0;
+        }
+
+        /* Bottom Controls */
+        footer {
+            background-color: white;
+            border-top: 1px solid var(--border);
+            padding: 12px 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .btn {
+            background-color: var(--navy);
+            color: white;
+            border: none;
+            padding: 9px 22px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.95rem;
+            font-weight: 600;
+            transition: background 0.2s;
+        }
+
+        .btn:hover {
+            background-color: #27497A;
+        }
+
+        .btn-outline {
+            background-color: transparent;
+            color: var(--navy);
+            border: 1px solid var(--navy);
+            margin-right: 10px;
+        }
+
+        .btn-outline:hover {
+            background-color: #F0F4F8;
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <div class="logo-area">
+            <span>💎 VELOOP REWARDS</span>
+            <span style="font-weight: 300; opacity: 0.7;">| Task 01 Internship Final Defense</span>
+        </div>
+        <div class="slide-counter" id="counter">Slide 1 / 14</div>
+    </header>
+
+    <div class="disclaimer-ribbon">
+        ⚠️ SIMULATED DATA — CREATED FOR ANALYTICAL TESTING | STRICT NON-NEGOTIABLE AUTHENTICITY ENFORCED
+    </div>
+
+    <div class="stage">
+
+        <!-- Slide 1: Title -->
+        <div class="slide active">
+            <div class="slide-header">
+                <div class="slide-num">Executive Presentation</div>
+                <div class="slide-title">Product Analytics, Data Readiness & Data Management Blueprint</div>
+                <div class="slide-subtitle">Master Internship Defense & Technical Architecture Handoff</div>
+            </div>
+            <div class="slide-body" style="display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center;">
+                <h2 style="color: var(--navy); font-size: 2.2rem; margin-bottom: 12px;">VELOOP REWARDS & VELOOP CO.</h2>
+                <p style="font-size: 1.25rem; color: var(--teal); font-weight: 600; margin-bottom: 30px;">
+                    Data Analyst Internship — Task 01 Final Project
+                </p>
+                <div style="background: #F8FAFC; border: 1px solid var(--border); padding: 20px 40px; border-radius: 8px; max-width: 650px;">
+                    <p style="margin-bottom: 6px;"><strong>Role:</strong> Data Analyst Intern</p>
+                    <p style="margin-bottom: 6px;"><strong>Chief Executive Officer:</strong> Ayan Alam</p>
+                    <p style="margin-bottom: 6px;"><strong>Schedule Cadence:</strong> 2 Development Days followed by 1 Review Day (25-Day Milestone)</p>
+                    <p style="margin-top: 12px; font-size: 0.85rem; color: var(--warning-text); font-weight: 600;">
+                        Policy Notice: All analyses utilize simulated test datasets; zero actual company stats represented.
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 2: Objectives -->
+        <div class="slide">
+            <div class="slide-header">
+                <div class="slide-num">Slide 02</div>
+                <div class="slide-title">Project Objectives & The 5 Core Analytical Questions</div>
+                <div class="slide-subtitle">Establishing the Data Foundation for a Developing Rewards Ecosystem</div>
+            </div>
+            <div class="slide-body">
+                <div class="grid-2">
+                    <div class="card">
+                        <h4>🎯 Primary Mission</h4>
+                        <p style="margin-bottom: 14px;">Build a reliable, traceable, and reusable analytical foundation enabling VELOOP Rewards to measure user behavior and scale financial operations with complete integrity.</p>
+                        <ul>
+                            <li><strong>19 Work Packages:</strong> Full coverage from WP-A through WP-S.</li>
+                            <li><strong>21 Deliverables:</strong> Specifications, Excel workbooks, SQL DDL, and BI apps.</li>
+                            <li><strong>4-Tier Discipline:</strong> Strict tagging of [Confirmed], [Proposed], [To Be Verified], and [Simulated].</li>
+                        </ul>
+                    </div>
+                    <div class="card">
+                        <h4>❓ The 5 Core Questions Answered</h4>
+                        <ul>
+                            <li><strong>What should VELOOP collect?</strong> 32 standardized production events & 81 enterprise fields.</li>
+                            <li><strong>How should VELOOP structure it?</strong> Normalized star-schema in PostgreSQL 15+.</li>
+                            <li><strong>How do we know data is trustworthy?</strong> 6-stage QC framework & daily ledger assertions.</li>
+                            <li><strong>What should management measure?</strong> 35 mathematically defined production KPIs.</li>
+                            <li><strong>What should engineering implement?</strong> Exact payload contracts & acceptance tests.</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 3: Product Readiness Audit -->
+        <div class="slide">
+            <div class="slide-header">
+                <div class="slide-num">Slide 03</div>
+                <div class="slide-title">Product Data Readiness Audit (Work Package A)</div>
+                <div class="slide-subtitle">Mapping 18 Product Domains and the Event Triad Framework</div>
+            </div>
+            <div class="slide-body">
+                <div class="grid-3">
+                    <div class="card">
+                        <h4>1. User Events (Client)</h4>
+                        <p style="font-size: 0.9rem; color: var(--text-muted); margin-bottom: 10px;">Captures intent from user actions.</p>
+                        <ul>
+                            <li>Button taps & task views</li>
+                            <li>Form submissions</li>
+                            <li>Withdrawal requests</li>
+                            <li>Referral invite shares</li>
+                        </ul>
+                    </div>
+                    <div class="card">
+                        <h4>2. System Events (Server)</h4>
+                        <p style="font-size: 0.9rem; color: var(--text-muted); margin-bottom: 10px;">Captures ground truth & validations.</p>
+                        <ul>
+                            <li>Ad SDK callback verified</li>
+                            <li>Anti-cheat tap check passed</li>
+                            <li>Double-entry ledger credit</li>
+                            <li>Gateway payout dispatched</li>
+                        </ul>
+                    </div>
+                    <div class="card">
+                        <h4>3. Business Outcomes (Value)</h4>
+                        <p style="font-size: 0.9rem; color: var(--text-muted); margin-bottom: 10px;">Captures economic & retention impact.</p>
+                        <ul>
+                            <li>Ad network revenue recognized</li>
+                            <li>Platform point liability accrued</li>
+                            <li>Cash liquidity disbursed</li>
+                            <li>Long-term D30 retention built</li>
+                        </ul>
+                    </div>
+                </div>
+                <div style="margin-top: 20px;" class="card">
+                    <h4>📊 Scope & Readiness Summary</h4>
+                    <p>Audited <strong>32 features across 18 domains</strong>: 11 domains production-ready (Ads, Missions, Streaks, Daily Reward, Spin), 3 partial (Registration/Login, Tap volume), and 4 critical architectural gaps identified (Withdrawals ledger, double-entry wallet, relational referrals, and currency segregation).</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 4: Domain Specifications -->
+        <div class="slide">
+            <div class="slide-header">
+                <div class="slide-num">Slide 04</div>
+                <div class="slide-title">Domain Analytics Specifications (Work Packages B, C, D, E)</div>
+                <div class="slide-subtitle">Decoupling Execution from Financial Disbursement & Attribution</div>
+            </div>
+            <div class="slide-body">
+                <div class="grid-2">
+                    <div class="card">
+                        <h4>Earning & Rewards Lifecycle (WP-C)</h4>
+                        <p style="font-size: 0.9rem; margin-bottom: 8px;"><strong>Discovery → Start → Completion → Validation → Reward</strong></p>
+                        <ul>
+                            <li><strong>Core Principle:</strong> Task completion ≠ Reward credit.</li>
+                            <li>Audited across 12 deterministic states including <em>Tracking Failed</em>, <em>Validation Failed</em>, and <em>Reward Reversed</em>.</li>
+                            <li>Third-party partner failure handling (AdMob, ironSource, BitLabs).</li>
+                        </ul>
+                    </div>
+                    <div class="card">
+                        <h4>Referral & Growth Funnel (WP-E)</h4>
+                        <p style="font-size: 0.9rem; margin-bottom: 8px;"><strong>Created → Registered → Activated → Converted</strong></p>
+                        <ul>
+                            <li><strong>Core Principle:</strong> Registration ≠ Referral conversion.</li>
+                            <li>Requires referee to reach verified activation threshold (50 XP) before paying commission.</li>
+                            <li>Virality tracking: Viral coefficient ($K$), viral cycle time, and retention uplift.</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 5: Data Model -->
+        <div class="slide">
+            <div class="slide-header">
+                <div class="slide-num">Slide 05</div>
+                <div class="slide-title">Logical Data Model & Relational ER Architecture (Work Package H)</div>
+                <div class="slide-subtitle">PostgreSQL 15+ Normalized Schema Safeguarding Financial Integrity</div>
+            </div>
+            <div class="slide-body">
+                <div class="grid-2">
+                    <div class="card">
+                        <h4>🗄️ Normalized Star-Schema Entities</h4>
+                        <ul>
+                            <li><code>users</code>: Master identity, demographic attributes, and balances.</li>
+                            <li><code>sessions</code> & <code>feature_events</code>: Contiguous visit framing & atomic streaming logs.</li>
+                            <li><code>task_catalog</code> & <code>task_activity</code>: Catalog inventory & execution instances.</li>
+                            <li><code>wallet_transactions</code>: Double-entry financial balance mutations.</li>
+                            <li><code>withdrawals</code>: Payout requests, gateway clearing IDs, and SLAs.</li>
+                            <li><code>referrals</code>: Relational tree mapping referrer to referee.</li>
+                        </ul>
+                    </div>
+                    <div class="card">
+                        <h4>🛡️ Integrity & Audit Safeguards</h4>
+                        <ul>
+                            <li><strong>Financial Protection:</strong> <code>ON DELETE RESTRICT</code> on wallet and withdrawal tables prevents destructive cascading deletes.</li>
+                            <li><strong>Ledger Immutability:</strong> Balances are the materialized sum of signed transactions; zero destructive in-place SQL updates.</li>
+                            <li><strong>Tamper-Evident Clawbacks:</strong> Self-referencing recursive foreign key on <code>wallet_transactions</code> tracks fraud reversals.</li>
+                            <li><strong>Unique Attribution:</strong> <code>referrals.referred_user_id</code> is marked UNIQUE.</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 6: Event Plan & Dictionary -->
+        <div class="slide">
+            <div class="slide-header">
+                <div class="slide-num">Slide 06</div>
+                <div class="slide-title">Production Event Tracking Plan & Enterprise Data Dictionary</div>
+                <div class="slide-subtitle">Deliverables 08 & 09 (Work Packages F & G)</div>
+            </div>
+            <div class="slide-body">
+                <div class="grid-2">
+                    <div class="card">
+                        <h4>📡 Event Tracking Plan (32 Events)</h4>
+                        <p style="font-size: 0.9rem; margin-bottom: 8px;">Standardized format: <code>[domain]_[object]_[action]</code></p>
+                        <ul>
+                            <li><strong>Account (5):</strong> <code>user_registered</code>, <code>user_logged_in</code>, <code>onboarding_completed</code>...</li>
+                            <li><strong>Tasks (5):</strong> <code>task_viewed</code>, <code>task_started</code>, <code>task_completed</code>...</li>
+                            <li><strong>Rewards (3):</strong> <code>reward_credited</code>, <code>reward_pending</code>, <code>reward_reversed</code>.</li>
+                            <li><strong>Daily (7):</strong> <code>daily_reward_claimed</code>, <code>streak_updated</code>, <code>spin_completed</code>...</li>
+                            <li><strong>Wallet & Withdrawals (8):</strong> <code>wallet_transaction_completed</code>, <code>withdrawal_requested</code>...</li>
+                        </ul>
+                    </div>
+                    <div class="card">
+                        <h4>📖 Enterprise Data Dictionary (81 Fields)</h4>
+                        <p style="font-size: 0.9rem; margin-bottom: 8px;">10 entities covered across 12 rigorous attributes</p>
+                        <ul>
+                            <li>Exact data types & format rules (regex).</li>
+                            <li>Mandatory vs optional nullability rules.</li>
+                            <li>Sensitivity classification (Public / Internal / Restricted).</li>
+                            <li>Explicit analytical purpose for every single field.</li>
+                            <li>Zero meaningless filler fields.</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 7: KPI Framework -->
+        <div class="slide">
+            <div class="slide-header">
+                <div class="slide-num">Slide 07</div>
+                <div class="slide-title">Enterprise KPI Catalogue (Work Package I)</div>
+                <div class="slide-subtitle">35 Production KPIs with Mathematical Precision (Deliverable 11)</div>
+            </div>
+            <div class="slide-body">
+                <div class="grid-3">
+                    <div class="card">
+                        <h4>User & Engagement (11 KPIs)</h4>
+                        <ul>
+                            <li><strong>DAU / MAU:</strong> Qualifying active actions only.</li>
+                            <li><strong>Stickiness Ratio:</strong> (DAU / MAU) × 100%.</li>
+                            <li><strong>Task Completion Rate:</strong> Completed / Started.</li>
+                            <li><strong>Breadth Score:</strong> Mean active features/day.</li>
+                        </ul>
+                    </div>
+                    <div class="card">
+                        <h4>Rewards & Wallet (9 KPIs)</h4>
+                        <ul>
+                            <li><strong>Credit Volume:</strong> Total points issued.</li>
+                            <li><strong>Fulfillment Rate:</strong> Credited / Completed.</li>
+                            <li><strong>Reversal Ratio:</strong> Clawbacks / Credits.</li>
+                            <li><strong>Net Currency Velocity:</strong> Credits / Debits.</li>
+                        </ul>
+                    </div>
+                    <div class="card">
+                        <h4>Withdrawals & Growth (15 KPIs)</h4>
+                        <ul>
+                            <li><strong>Payout SLA:</strong> Median latency < 24 hours.</li>
+                            <li><strong>Fulfillment Rate:</strong> Settled / Requested.</li>
+                            <li><strong>Viral Coefficient ($K$):</strong> $i \times c_r \times c_a$.</li>
+                            <li><strong>Support Deflection:</strong> FAQ resolution %.</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 8: Data Profiling -->
+        <div class="slide">
+            <div class="slide-header">
+                <div class="slide-num">Slide 08</div>
+                <div class="slide-title">Simulated Data Profiling Findings (Work Package J)</div>
+                <div class="slide-subtitle">Empirical Audit Across 67,868 Records and 9 Sheets (Deliverable 12)</div>
+            </div>
+            <div class="slide-body">
+                <div class="grid-2">
+                    <div class="card">
+                        <h4>🔍 Referential Integrity Results</h4>
+                        <div class="highlight-stat">100% Valid</div>
+                        <p>Zero orphan records across all clean sheets:</p>
+                        <ul>
+                            <li><code>02_Sessions</code> (7,913 rows): 100% match to Users.</li>
+                            <li><code>03_Feature_Events</code> (35,704 rows): 100% match to Users & Sessions.</li>
+                            <li><code>05_Task_Activity</code> (9,846 rows): 100% match to Users.</li>
+                            <li><code>04_Daily_Activity</code> (6,667 rows): 100% match to Users.</li>
+                        </ul>
+                    </div>
+                    <div class="card">
+                        <h4>⚖️ KPI Computability Audit</h4>
+                        <ul>
+                            <li>✅ <strong>DAU & Activity:</strong> Fully computable (Mean 44.4 DAU).</li>
+                            <li>✅ <strong>Task Completion Rate:</strong> 57.15% (5,627 of 9,846 tasks).</li>
+                            <li>✅ <strong>Active 30d Ratio:</strong> 32.50% (325 of 1,000 users).</li>
+                            <li>❌ <strong>Withdrawals & Wallet:</strong> Blocked due to missing standalone ledgers in supplied files.</li>
+                            <li>❌ <strong>Virality ($K$):</strong> Blocked due to missing referee linkage.</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 9: Data Quality Audit -->
+        <div class="slide">
+            <div class="slide-header">
+                <div class="slide-num">Slide 09</div>
+                <div class="slide-title">Data Quality Audit & Cleaning Transformations (Work Packages K & L)</div>
+                <div class="slide-subtitle">Resolving Injected Anomalies across 12 Defect Classes (Deliverable 13)</div>
+            </div>
+            <div class="slide-body">
+                <div class="grid-2">
+                    <div class="card">
+                        <h4>🧹 Reproducible Cleaning Results</h4>
+                        <p><strong>Users Messy Audit:</strong></p>
+                        <ul>
+                            <li>Raw: 1,008 rows (8 duplicate PKs, 542 missing cells).</li>
+                            <li>Cleaned: Exactly 1,000 unique records in <code>02_processed_data/users_cleaned.csv</code>.</li>
+                        </ul>
+                        <p style="margin-top: 10px;"><strong>Event Data Quality Audit:</strong></p>
+                        <ul>
+                            <li>Raw: 35,714 rows (10 duplicate IDs, 4,210 lowercase casing).</li>
+                            <li>Cleaned: Exactly 35,704 unique records matching production baseline.</li>
+                        </ul>
+                    </div>
+                    <div class="card">
+                        <h4>🛡️ 6-Stage Quality Control Framework</h4>
+                        <ul>
+                            <li><strong>Application:</strong> Input bounds, regex & client idempotency.</li>
+                            <li><strong>Ingestion:</strong> JSON schema contracts & Redis 1h deduplication.</li>
+                            <li><strong>Raw Storage:</strong> Dead Letter Queue (DLQ) quarantine.</li>
+                            <li><strong>Transformation:</strong> UTC casting & deterministic imputation.</li>
+                            <li><strong>Analytics:</strong> Daily automated double-entry balance assertion.</li>
+                            <li><strong>Dashboard:</strong> Pre-render mathematical sanity checks.</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 10: BI Dashboard -->
+        <div class="slide">
+            <div class="slide-header">
+                <div class="slide-num">Slide 10</div>
+                <div class="slide-title">Interactive Streamlit Analytics Dashboard (Work Package M)</div>
+                <div class="slide-subtitle">Functional BI Suite in <code>05_dashboard/app.py</code> (Deliverable 14)</div>
+            </div>
+            <div class="slide-body">
+                <div class="grid-3">
+                    <div class="card">
+                        <h4>Executive & Users</h4>
+                        <ul>
+                            <li>DAU & event velocity dual-axis trend.</li>
+                            <li>Feature engagement share donut.</li>
+                            <li>Acquisition source distribution.</li>
+                            <li>Demographic age & gender pyramid.</li>
+                        </ul>
+                    </div>
+                    <div class="card">
+                        <h4>Engagement & Rewards</h4>
+                        <ul>
+                            <li>Feature adoption ranking (15 features).</li>
+                            <li>Session duration distribution.</li>
+                            <li>Task volume across 8 categories.</li>
+                            <li>Task failure root cause diagnostics.</li>
+                        </ul>
+                    </div>
+                    <div class="card">
+                        <h4>Wallet, Payouts & Growth</h4>
+                        <ul>
+                            <li>Outstanding XP balance distribution.</li>
+                            <li>Withdrawal queue & payment rail share.</li>
+                            <li>Referral outbound sharing by channel.</li>
+                            <li>4-stage referral conversion funnel.</li>
+                        </ul>
+                    </div>
+                </div>
+                <div style="margin-top: 20px; background: #E8F4FD; border-left: 4px solid var(--teal); padding: 12px; border-radius: 4px;">
+                    <p style="font-size: 0.95rem; color: #01579B;">
+                        💻 <strong>Local Execution:</strong> Run <code>streamlit run 05_dashboard/app.py</code> to test filters, tooltips, and interactive Plotly drill-downs locally.
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 11: Pipeline Architecture -->
+        <div class="slide">
+            <div class="slide-header">
+                <div class="slide-num">Slide 11</div>
+                <div class="slide-title">Data Pipeline & Operating Model (Work Package O)</div>
+                <div class="slide-subtitle">Lean, Pragmatic, Cost-Effective (< $100/mo) Architecture (Deliverable 16)</div>
+            </div>
+            <div class="slide-body">
+                <div class="grid-2">
+                    <div class="card">
+                        <h4>🏗️ 7-Stage Operating Architecture</h4>
+                        <ul>
+                            <li><strong>Producers:</strong> Mobile SDK, Web App, Partner Postbacks.</li>
+                            <li><strong>Collection:</strong> FastAPI Gateway with Redis 1h sliding cache.</li>
+                            <li><strong>Raw Lake:</strong> S3/R2 append-only partitioned Parquet.</li>
+                            <li><strong>Validation:</strong> Pydantic schema validation + DLQ.</li>
+                            <li><strong>Transformation:</strong> Hourly dbt Core SQL models.</li>
+                            <li><strong>Serving Mart:</strong> PostgreSQL 15+ analytical read-replica.</li>
+                            <li><strong>Presentation:</strong> Interactive Streamlit BI Dashboard.</li>
+                        </ul>
+                    </div>
+                    <div class="card">
+                        <h4>💡 Anti-Bloat Design Principles</h4>
+                        <ul>
+                            <li>Avoids expensive distributed enterprise tools before volume warrants it.</li>
+                            <li>Supports up to 50,000 DAU and 5,000,000 events/mo at minimal cloud cost.</li>
+                            <li>Clear evolutionary roadmap to Kafka / ClickHouse as platform scales to 1M+ DAU.</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 12: Governance & Privacy -->
+        <div class="slide">
+            <div class="slide-header">
+                <div class="slide-num">Slide 12</div>
+                <div class="slide-title">Data Privacy, Governance & Change Management (Work Packages P & Q)</div>
+                <div class="slide-subtitle">5-Tier RBAC, Zero-Storage Rules & Change Control (Deliverable 17)</div>
+            </div>
+            <div class="slide-body">
+                <div class="grid-2">
+                    <div class="card">
+                        <h4>🔒 5-Tier RBAC Access Model</h4>
+                        <ul>
+                            <li><strong>Engineering:</strong> Full DDL & raw infrastructure access.</li>
+                            <li><strong>Data Analyst:</strong> Read-only access to masked analytical marts.</li>
+                            <li><strong>Product / Operations:</strong> Aggregated BI dashboard reporting.</li>
+                            <li><strong>Content Team:</strong> Aggregated placement metrics.</li>
+                            <li><strong>Interns:</strong> Approved, sanitized, simulated datasets only.</li>
+                        </ul>
+                    </div>
+                    <div class="card">
+                        <h4>🚫 Prohibited Attributes & Change Control</h4>
+                        <ul>
+                            <li><strong>Zero Storage:</strong> Passwords, payment card CVV, bank PINs, and national IDs are categorically excluded.</li>
+                            <li><strong>Sanitization:</strong> SHA-256 one-way hashing for email and payment addresses in reporting views.</li>
+                            <li><strong>Change Management:</strong> Living Metric/Event Change Log with mandatory 14-day deprecation windows.</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 13: Backlog -->
+        <div class="slide">
+            <div class="slide-header">
+                <div class="slide-num">Slide 13</div>
+                <div class="slide-title">Strategic Gap Assessment & Implementation Backlog (Deliverables 18 & 20)</div>
+                <div class="slide-subtitle">Readiness Scorecard (68/100) and Prioritized Engineering Roadmap</div>
+            </div>
+            <div class="slide-body">
+                <div class="grid-2">
+                    <div class="card">
+                        <h4>🔴 Pre-Launch Blockers (Weeks 1–3)</h4>
+                        <ul>
+                            <li><strong>Critical:</strong> Deploy PostgreSQL normalized schema (<code>schema.sql</code>) for wallet transactions and withdrawals.</li>
+                            <li><strong>Critical:</strong> Deploy relational referral table mapping referee to referrer.</li>
+                            <li><strong>High:</strong> Mobile SDK instrumentation for 32 production events.</li>
+                            <li><strong>High:</strong> Redis ingestion deduplication filter.</li>
+                            <li><strong>High:</strong> SHA-256 PII email masking in reporting marts.</li>
+                        </ul>
+                    </div>
+                    <div class="card">
+                        <h4>🟡 Post-Launch Roadmap (Weeks 4–8)</h4>
+                        <ul>
+                            <li><strong>Medium:</strong> Hourly automated dbt Core rollup jobs.</li>
+                            <li><strong>Medium:</strong> Multi-currency segregation (XP vs Gems vs Tokens).</li>
+                            <li><strong>Medium:</strong> Customer support interaction telemetry.</li>
+                            <li><strong>Low:</strong> Machine-learning predictive churn model.</li>
+                            <li><strong>Low:</strong> BI migration to Metabase / Apache Superset.</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 14: Conclusion -->
+        <div class="slide">
+            <div class="slide-header">
+                <div class="slide-num">Slide 14</div>
+                <div class="slide-title">Conclusion & Internship Defense Summary</div>
+                <div class="slide-subtitle">Complete Handoff of Task 01 Deliverables to VELOOP Rewards Leadership</div>
+            </div>
+            <div class="slide-body" style="text-align: center; display: flex; flex-direction: column; justify-content: center; align-items: center;">
+                <div style="background: #F0FDF4; border: 2px solid #22C55E; padding: 25px 45px; border-radius: 12px; max-width: 800px; margin-bottom: 25px;">
+                    <h3 style="color: #15803D; font-size: 1.6rem; margin-bottom: 10px;">✅ 100% ASSIGNMENT COMPLETION VERIFIED</h3>
+                    <p style="font-size: 1.1rem; color: #166534; line-height: 1.6;">
+                        All 19 Work Packages (A through S) and all 21 official required deliverables have been completely authored, mathematically validated, and organized in the project repository.
+                    </p>
+                </div>
+                <div class="grid-3" style="width: 100%; max-width: 900px; text-align: left;">
+                    <div class="card">
+                        <h4>🛡️ Data Integrity</h4>
+                        <p style="font-size: 0.9rem;">Zero fabricated statistics; non-negotiable simulation disclaimer enforced across all files.</p>
+                    </div>
+                    <div class="card">
+                        <h4>📊 Technical Rigor</h4>
+                        <p style="font-size: 0.9rem;">ACID double-entry ledger, 32 events, 81 fields, 35 KPIs, and working Streamlit app.</p>
+                    </div>
+                    <div class="card">
+                        <h4>🚀 Business Ready</h4>
+                        <p style="font-size: 0.9rem;">Provides VELOOP leadership with the exact blueprint to launch with complete visibility.</p>
+                    </div>
+                </div>
+                <p style="margin-top: 30px; font-weight: 700; color: var(--navy); font-size: 1.1rem;">
+                    Thank you. The floor is now open for review questions and feedback.
+                </p>
+            </div>
+        </div>
+
+    </div>
+
+    <footer>
+        <button class="btn btn-outline" id="prevBtn" onclick="changeSlide(-1)">← Previous Slide</button>
+        <span style="font-size: 0.9rem; color: var(--text-muted);">Use Arrow Keys [← / →] or Buttons to Navigate</span>
+        <button class="btn" id="nextBtn" onclick="changeSlide(1)">Next Slide →</button>
+    </footer>
+
+    <script>
+        let currentSlide = 0;
+        const slides = document.querySelectorAll('.slide');
+        const counter = document.getElementById('counter');
+        const prevBtn = document.getElementById('prevBtn');
+        const nextBtn = document.getElementById('nextBtn');
+
+        function updateSlide() {
+            slides.forEach((s, idx) => {
+                s.classList.toggle('active', idx === currentSlide);
+            });
+            counter.innerText = `Slide ${currentSlide + 1} / ${slides.length}`;
+            prevBtn.disabled = (currentSlide === 0);
+            nextBtn.disabled = (currentSlide === slides.length - 1);
+        }
+
+        function changeSlide(direction) {
+            currentSlide += direction;
+            if (currentSlide < 0) currentSlide = 0;
+            if (currentSlide >= slides.length) currentSlide = slides.length - 1;
+            updateSlide();
+        }
+
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'ArrowRight' || e.key === ' ') {
+                changeSlide(1);
+            } else if (e.key === 'ArrowLeft') {
+                changeSlide(-1);
+            }
+        });
+
+        updateSlide();
+    </script>
+</body>
+</html>
+

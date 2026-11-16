@@ -8,7 +8,7 @@
 
 ## 1. Executive Summary & Purpose
 
-This document provides the formal business intelligence blueprint and visual-by-visual engineering specifications for the VELOOP Rewards Executive BI Suite, implemented in [05_dashboard/app.py](file:///d:/Veloop%20data%20Analysis/05_dashboard/app.py).
+This document provides the formal business intelligence blueprint and visual-by-visual engineering specifications for the VELOOP Rewards Executive BI Suite, implemented in [05_dashboard/app.py](05_dashboard/app.py).
 
 The application matches the official internship master specification, structured into **10 dedicated analytical modules**:
 

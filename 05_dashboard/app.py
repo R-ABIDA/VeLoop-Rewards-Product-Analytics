@@ -645,10 +645,7 @@ sections = [
     "Wallet & Withdrawal",
     "Referral & Virality",
     "Feature & Engagement",
-    "Data Quality & Audit",
-    "Data Explorer",
-    "Reports & Exports",
-    "Project Information"
+    "Data Quality & Audit"
 ]
 
 section = st.sidebar.radio("Navigation:", sections, label_visibility="collapsed")
@@ -1351,204 +1348,206 @@ elif section == "Referral & Virality" or section == "Referral Analytics" or sect
     st.markdown('</div>', unsafe_allow_html=True)
 
 # =============================================================================
-# 8. DATA QUALITY & AUDIT
+# 7. DATA QUALITY & AUDIT (CONSOLIDATED AUDIT, EXPLORER, EXPORTS & GOVERNANCE)
 # =============================================================================
-elif section == "Data Quality" or section == "Data Quality & Audit":
-    card_header("Data Quality Monitoring & Reconciliation Audit")
+elif section == "Data Quality & Audit" or section == "Data Quality" or section == "Data Explorer" or section == "Reports & Exports" or section == "Project Information":
+    card_header("Data Quality Monitoring, File Profiling, Exports & Governance")
 
-    q1, q2, q3, q4 = st.columns(4)
-    with q1:
-        st.metric("Clean Users Cohort", f"{len(users):,} Rows", "27 Columns | 0 Duplicates")
-    with q2:
-        st.metric("Messy Users Cohort", f"{len(messy_users):,} Rows", "8 Duplicate IDs | 28 Columns")
-    with q3:
-        st.metric("Events Sheet Count", "35,704 Rows", "0 Duplicate Event IDs")
-    with q4:
-        st.metric("Event Audit Sheet", "35,714 Rows", "Exactly 10 Injected Duplicates")
-
-    st.markdown("---")
-
-    col_q1, col_q2 = st.columns(2)
-    with col_q1:
-        st.markdown('<div class="sample-card">', unsafe_allow_html=True)
-        card_header("Investigation: Event Count Difference (35,704 vs 35,714)")
-        st.markdown("""
-        **Root Cause Analysis:**
-        * `03_Feature_Events`: **35,704** rows, 35,704 unique `event_id`s.
-        * `10_Event_Data_Quality_Audit`: **35,714** rows, 35,704 unique `event_id`s.
-        * Difference: Exactly **10 duplicate rows** injected for QA deduplication testing:
-          `EVT00021600`, `EVT00011275`, `EVT00006040`, `EVT00028196`, `EVT00030205`, `EVT00017051`, `EVT00034075`, `EVT00014772`, `EVT00025552`, `EVT00006379`.
-        * Deduplicating `10_Event_Data_Quality_Audit` on `event_id` yields exactly **35,704** records (1:1 match).
-        """)
-        st.markdown('</div>', unsafe_allow_html=True)
-
-    with col_q2:
-        st.markdown('<div class="sample-card">', unsafe_allow_html=True)
-        card_header("Investigation: Messy Users Audit (1,008 vs 1,000)")
-        st.markdown("""
-        **Root Cause Analysis:**
-        * `Users_1000_Clean`: **1,000** rows, 1,000 unique `user_id`s.
-        * `Users_Messy_Audit`: **1,008** rows, 1,000 unique `user_id`s.
-        * Difference: Exactly **8 duplicate user IDs**:
-          `VLUSR000095`, `VLUSR000217`, `VLUSR000272`, `VLUSR000335`, `VLUSR000409`, `VLUSR000779`, `VLUSR000803`, `VLUSR000813`.
-        * Additional Messy Anomalies: Missing values in `age` (1), `gender` (1), `city` (1), `registration_datetime` (1), `primary_device` (1).
-        """)
-        st.markdown('</div>', unsafe_allow_html=True)
-
-# =============================================================================
-# 9. DATA EXPLORER & FILE UPLOAD
-# =============================================================================
-elif section == "Data Explorer" or section == "Data Explorer & File Upload":
-    card_header("Interactive Data Explorer & File Profiler")
-
-    st.markdown('<div class="sample-card">', unsafe_allow_html=True)
-    card_header("Upload Dataset File (CSV or Excel)")
-    uploaded_file = st.file_uploader(
-        "Upload a dataset file (.csv or .xlsx) for on-the-fly inspection and profiling:",
-        type=["csv", "xlsx"]
-    )
-
-    if uploaded_file is not None:
-        try:
-            if uploaded_file.name.endswith(".csv"):
-                active_df = pd.read_csv(uploaded_file)
-            else:
-                active_df = pd.read_excel(uploaded_file)
-            st.success(f"✅ Successfully loaded uploaded file: `{uploaded_file.name}` ({active_df.shape[0]:,} rows, {active_df.shape[1]} columns)")
-        except Exception as e:
-            st.error(f"Error reading uploaded file: {e}")
-            active_df = users
-    else:
-        st.markdown("<div style='font-size:0.95rem; font-weight:600; color:#FFFFFF; margin-top:8px;'>Or Inspect Built-In Cohorts:</div>", unsafe_allow_html=True)
-        dataset_choice = st.selectbox(
-            "Select Built-In Dataset:",
-            [
-                "Users (Clean Cohort - 1,000 Rows)",
-                "Users (Messy Audit Cohort - 1,008 Rows)",
-                "Feature Events (35,704 Rows)",
-                "Sessions (7,913 Rows)",
-                "Task Activity (9,846 Rows)",
-                "Daily Activity (6,667 Rows)",
-                "Milestones (4,799 Rows)"
-            ],
-            label_visibility="collapsed"
-        )
-        if "Clean Cohort" in dataset_choice:
-            active_df = users
-        elif "Messy" in dataset_choice:
-            active_df = messy_users
-        elif "Events" in dataset_choice:
-            active_df = events
-        elif "Sessions" in dataset_choice:
-            active_df = sessions
-        elif "Task" in dataset_choice:
-            active_df = tasks
-        elif "Milestones" in dataset_choice:
-            active_df = milestones
-        else:
-            active_df = daily
-
-    st.markdown("---")
-    c1, c2, c3, c4 = st.columns(4)
-    with c1:
-        st.metric("Dataset Rows", f"{active_df.shape[0]:,}")
-    with c2:
-        st.metric("Total Columns", f"{active_df.shape[1]}")
-    with c3:
-        st.metric("Missing Values", f"{active_df.isna().sum().sum():,}")
-    with c4:
-        st.metric("Memory Usage", f"{active_df.memory_usage().sum() / 1024:.1f} KB")
-
-    col_filter = st.multiselect("Select Columns to Display:", options=list(active_df.columns), default=list(active_df.columns)[:8])
-    max_rows = st.slider("Max rows to preview:", min_value=10, max_value=min(1000, len(active_df)), value=50, step=10)
-
-    if col_filter:
-        preview_df = active_df[col_filter].head(max_rows)
-    else:
-        preview_df = active_df.head(max_rows)
-
-    st.dataframe(preview_df, use_container_width=True)
-    st.markdown('</div>', unsafe_allow_html=True)
-
-# =============================================================================
-# 10. REPORTS & DOCUMENT EXPORTS
-# =============================================================================
-elif section == "Reports & Exports" or section == "Reports & Document Exports":
-    card_header("Artifact & Document Export Center")
-
-    st.markdown('<div class="sample-card">', unsafe_allow_html=True)
-    card_header("Executive PDF Reports")
-    pdf_files = [
-        ("Executive Summary (Deliverable 01)", "04_deliverables/deliverable_01_executive_summary/Executive_Summary.pdf", "Executive_Summary_VELOOP.pdf"),
-        ("Data Quality Audit Report (Deliverable 13)", "04_deliverables/deliverable_13_data_quality_audit/Data_Quality_Audit_Report.pdf", "Data_Quality_Audit_VELOOP.pdf"),
-        ("Analytics Readiness Assessment (Deliverable 18)", "04_deliverables/deliverable_18_analytics_readiness_assessment/Analytics_Readiness_Assessment.pdf", "Analytics_Readiness_VELOOP.pdf"),
-        ("Final Consolidated Technical Report (Deliverable 21)", "04_deliverables/deliverable_21_final_consolidated_report/Final_Consolidated_Report.pdf", "Final_Consolidated_Report_VELOOP.pdf")
-    ]
-
-    p_col1, p_col2 = st.columns(2)
-    for i, (label, fpath, dl_name) in enumerate(pdf_files):
-        col = p_col1 if i % 2 == 0 else p_col2
-        with col:
-            if os.path.exists(fpath):
-                with open(fpath, "rb") as f:
-                    pdf_bytes = f.read()
-                st.download_button(
-                    label=f"📄 Download {label}",
-                    data=pdf_bytes,
-                    file_name=dl_name,
-                    mime="application/pdf",
-                    use_container_width=True
-                )
-            else:
-                st.warning(f"File pending compilation: {fpath}")
-    st.markdown('</div>', unsafe_allow_html=True)
-
-    st.markdown('<div class="sample-card">', unsafe_allow_html=True)
-    card_header("Official Excel Analytical Workbooks")
-    excel_files = [
-        ("Data Coverage Matrix", "04_deliverables/deliverable_03_data_coverage_matrix/Data_Coverage_Matrix.xlsx"),
-        ("Event Tracking Plan", "04_deliverables/deliverable_08_event_tracking_plan/Event_Tracking_Plan.xlsx"),
-        ("Enterprise Data Dictionary", "04_deliverables/deliverable_09_data_dictionary/Data_Dictionary.xlsx"),
-        ("KPI Catalogue", "04_deliverables/deliverable_11_kpi_catalogue/KPI_Catalogue.xlsx"),
-        ("Simulated Data Profiling", "04_deliverables/deliverable_12_simulated_data_profiling/Simulated_Data_Profiling_Workbook.xlsx"),
-        ("Data Quality Audit", "04_deliverables/deliverable_13_data_quality_audit/Data_Quality_Audit_Workbook.xlsx"),
-        ("Source & Verification Register", "04_deliverables/deliverable_19_assumption_and_verification_register/Source_and_Verification_Register.xlsx")
-    ]
-
-    ex_cols = st.columns(3)
-    for i, (lbl, fpath) in enumerate(excel_files):
-        with ex_cols[i % 3]:
-            if os.path.exists(fpath):
-                with open(fpath, "rb") as f:
-                    xl_bytes = f.read()
-                st.download_button(
-                    label=f"📗 {lbl} (.xlsx)",
-                    data=xl_bytes,
-                    file_name=os.path.basename(fpath),
-                    mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-                    use_container_width=True
-                )
-    st.markdown('</div>', unsafe_allow_html=True)
-
-# =============================================================================
-# 11. PROJECT INFORMATION & GOVERNANCE
-# =============================================================================
-elif section == "Project Information" or section == "Project Information & Governance":
-    card_header("Project Information & Governance Standards")
-
-    st.markdown('<div class="sample-card">', unsafe_allow_html=True)
-    card_header("Internship Scope & Project Metadata")
-    info_table = pd.DataFrame([
-        {"Attribute": "Project Title", "Details": "Product Analytics, Data Readiness & Data Management Blueprint"},
-        {"Attribute": "Organization", "Details": "VELOOP Rewards & VELOOP CO."},
-        {"Attribute": "Role", "Details": "Data Analyst Intern (Analytics, Engineering, BI & Documentation Specialist)"},
-        {"Attribute": "Assignment Code", "Details": "Data Analyst Internship — Task 01"},
-        {"Attribute": "Duration", "Details": "22–25 Days Scheduled (Comprehensive 21-Deliverable Program)"},
-        {"Attribute": "Integrity Standard", "Details": "SIMULATED DATA — CREATED FOR ANALYTICAL TESTING"},
-        {"Attribute": "Overall Status", "Details": "100% COMPLETE — All 21 Deliverables Implemented & Verified"}
+    tab_audit, tab_explorer, tab_reports, tab_info = st.tabs([
+        "🛡️ Quality & Forensic Audit",
+        "🔍 Interactive Data Explorer & Upload",
+        "📥 Reports & Document Exports",
+        "ℹ️ Project Info & PostgreSQL Health"
     ])
-    st.table(info_table)
-    st.markdown('</div>', unsafe_allow_html=True)
+
+    with tab_audit:
+        q1, q2, q3, q4 = st.columns(4)
+        with q1:
+            st.metric("Clean Users Cohort", f"{len(users):,} Rows", "27 Columns | 0 Duplicates")
+        with q2:
+            st.metric("Messy Users Cohort", f"{len(messy_users):,} Rows", "8 Duplicate IDs | 28 Columns")
+        with q3:
+            st.metric("Events Sheet Count", "35,704 Rows", "0 Duplicate Event IDs")
+        with q4:
+            st.metric("Event Audit Sheet", "35,714 Rows", "Exactly 10 Injected Duplicates")
+
+        st.markdown("---")
+
+        col_q1, col_q2 = st.columns(2)
+        with col_q1:
+            st.markdown('<div class="sample-card">', unsafe_allow_html=True)
+            card_header("Investigation: Event Count Difference (35,704 vs 35,714)")
+            st.markdown("""
+            **Forensic Root Cause Analysis:**
+            * `03_Feature_Events`: **35,704** rows, 35,704 unique `event_id`s.
+            * `10_Event_Data_Quality_Audit`: **35,714** rows, 35,704 unique `event_id`s.
+            * Difference: Exactly **10 duplicate rows** (10 duplicate pairs, 20 rows total):
+              `EVT00006040`, `EVT00006379`, `EVT00011275`, `EVT00014772`, `EVT00017051`, `EVT00021600`, `EVT00025552`, `EVT00028196`, `EVT00030205`, `EVT00034075`.
+            * **5 Feature Name Casing Anomalies:** `missions`, `leaderboard`, `wallet`, `daily reward`, `watch ads`.
+            * **4 Event Status Anomalies:** Trailing whitespace defects (`success `).
+            * Deduplicating `10_Event_Data_Quality_Audit` on `event_id` yields exactly **35,704** records (1:1 match).
+            """)
+            st.markdown('</div>', unsafe_allow_html=True)
+
+        with col_q2:
+            st.markdown('<div class="sample-card">', unsafe_allow_html=True)
+            card_header("Investigation: Messy Users Audit (1,008 vs 1,000)")
+            st.markdown("""
+            **Forensic Root Cause Analysis:**
+            * `Users_1000_Clean`: **1,000** rows, 1,000 unique `user_id`s.
+            * `Users_Messy_Audit`: **1,008** rows, 1,000 unique `user_id`s.
+            * Difference: Exactly **8 duplicate user IDs**:
+              `VLUSR000095`, `VLUSR000217`, `VLUSR000272`, `VLUSR000335`, `VLUSR000409`, `VLUSR000779`, `VLUSR000803`, `VLUSR000813`.
+            * Additional Messy Anomalies: Missing values in `age` (1), `gender` (1), `city` (1), `registration_datetime` (1), `primary_device` (1).
+            """)
+            st.markdown('</div>', unsafe_allow_html=True)
+
+    with tab_explorer:
+        st.markdown('<div class="sample-card">', unsafe_allow_html=True)
+        card_header("Upload Dataset File (CSV or Excel)")
+        uploaded_file = st.file_uploader(
+            "Upload a dataset file (.csv or .xlsx) for on-the-fly inspection and profiling:",
+            type=["csv", "xlsx"]
+        )
+
+        if uploaded_file is not None:
+            try:
+                if uploaded_file.name.endswith(".csv"):
+                    active_df = pd.read_csv(uploaded_file)
+                else:
+                    active_df = pd.read_excel(uploaded_file)
+                st.success(f"✅ Successfully loaded uploaded file: `{uploaded_file.name}` ({active_df.shape[0]:,} rows, {active_df.shape[1]} columns)")
+            except Exception as e:
+                st.error(f"Error reading uploaded file: {e}")
+                active_df = users
+        else:
+            st.markdown("<div style='font-size:0.95rem; font-weight:600; color:#FFFFFF; margin-top:8px;'>Or Inspect Built-In Cohorts:</div>", unsafe_allow_html=True)
+            dataset_choice = st.selectbox(
+                "Select Built-In Dataset:",
+                [
+                    "Users (Clean Cohort - 1,000 Rows)",
+                    "Users (Messy Audit Cohort - 1,008 Rows)",
+                    "Feature Events (35,704 Rows)",
+                    "Sessions (7,913 Rows)",
+                    "Task Activity (9,846 Rows)",
+                    "Daily Activity (6,667 Rows)",
+                    "Milestones (4,799 Rows)"
+                ],
+                label_visibility="collapsed"
+            )
+            if "Clean Cohort" in dataset_choice:
+                active_df = users
+            elif "Messy" in dataset_choice:
+                active_df = messy_users
+            elif "Events" in dataset_choice:
+                active_df = events
+            elif "Sessions" in dataset_choice:
+                active_df = sessions
+            elif "Task" in dataset_choice:
+                active_df = tasks
+            elif "Milestones" in dataset_choice:
+                active_df = milestones
+            else:
+                active_df = daily
+
+        st.markdown("---")
+        c1, c2, c3, c4 = st.columns(4)
+        with c1:
+            st.metric("Dataset Rows", f"{active_df.shape[0]:,}")
+        with c2:
+            st.metric("Total Columns", f"{active_df.shape[1]}")
+        with c3:
+            st.metric("Missing Values", f"{active_df.isna().sum().sum():,}")
+        with c4:
+            st.metric("Memory Usage", f"{active_df.memory_usage().sum() / 1024:.1f} KB")
+
+        col_filter = st.multiselect("Select Columns to Display:", options=list(active_df.columns), default=list(active_df.columns)[:8])
+        max_rows = st.slider("Max rows to preview:", min_value=10, max_value=min(1000, len(active_df)), value=50, step=10)
+
+        if col_filter:
+            preview_df = active_df[col_filter].head(max_rows)
+        else:
+            preview_df = active_df.head(max_rows)
+
+        st.dataframe(preview_df, use_container_width=True)
+        st.markdown('</div>', unsafe_allow_html=True)
+
+    with tab_reports:
+        st.markdown('<div class="sample-card">', unsafe_allow_html=True)
+        card_header("Executive PDF Reports")
+        pdf_files = [
+            ("Executive Summary (Deliverable 01)", "04_deliverables/deliverable_01_executive_summary/Executive_Summary.pdf", "Executive_Summary_VELOOP.pdf"),
+            ("Data Quality Audit Report (Deliverable 13)", "04_deliverables/deliverable_13_data_quality_audit/Data_Quality_Audit_Report.pdf", "Data_Quality_Audit_VELOOP.pdf"),
+            ("Analytics Readiness Assessment (Deliverable 18)", "04_deliverables/deliverable_18_analytics_readiness_assessment/Analytics_Readiness_Assessment.pdf", "Analytics_Readiness_VELOOP.pdf"),
+            ("Final Consolidated Technical Report (Deliverable 21)", "04_deliverables/deliverable_21_final_consolidated_report/Final_Consolidated_Report.pdf", "Final_Consolidated_Report_VELOOP.pdf")
+        ]
+
+        p_col1, p_col2 = st.columns(2)
+        for i, (label, fpath, dl_name) in enumerate(pdf_files):
+            col = p_col1 if i % 2 == 0 else p_col2
+            with col:
+                if os.path.exists(fpath):
+                    with open(fpath, "rb") as f:
+                        pdf_bytes = f.read()
+                    st.download_button(
+                        label=f"📄 Download {label}",
+                        data=pdf_bytes,
+                        file_name=dl_name,
+                        mime="application/pdf",
+                        use_container_width=True
+                    )
+                else:
+                    st.warning(f"File pending compilation: {fpath}")
+        st.markdown('</div>', unsafe_allow_html=True)
+
+        st.markdown('<div class="sample-card">', unsafe_allow_html=True)
+        card_header("Official Excel Analytical Workbooks")
+        excel_files = [
+            ("Data Coverage Matrix", "04_deliverables/deliverable_03_data_coverage_matrix/Data_Coverage_Matrix.xlsx"),
+            ("Event Tracking Plan", "04_deliverables/deliverable_08_event_tracking_plan/Event_Tracking_Plan.xlsx"),
+            ("Enterprise Data Dictionary", "04_deliverables/deliverable_09_data_dictionary/Data_Dictionary.xlsx"),
+            ("KPI Catalogue", "04_deliverables/deliverable_11_kpi_catalogue/KPI_Catalogue.xlsx"),
+            ("Simulated Data Profiling", "04_deliverables/deliverable_12_simulated_data_profiling/Simulated_Data_Profiling_Workbook.xlsx"),
+            ("Data Quality Audit", "04_deliverables/deliverable_13_data_quality_audit/Data_Quality_Audit_Workbook.xlsx"),
+            ("Source & Verification Register", "04_deliverables/deliverable_19_assumption_and_verification_register/Source_and_Verification_Register.xlsx")
+        ]
+
+        ex_cols = st.columns(3)
+        for i, (lbl, fpath) in enumerate(excel_files):
+            with ex_cols[i % 3]:
+                if os.path.exists(fpath):
+                    with open(fpath, "rb") as f:
+                        xl_bytes = f.read()
+                    st.download_button(
+                        label=f"📗 {lbl} (.xlsx)",
+                        data=xl_bytes,
+                        file_name=os.path.basename(fpath),
+                        mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+                        use_container_width=True
+                    )
+        st.markdown('</div>', unsafe_allow_html=True)
+
+    with tab_info:
+        st.markdown('<div class="sample-card">', unsafe_allow_html=True)
+        card_header("Internship Scope & Project Metadata")
+        info_table = pd.DataFrame([
+            {"Attribute": "Project Title", "Details": "Product Analytics, Data Readiness & Data Management Blueprint"},
+            {"Attribute": "Organization", "Details": "VELOOP Rewards & VELOOP CO."},
+            {"Attribute": "Role", "Details": "Data Analyst Intern (Analytics, Engineering, BI & Documentation Specialist)"},
+            {"Attribute": "Assignment Code", "Details": "Data Analyst Internship — Task 01"},
+            {"Attribute": "Duration", "Details": "22–25 Days Scheduled (Comprehensive 21-Deliverable Program)"},
+            {"Attribute": "Integrity Standard", "Details": "SIMULATED DATA — CREATED FOR ANALYTICAL TESTING"},
+            {"Attribute": "Overall Status", "Details": "100% COMPLETE — All 21 Deliverables Implemented & Verified"}
+        ])
+        st.table(info_table)
+        st.markdown('</div>', unsafe_allow_html=True)
+
+        st.markdown('<div class="sample-card">', unsafe_allow_html=True)
+        card_header("PostgreSQL & pgAdmin 4 Relational Connection Diagnostics")
+        db_stat = check_db_health()
+        st.write(f"**Engine Status:** `{db_stat.get('status', 'OFFLINE')}`")
+        st.write(f"**Diagnostic Message:** {db_stat.get('message', 'Direct local data mode active.')}")
+        st.markdown('</div>', unsafe_allow_html=True)
 
 # Footer
 st.markdown("---")

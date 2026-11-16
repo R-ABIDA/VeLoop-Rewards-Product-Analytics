@@ -80,3 +80,4 @@ def query_database(sql_query, params=None):
     except Exception as e:
         st.error(f"SQL execution error: {e}")
         return None
+

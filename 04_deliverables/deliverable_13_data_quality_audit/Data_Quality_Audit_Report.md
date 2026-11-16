@@ -17,7 +17,7 @@ In accordance with **Work Packages K & L (Sections 17 & 18)** of `Data_Analyst_0
 
 ### Key Quality Findings:
 1. **Anomaly Surface Area:** 12 distinct classes of data quality anomalies were audited, including duplicate primary keys, null emails, unstandardized casing, malformed dates, and trailing spaces.
-2. **Reproducible Cleaning Executed:** Automated cleaning scripts successfully transformed `Users_Messy_Audit` from 1,008 rows to **1,000 clean records** and `10_Event_Data_Quality_Audit` from 35,714 rows to **35,704 clean records**, saved in [`02_processed_data/`](file:///d:/Veloop%20data%20Analysis/02_processed_data).
+2. **Reproducible Cleaning Executed:** Automated cleaning scripts successfully transformed `Users_Messy_Audit` from 1,008 rows to **1,000 clean records** and `10_Event_Data_Quality_Audit` from 35,714 rows to **35,704 clean records**, saved in [`02_processed_data/`](02_processed_data).
 3. **End-to-End Control Framework:** A 6-stage proactive prevention architecture was designed, spanning Application runtime validation through Ingestion gates, ELT cleaning, and pre-dashboard sanity checks.
 
 ---
@@ -60,7 +60,7 @@ flowchart LR
   3. Lowercased and stripped `email`, imputing standardized missing placeholder.
   4. Imputed `'Unknown'` for optional demographic nulls in `city` and `state`.
   5. Coerced non-standard dates to ISO-8601 UTC timestamps.
-* **Final State:** Exactly **1,000 clean user records** saved in [`02_processed_data/users_cleaned.csv`](file:///d:/Veloop%20data%20Analysis/02_processed_data/users_cleaned.csv).
+* **Final State:** Exactly **1,000 clean user records** saved in [`02_processed_data/users_cleaned.csv`](02_processed_data/users_cleaned.csv).
 
 ### 3.2 Feature Events Dataset Transformation:
 * **Initial State:** 35,714 records in `10_Event_Data_Quality_Audit`, 10 duplicate `event_id` rows, mixed lowercase feature names (`missions`, `watch ads`).
@@ -68,7 +68,7 @@ flowchart LR
   1. Deduplicated `event_id` keeping first occurrence $\rightarrow$ 10 duplicate rows purged.
   2. Standardized `feature_name` casing using `.str.title()` (e.g. `'missions'` $\rightarrow$ `'Missions'`).
   3. Replaced blank/null device strings with `'Unknown'`.
-* **Final State:** Exactly **35,704 clean event records** matching the production baseline in `03_Feature_Events`, saved in [`02_processed_data/events_cleaned.csv`](file:///d:/Veloop%20data%20Analysis/02_processed_data/events_cleaned.csv).
+* **Final State:** Exactly **35,704 clean event records** matching the production baseline in `03_Feature_Events`, saved in [`02_processed_data/events_cleaned.csv`](02_processed_data/events_cleaned.csv).
 
 ---
 
@@ -116,6 +116,6 @@ flowchart TD
 
 ## 5. Artifact References
 
-* **Deliverable 13 Excel Workbook:** [`04_deliverables/deliverable_13_data_quality_audit/Data_Quality_Audit_Workbook.xlsx`](file:///d:/Veloop%20data%20Analysis/04_deliverables/deliverable_13_data_quality_audit/Data_Quality_Audit_Workbook.xlsx)
-* **Cleaned Processed Datasets:** [`02_processed_data/users_cleaned.csv`](file:///d:/Veloop%20data%20Analysis/02_processed_data/users_cleaned.csv) and [`02_processed_data/events_cleaned.csv`](file:///d:/Veloop%20data%20Analysis/02_processed_data/events_cleaned.csv)
+* **Deliverable 13 Excel Workbook:** [`04_deliverables/deliverable_13_data_quality_audit/Data_Quality_Audit_Workbook.xlsx`](04_deliverables/deliverable_13_data_quality_audit/Data_Quality_Audit_Workbook.xlsx)
+* **Cleaned Processed Datasets:** [`02_processed_data/users_cleaned.csv`](02_processed_data/users_cleaned.csv) and [`02_processed_data/events_cleaned.csv`](02_processed_data/events_cleaned.csv)
 

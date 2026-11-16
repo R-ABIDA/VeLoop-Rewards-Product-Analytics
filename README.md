@@ -32,7 +32,7 @@ Because VELOOP is currently in active pre-launch development, the platform lacks
 
 ## 3. Source Workbooks and Worksheets Used
 
-All metrics, data models, and analytical dashboards are strictly derived from the two original Excel workbooks located in [`01_raw_data/`](file:///d:/Veloop%20data%20Analysis/01_raw_data) (also preserved in [`Data/`](file:///d:/Veloop%20data%20Analysis/Data)):
+All metrics, data models, and analytical dashboards are strictly derived from the two original Excel workbooks located in [`01_raw_data/`](01_raw_data) (also preserved in [`Data/`](Data)):
 
 ### Source Workbook 1: `VELoop_Rewards_Data_01.xlsx` (359 KB)
 * **`Users_1000_Clean` (1,000 rows, 27 cols):** Master clean user demographic profiles, registration timestamps, acquisition channels, device types, verification flags, and static soft currency `xp_balance`.
@@ -57,12 +57,12 @@ All metrics, data models, and analytical dashboards are strictly derived from th
 
 ## 4. Data Cleaning & Reconciliation Methodology
 
-To ensure 100% reproducible and audit-compliant analytics, an automated cleaning pipeline [`03_analysis_and_models/profiling/clean_and_export_all_datasets.py`](file:///d:/Veloop%20data%20Analysis/03_analysis_and_models/profiling/clean_and_export_all_datasets.py) was developed:
+To ensure 100% reproducible and audit-compliant analytics, an automated cleaning pipeline [`03_analysis_and_models/profiling/clean_and_export_all_datasets.py`](03_analysis_and_models/profiling/clean_and_export_all_datasets.py) was developed:
 
 ### 4.1 Forensic Audit & Discrepancy Resolution
-1. **The 10-Record Event Discrepancy:** The 10-record difference between `03_Feature_Events` (35,704 rows) and `10_Event_Data_Quality_Audit` (35,714 rows) was forensically verified: `10_Event_Data_Quality_Audit` contains **exactly 10 duplicate rows** for 10 specific event IDs (`EVT00021600`, `EVT00011275`, `EVT00006040`, `EVT00028196`, `EVT00030205`, `EVT00017051`, `EVT00034075`, `EVT00014772`, `EVT00025552`, `EVT00006379`). Deduplicating on `event_id` yields exactly 35,704 rows matching `03_Feature_Events` 1:1. These 10 duplicate records are archived in [`02_processed_data/event_audit_10_duplicates.csv`](file:///d:/Veloop%20data%20Analysis/02_processed_data/event_audit_10_duplicates.csv).
-2. **Messy User Deduplication:** In `Users_Messy_Audit` (1,008 rows), exactly 8 duplicate user IDs (`VLUSR000095`, `VLUSR000217`, `VLUSR000272`, `VLUSR000335`, `VLUSR000409`, `VLUSR000779`, `VLUSR000803`, `VLUSR000813`) were identified and resolved by retaining the primary record, resulting in exactly 1,000 clean user records archived in [`02_processed_data/users_messy_8_duplicates.csv`](file:///d:/Veloop%20data%20Analysis/02_processed_data/users_messy_8_duplicates.csv).
-3. **Standardized Cleaned Outputs:** Cleaned datasets are persisted in [`02_processed_data/`](file:///d:/Veloop%20data%20Analysis/02_processed_data):
+1. **The 10-Record Event Discrepancy:** The 10-record difference between `03_Feature_Events` (35,704 rows) and `10_Event_Data_Quality_Audit` (35,714 rows) was forensically verified: `10_Event_Data_Quality_Audit` contains **exactly 10 duplicate rows** for 10 specific event IDs (`EVT00021600`, `EVT00011275`, `EVT00006040`, `EVT00028196`, `EVT00030205`, `EVT00017051`, `EVT00034075`, `EVT00014772`, `EVT00025552`, `EVT00006379`). Deduplicating on `event_id` yields exactly 35,704 rows matching `03_Feature_Events` 1:1. These 10 duplicate records are archived in [`02_processed_data/event_audit_10_duplicates.csv`](02_processed_data/event_audit_10_duplicates.csv).
+2. **Messy User Deduplication:** In `Users_Messy_Audit` (1,008 rows), exactly 8 duplicate user IDs (`VLUSR000095`, `VLUSR000217`, `VLUSR000272`, `VLUSR000335`, `VLUSR000409`, `VLUSR000779`, `VLUSR000803`, `VLUSR000813`) were identified and resolved by retaining the primary record, resulting in exactly 1,000 clean user records archived in [`02_processed_data/users_messy_8_duplicates.csv`](02_processed_data/users_messy_8_duplicates.csv).
+3. **Standardized Cleaned Outputs:** Cleaned datasets are persisted in [`02_processed_data/`](02_processed_data):
    * `users_cleaned.csv` (1,000 rows, 27 cols, 0 duplicates, 100% valid PKs)
    * `events_cleaned.csv` (35,704 rows, 13 cols, title-cased feature names)
    * `sessions_cleaned.csv` (7,913 rows, 12 cols)
@@ -85,7 +85,7 @@ To ensure 100% reproducible and audit-compliant analytics, an automated cleaning
 
 ## 6. Dashboard Sections & Live Interactive Capabilities
 
-The Streamlit BI dashboard ([`05_dashboard/app.py`](file:///d:/Veloop%20data%20Analysis/05_dashboard/app.py)) is organized into the **7 official working sections** plus utility modules, featuring a sample-matched dark theme (matte charcoal `#212435`, crisp white navigation sidebar, custom Plotly dark charts, and zero top white space):
+The Streamlit BI dashboard ([`05_dashboard/app.py`](05_dashboard/app.py)) is organized into the **7 official working sections** plus utility modules, featuring a sample-matched dark theme (matte charcoal `#212435`, crisp white navigation sidebar, custom Plotly dark charts, and zero top white space):
 
 1. **Executive Overview:** High-level platform KPIs (Total Users: 1,000, Active Users: 815, Total Sessions: 7,913, Total Events: 35,704, Task Completion Rate: 57.1%), DAU trend line, and feature adoption donut.
 2. **User & Account Analytics:** User demographics, age distribution histogram, gender split, device breakdown (Android vs iOS vs Web), and acquisition source distribution.
@@ -103,7 +103,7 @@ The Streamlit BI dashboard ([`05_dashboard/app.py`](file:///d:/Veloop%20data%20A
 
 ## 7. PostgreSQL Schema & SQL File Structure
 
-Located in [`03_analysis_and_models/sql/`](file:///d:/Veloop%20data%20Analysis/03_analysis_and_models/sql):
+Located in [`03_analysis_and_models/sql/`](03_analysis_and_models/sql):
 
 | File Name | Purpose & Contents | Tables / Views Created |
 | :--- | :--- | :--- |
@@ -162,7 +162,7 @@ python -m unittest 07_tests_and_validation/test_phase1_audit.py
 python -m unittest 07_tests_and_validation/test_sql_and_reconciliation.py
 ```
 
-* **Test Execution Evidence:** Full test execution output is logged in [`07_tests_and_validation/evidence/test_run.log`](file:///d:/Veloop%20data%20Analysis/07_tests_and_validation/evidence/test_run.log) and [`07_tests_and_validation/evidence/test_execution_report.md`](file:///d:/Veloop%20data%20Analysis/07_tests_and_validation/evidence/test_execution_report.md).
+* **Test Execution Evidence:** Full test execution output is logged in [`07_tests_and_validation/evidence/test_run.log`](07_tests_and_validation/evidence/test_run.log) and [`07_tests_and_validation/evidence/test_execution_report.md`](07_tests_and_validation/evidence/test_execution_report.md).
 
 ---
 
@@ -204,24 +204,24 @@ The repository is fully configured for zero-configuration deployment to **Stream
 
 | # | Code | Deliverable Name | File Link(s) | Status |
 | :-: | :--- | :--- | :--- | :---: |
-| **01** | `DEL-01` | Executive Summary | [Executive_Summary.md](file:///d:/Veloop%20data%20Analysis/04_deliverables/deliverable_01_executive_summary/Executive_Summary.md), [PDF](file:///d:/Veloop%20data%20Analysis/04_deliverables/deliverable_01_executive_summary/Executive_Summary.pdf) | **Verified 100%** |
-| **02** | `DEL-02` | Product Data Readiness Audit | [Product_Data_Readiness_Audit.md](file:///d:/Veloop%20data%20Analysis/04_deliverables/deliverable_02_product_data_audit/Product_Data_Readiness_Audit.md) | **Verified 100%** |
-| **03** | `DEL-03` | Data Coverage Matrix & Gaps Register | [Data_Coverage_Matrix.xlsx](file:///d:/Veloop%20data%20Analysis/04_deliverables/deliverable_03_data_coverage_matrix/Data_Coverage_Matrix.xlsx), [MD](file:///d:/Veloop%20data%20Analysis/04_deliverables/deliverable_03_data_coverage_matrix/Data_Coverage_Matrix.md) | **Verified 100%** |
-| **04** | `DEL-04` | User & Account Analytics Specification | [User_Analytics_Specification.md](file:///d:/Veloop%20data%20Analysis/04_deliverables/deliverable_04_user_analytics_spec/User_Analytics_Specification.md) | **Verified 100%** |
-| **05** | `DEL-05` | Earning & Reward Analytics Specification | [Reward_Analytics_Specification.md](file:///d:/Veloop%20data%20Analysis/04_deliverables/deliverable_05_reward_analytics_spec/Reward_Analytics_Specification.md) | **Verified 100%** |
-| **06** | `DEL-06` | Wallet & Withdrawal Specification | [Wallet_Withdrawal_Specification.md](file:///d:/Veloop%20data%20Analysis/04_deliverables/deliverable_06_wallet_withdrawal_spec/Wallet_Withdrawal_Specification.md) | **Verified 100%** |
-| **07** | `DEL-07` | Referral & Engagement Analytics | [Referral_Engagement_Analytics.md](file:///d:/Veloop%20data%20Analysis/04_deliverables/deliverable_07_referral_engagement_analytics/Referral_Engagement_Analytics.md) | **Verified 100%** |
-| **08** | `DEL-08` | Event Tracking Plan (32 Events, 16 Attrs) | [Event_Tracking_Plan.xlsx](file:///d:/Veloop%20data%20Analysis/04_deliverables/deliverable_08_event_tracking_plan/Event_Tracking_Plan.xlsx), [MD](file:///d:/Veloop%20data%20Analysis/04_deliverables/deliverable_08_event_tracking_plan/Event_Tracking_Plan.md) | **Verified 100%** |
-| **09** | `DEL-09` | Enterprise Data Dictionary (81 Fields) | [Data_Dictionary.xlsx](file:///d:/Veloop%20data%20Analysis/04_deliverables/deliverable_09_data_dictionary/Data_Dictionary.xlsx), [MD](file:///d:/Veloop%20data%20Analysis/04_deliverables/deliverable_09_data_dictionary/Data_Dictionary.md) | **Verified 100%** |
-| **10** | `DEL-10` | Logical Data Model & Physical DDL | [Logical_Data_Model_and_ER_Diagram.md](file:///d:/Veloop%20data%20Analysis/04_deliverables/deliverable_10_logical_data_model/Logical_Data_Model_and_ER_Diagram.md), [schema.sql](file:///d:/Veloop%20data%20Analysis/04_deliverables/deliverable_10_logical_data_model/schema.sql) | **Verified 100%** |
-| **11** | `DEL-11` | Enterprise KPI Catalogue (35 KPIs) | [KPI_Catalogue.xlsx](file:///d:/Veloop%20data%20Analysis/04_deliverables/deliverable_11_kpi_catalogue/KPI_Catalogue.xlsx), [MD](file:///d:/Veloop%20data%20Analysis/04_deliverables/deliverable_11_kpi_catalogue/KPI_Catalogue.md) | **Verified 100%** |
-| **12** | `DEL-12` | Simulated Data Profiling Report | [Simulated_Data_Profiling_Workbook.xlsx](file:///d:/Veloop%20data%20Analysis/04_deliverables/deliverable_12_simulated_data_profiling/Simulated_Data_Profiling_Workbook.xlsx), [MD](file:///d:/Veloop%20data%20Analysis/04_deliverables/deliverable_12_simulated_data_profiling/Simulated_Data_Profiling_Report.md) | **Verified 100%** |
-| **13** | `DEL-13` | Data Quality Audit & QC Framework | [Data_Quality_Audit_Workbook.xlsx](file:///d:/Veloop%20data%20Analysis/04_deliverables/deliverable_13_data_quality_audit/Data_Quality_Audit_Workbook.xlsx), [MD](file:///d:/Veloop%20data%20Analysis/04_deliverables/deliverable_13_data_quality_audit/Data_Quality_Audit_Report.md), [PDF](file:///d:/Veloop%20data%20Analysis/04_deliverables/deliverable_13_data_quality_audit/Data_Quality_Audit_Report.pdf) | **Verified 100%** |
-| **14** | `DEL-14` | Dashboard Blueprint Specification | [Dashboard_Blueprint_Specifications.md](file:///d:/Veloop%20data%20Analysis/04_deliverables/deliverable_14_dashboard_blueprint/Dashboard_Blueprint_Specifications.md) | **Verified 100%** |
-| **15** | `DEL-15` | Developer Analytics Handoff | [Developer_Analytics_Handoff.md](file:///d:/Veloop%20data%20Analysis/04_deliverables/deliverable_15_developer_handoff/Developer_Analytics_Handoff.md) | **Verified 100%** |
-| **16** | `DEL-16` | Data Pipeline Proposal & Architecture | [Data_Pipeline_Proposal.md](file:///d:/Veloop%20data%20Analysis/04_deliverables/deliverable_16_data_pipeline_proposal/Data_Pipeline_Proposal.md) | **Verified 100%** |
-| **17** | `DEL-17` | Privacy, Governance & Change Mgmt | [Privacy_Governance_and_Change_Management.md](file:///d:/Veloop%20data%20Analysis/04_deliverables/deliverable_17_privacy_and_governance/Privacy_Governance_and_Change_Management.md) | **Verified 100%** |
-| **18** | `DEL-18` | Analytics Readiness Assessment | [Analytics_Readiness_Assessment.md](file:///d:/Veloop%20data%20Analysis/04_deliverables/deliverable_18_analytics_readiness_assessment/Analytics_Readiness_Assessment.md), [PDF](file:///d:/Veloop%20data%20Analysis/04_deliverables/deliverable_18_analytics_readiness_assessment/Analytics_Readiness_Assessment.pdf) | **Verified 100%** |
-| **19** | `DEL-19` | Source & Verification Register | [Source_and_Verification_Register.xlsx](file:///d:/Veloop%20data%20Analysis/04_deliverables/deliverable_19_assumption_and_verification_register/Source_and_Verification_Register.xlsx), [MD](file:///d:/Veloop%20data%20Analysis/04_deliverables/deliverable_19_assumption_and_verification_register/Source_and_Verification_Register.md) | **Verified 100%** |
-| **20** | `DEL-20` | Implementation Backlog | [Implementation_Backlog.md](file:///d:/Veloop%20data%20Analysis/04_deliverables/deliverable_20_implementation_backlog/Implementation_Backlog.md) | **Verified 100%** |
-| **21** | `DEL-21` | Final Consolidated Report | [Final_Consolidated_Report.md](file:///d:/Veloop%20data%20Analysis/04_deliverables/deliverable_21_final_consolidated_report/Final_Consolidated_Report.md), [PDF](file:///d:/Veloop%20data%20Analysis/04_deliverables/deliverable_21_final_consolidated_report/Final_Consolidated_Report.pdf) | **Verified 100%** |
+| **01** | `DEL-01` | Executive Summary | [Executive_Summary.md](04_deliverables/deliverable_01_executive_summary/Executive_Summary.md), [PDF](04_deliverables/deliverable_01_executive_summary/Executive_Summary.pdf) | **Verified 100%** |
+| **02** | `DEL-02` | Product Data Readiness Audit | [Product_Data_Readiness_Audit.md](04_deliverables/deliverable_02_product_data_audit/Product_Data_Readiness_Audit.md) | **Verified 100%** |
+| **03** | `DEL-03` | Data Coverage Matrix & Gaps Register | [Data_Coverage_Matrix.xlsx](04_deliverables/deliverable_03_data_coverage_matrix/Data_Coverage_Matrix.xlsx), [MD](04_deliverables/deliverable_03_data_coverage_matrix/Data_Coverage_Matrix.md) | **Verified 100%** |
+| **04** | `DEL-04` | User & Account Analytics Specification | [User_Analytics_Specification.md](04_deliverables/deliverable_04_user_analytics_spec/User_Analytics_Specification.md) | **Verified 100%** |
+| **05** | `DEL-05` | Earning & Reward Analytics Specification | [Reward_Analytics_Specification.md](04_deliverables/deliverable_05_reward_analytics_spec/Reward_Analytics_Specification.md) | **Verified 100%** |
+| **06** | `DEL-06` | Wallet & Withdrawal Specification | [Wallet_Withdrawal_Specification.md](04_deliverables/deliverable_06_wallet_withdrawal_spec/Wallet_Withdrawal_Specification.md) | **Verified 100%** |
+| **07** | `DEL-07` | Referral & Engagement Analytics | [Referral_Engagement_Analytics.md](04_deliverables/deliverable_07_referral_engagement_analytics/Referral_Engagement_Analytics.md) | **Verified 100%** |
+| **08** | `DEL-08` | Event Tracking Plan (32 Events, 16 Attrs) | [Event_Tracking_Plan.xlsx](04_deliverables/deliverable_08_event_tracking_plan/Event_Tracking_Plan.xlsx), [MD](04_deliverables/deliverable_08_event_tracking_plan/Event_Tracking_Plan.md) | **Verified 100%** |
+| **09** | `DEL-09` | Enterprise Data Dictionary (81 Fields) | [Data_Dictionary.xlsx](04_deliverables/deliverable_09_data_dictionary/Data_Dictionary.xlsx), [MD](04_deliverables/deliverable_09_data_dictionary/Data_Dictionary.md) | **Verified 100%** |
+| **10** | `DEL-10` | Logical Data Model & Physical DDL | [Logical_Data_Model_and_ER_Diagram.md](04_deliverables/deliverable_10_logical_data_model/Logical_Data_Model_and_ER_Diagram.md), [schema.sql](04_deliverables/deliverable_10_logical_data_model/schema.sql) | **Verified 100%** |
+| **11** | `DEL-11` | Enterprise KPI Catalogue (35 KPIs) | [KPI_Catalogue.xlsx](04_deliverables/deliverable_11_kpi_catalogue/KPI_Catalogue.xlsx), [MD](04_deliverables/deliverable_11_kpi_catalogue/KPI_Catalogue.md) | **Verified 100%** |
+| **12** | `DEL-12` | Simulated Data Profiling Report | [Simulated_Data_Profiling_Workbook.xlsx](04_deliverables/deliverable_12_simulated_data_profiling/Simulated_Data_Profiling_Workbook.xlsx), [MD](04_deliverables/deliverable_12_simulated_data_profiling/Simulated_Data_Profiling_Report.md) | **Verified 100%** |
+| **13** | `DEL-13` | Data Quality Audit & QC Framework | [Data_Quality_Audit_Workbook.xlsx](04_deliverables/deliverable_13_data_quality_audit/Data_Quality_Audit_Workbook.xlsx), [MD](04_deliverables/deliverable_13_data_quality_audit/Data_Quality_Audit_Report.md), [PDF](04_deliverables/deliverable_13_data_quality_audit/Data_Quality_Audit_Report.pdf) | **Verified 100%** |
+| **14** | `DEL-14` | Dashboard Blueprint Specification | [Dashboard_Blueprint_Specifications.md](04_deliverables/deliverable_14_dashboard_blueprint/Dashboard_Blueprint_Specifications.md) | **Verified 100%** |
+| **15** | `DEL-15` | Developer Analytics Handoff | [Developer_Analytics_Handoff.md](04_deliverables/deliverable_15_developer_handoff/Developer_Analytics_Handoff.md) | **Verified 100%** |
+| **16** | `DEL-16` | Data Pipeline Proposal & Architecture | [Data_Pipeline_Proposal.md](04_deliverables/deliverable_16_data_pipeline_proposal/Data_Pipeline_Proposal.md) | **Verified 100%** |
+| **17** | `DEL-17` | Privacy, Governance & Change Mgmt | [Privacy_Governance_and_Change_Management.md](04_deliverables/deliverable_17_privacy_and_governance/Privacy_Governance_and_Change_Management.md) | **Verified 100%** |
+| **18** | `DEL-18` | Analytics Readiness Assessment | [Analytics_Readiness_Assessment.md](04_deliverables/deliverable_18_analytics_readiness_assessment/Analytics_Readiness_Assessment.md), [PDF](04_deliverables/deliverable_18_analytics_readiness_assessment/Analytics_Readiness_Assessment.pdf) | **Verified 100%** |
+| **19** | `DEL-19` | Source & Verification Register | [Source_and_Verification_Register.xlsx](04_deliverables/deliverable_19_assumption_and_verification_register/Source_and_Verification_Register.xlsx), [MD](04_deliverables/deliverable_19_assumption_and_verification_register/Source_and_Verification_Register.md) | **Verified 100%** |
+| **20** | `DEL-20` | Implementation Backlog | [Implementation_Backlog.md](04_deliverables/deliverable_20_implementation_backlog/Implementation_Backlog.md) | **Verified 100%** |
+| **21** | `DEL-21` | Final Consolidated Report | [Final_Consolidated_Report.md](04_deliverables/deliverable_21_final_consolidated_report/Final_Consolidated_Report.md), [PDF](04_deliverables/deliverable_21_final_consolidated_report/Final_Consolidated_Report.pdf) | **Verified 100%** |

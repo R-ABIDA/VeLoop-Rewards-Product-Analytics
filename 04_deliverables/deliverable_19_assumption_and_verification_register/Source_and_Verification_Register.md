@@ -36,5 +36,5 @@ In early-stage product analytics, undocumented assumptions lead to catastrophic 
 ---
 
 ## 3. Artifact Reference
-* **Deliverable 19 Excel Workbook:** [`04_deliverables/deliverable_19_assumption_and_verification_register/Source_and_Verification_Register.xlsx`](file:///d:/Veloop%20data%20Analysis/04_deliverables/deliverable_19_assumption_and_verification_register/Source_and_Verification_Register.xlsx)
+* **Deliverable 19 Excel Workbook:** [`04_deliverables/deliverable_19_assumption_and_verification_register/Source_and_Verification_Register.xlsx`](04_deliverables/deliverable_19_assumption_and_verification_register/Source_and_Verification_Register.xlsx)
 

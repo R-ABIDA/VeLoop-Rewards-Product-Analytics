@@ -93,3 +93,4 @@ for col in df_events.columns:
 print("Cell differences across columns between Events and Deduplicated Audit:")
 for col, diffs in diff_count_by_col.items():
     print(f"  {col}: {diffs} differences")
+
