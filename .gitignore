@@ -9,6 +9,7 @@ __pycache__/
 .env
 .env.*
 *.env
+!.env.example
 
 # Archives & compressed files
 *.zip
@@ -17,10 +18,13 @@ __pycache__/
 *.rar
 *.7z
 
-# Explicitly excluded project directories per user request
+# Excluded folders per user instruction
 06_documentation_and_reports/
 06_documentation/
 08_presentation/
+
+# Backup directories
+00_backup_before_revision/
 
 # IDE & OS files
 .vscode/
@@ -28,4 +32,3 @@ __pycache__/
 .DS_Store
 Thumbs.db
 *.tmp
-

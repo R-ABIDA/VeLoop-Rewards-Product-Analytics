@@ -40,5 +40,6 @@
 * **Functional BI Dashboard:** `05_dashboard/app.py` (Fully operational, 7 core sections + utilities, sample-matched dark theme `#212435`, dynamic filters, Plotly dark charts, zero top white space).
 * **Modular PostgreSQL Scripts:** `03_analysis_and_models/sql/` (6 scripts, 10 tables, 22 indexes, 18 views, double-entry mathematical reconciliation).
 * **Automated Data Cleaning Pipeline:** `03_analysis_and_models/profiling/clean_and_export_all_datasets.py` (Outputs saved in `02_processed_data/`).
-* **Automated Test Suites:** `07_tests_and_validation/` (4 test suites, 26 automated tests, 100% pass rate).
+* **Automated Test Suites:** `07_tests_and_validation/` (5 test suites, 30 automated tests, 100% pass rate).
 * **Presentation Artifacts:** `08_presentation/VELOOP_Rewards_Final_Presentation.pptx` and `.html`.
+

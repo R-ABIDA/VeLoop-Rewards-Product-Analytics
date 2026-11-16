@@ -1,6 +1,6 @@
-======================================================================
-VELOOP REWARDS — AUTOMATED TEST SUITE EXECUTION LOG
-Generated: 2026-11-16T15:54:00+05:30
+﻿======================================================================
+VELOP REWARDS — AUTOMATED TEST SUITE EXECUTION LOG
+Generated: 2026-11-16T16:56:00+05:30
 Python Version: 3.12 (Anaconda Environment)
 Framework: Python unittest
 Discovery Directory: 07_tests_and_validation
@@ -38,6 +38,14 @@ test_04_csv_and_excel_upload_parsing (test_dashboard_interactive.TestDashboardIn
 Verify CSV and Excel upload parsing pipeline. ... ok
 test_05_download_payloads_exist (test_dashboard_interactive.TestDashboardInteractivity.test_05_download_payloads_exist)
 Verify all download buttons have valid, non-empty binary files on disk. ... ok
+test_01_all_32_events_documented (test_event_tracking_schemas.TestEventTrackingSchemas.test_01_all_32_events_documented)
+Verify that exactly 32 distinct production events are defined. ... ok
+test_02_all_events_have_required_sections (test_event_tracking_schemas.TestEventTrackingSchemas.test_02_all_events_have_required_sections)
+Verify that every event block contains the 16 core engineering attributes. ... ok
+test_03_json_schema_and_payload_validation (test_event_tracking_schemas.TestEventTrackingSchemas.test_03_json_schema_and_payload_validation)
+Extract JSON Schema and Example Payload for each event and validate with jsonschema. ... ok
+test_04_distinguish_observed_vs_proposed (test_event_tracking_schemas.TestEventTrackingSchemas.test_04_distinguish_observed_vs_proposed)
+Verify that Observed in Data vs Proposed Future Spec status is clearly declared. ... ok
 test_01_directory_scaffolding (test_phase1_audit.TestPhase1Audit.test_01_directory_scaffolding)
 Verify that all core project directories exist. ... ok
 test_02_raw_data_preservation (test_phase1_audit.TestPhase1Audit.test_02_raw_data_preservation)
@@ -62,9 +70,9 @@ test_05_views_defined_across_analytics_scripts (test_sql_and_reconciliation.Test
 Verify that analytical views are formulated for reporting. ... ok
 
 ----------------------------------------------------------------------
-Ran 26 tests in 25.551s
+Ran 30 tests in 25.883s
 
 OK
 ======================================================================
-TEST RUN VERDICT: 100% PASSED (26 passed, 0 failed, 0 errors)
+TEST RUN VERDICT: 100% PASSED (30 passed, 0 failed, 0 errors)
 ======================================================================

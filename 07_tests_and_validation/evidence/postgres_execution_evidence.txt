@@ -1,0 +1,16 @@
+======================================================================
+VELOOP REWARDS — POSTGRESQL & PGADMIN 4 EXECUTION EVIDENCE
+======================================================================
+Host: 127.0.0.1:5432
+User: postgres
+Database: veloop_rewards
+[AUTH REQUIRED] PGPASSWORD environment variable or --password argument is required to authenticate.
+
+PGADMIN 4 EXECUTION INSTRUCTIONS:
+1. Open pgAdmin 4 (located in 'C:\Program Files\PostgreSQL\15\pgAdmin 4\').
+2. Right-click 'Databases' -> 'Create' -> 'Database...' -> Name: 'veloop_rewards'.
+3. Open Query Tool on 'veloop_rewards'.
+4. Open and execute: 03_analysis_and_models/sql/01_schema_ddl.sql
+5. Execute scripts 02 through 06 to create analytical views.
+
+Final Execution Status: AUTH_REQUIRED_NOT_VERIFIED

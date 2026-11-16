@@ -14,6 +14,20 @@ import plotly.express as px
 import plotly.graph_objects as go
 from datetime import datetime
 
+# Resilient PostgreSQL database helper import
+try:
+    from db import check_db_health, query_database
+except ImportError:
+    import sys
+    sys.path.insert(0, os.path.dirname(__file__))
+    try:
+        from db import check_db_health, query_database
+    except Exception:
+        def check_db_health():
+            return {"connected": False, "status": "OFFLINE", "message": "Database module standby", "badge_color": "#F59E0B"}
+        def query_database(q, p=None):
+            return None
+
 # =============================================================================
 # PAGE CONFIGURATION & THEME STYLING MATCHED TO SAMPLE
 # =============================================================================
@@ -625,17 +639,16 @@ st.sidebar.markdown("""
 """, unsafe_allow_html=True)
 
 sections = [
-    "Executive Overview",
-    "User & Account Analytics",
-    "Engagement & Behavioral Analytics",
-    "Earning & Reward Analytics",
-    "Wallet Intelligence",
-    "Withdrawal Operations",
-    "Referral & Viral Growth",
+    "Overview",
+    "User Analytics",
+    "Earning & Rewards",
+    "Wallet & Withdrawal",
+    "Referral & Virality",
+    "Feature & Engagement",
     "Data Quality & Audit",
-    "Data Explorer & File Upload",
-    "Reports & Document Exports",
-    "Project Information & Governance"
+    "Data Explorer",
+    "Reports & Exports",
+    "Project Information"
 ]
 
 section = st.sidebar.radio("Navigation:", sections, label_visibility="collapsed")
@@ -717,7 +730,7 @@ if section == "Overview" or section == "Executive Overview":
         daily_tasks_cnt = filtered_tasks.groupby(filtered_tasks["task_viewed_at"].dt.date)["user_id"].count().reset_index()
         daily_tasks_cnt.columns = ["Date", "Tasks"]
         daily_tasks_cnt["Date"] = pd.to_datetime(daily_tasks_cnt["Date"])
-        merged_trend = pd.merge(dau_trend, daily_tasks_cnt, on="Date", how="left").fillna(20)
+        merged_trend = pd.merge(dau_trend, daily_tasks_cnt, on="Date", how="left").fillna(0)
         
         fig_ms = go.Figure()
         fig_ms.add_trace(go.Scatter(
@@ -746,7 +759,7 @@ if section == "Overview" or section == "Executive Overview":
             fig_ms.add_annotation(
                 x=peak_date,
                 y=peak_val,
-                text=f"Peak: {peak_date.strftime('%a %d %b')} | +58%",
+                text=f"Peak: {peak_date.strftime('%a %d %b')} ({int(peak_val)} DAU)",
                 showarrow=True,
                 arrowhead=2,
                 arrowsize=1,
@@ -882,7 +895,7 @@ if section == "Overview" or section == "Executive Overview":
         tasks_dow = filtered_tasks[filtered_tasks['status'] == 'Completed'].copy()
         tasks_dow['day_name'] = tasks_dow['task_viewed_at'].dt.strftime('%a').str.upper()
         dow_order = ["MON", "TUE", "WED", "THU", "FRI", "SAT", "SUN"]
-        dow_counts = tasks_dow['day_name'].value_counts().reindex(dow_order).fillna(100)
+        dow_counts = tasks_dow['day_name'].value_counts().reindex(dow_order).fillna(0)
         
         colors = [CYAN, CYAN, LAVENDER, CYAN, CYAN, LAVENDER, CYAN]
         fig_bar = go.Figure(go.Bar(
@@ -958,13 +971,14 @@ if section == "Overview" or section == "Executive Overview":
         st.plotly_chart(fig_feat_line, use_container_width=True)
         
         tot_xp = filtered_users['xp_balance'].sum()
+        avg_xp = filtered_users['xp_balance'].mean()
         st.markdown(f"""
         <div style="display:flex; justify-content:space-between; align-items:center; padding:4px 6px;">
             <div style="font-size:1.15rem; font-weight:800; color:#FFFFFF;">
-                {tot_xp:,} XP Total <span style="color:#10B981; font-size:0.90rem;">▲</span>
+                {tot_xp:,} XP Total <span style="color:#00C0F0; font-size:0.90rem;">●</span>
             </div>
-            <div style="color:#10B981; font-weight:700; font-size:0.95rem;">
-                +140% Growth
+            <div style="color:#8E95A5; font-weight:600; font-size:0.85rem;">
+                Cohort Mean: {avg_xp:,.0f} XP/User
             </div>
         </div>
         """, unsafe_allow_html=True)
@@ -1045,7 +1059,7 @@ elif section == "User Analytics" or section == "User & Account Analytics":
 # =============================================================================
 # 3. ENGAGEMENT & BEHAVIORAL ANALYTICS
 # =============================================================================
-elif section == "Event Analytics" or section == "Engagement & Behavioral Analytics":
+elif section == "Feature & Engagement" or section == "Event Analytics" or section == "Engagement & Behavioral Analytics":
     card_header("Engagement & Behavioral Analytics")
 
     e1, e2, e3, e4 = st.columns(4)
@@ -1185,9 +1199,9 @@ elif section == "Earning & Rewards" or section == "Earning & Reward Analytics":
         st.markdown('</div>', unsafe_allow_html=True)
 
 # =============================================================================
-# 5. WALLET INTELLIGENCE
+# 5. WALLET & WITHDRAWAL ANALYTICS
 # =============================================================================
-elif section == "Wallet Intelligence":
+elif section == "Wallet & Withdrawal" or section == "Wallet & Withdrawals" or section == "Wallet Intelligence" or section == "Withdrawal Operations":
     card_header("Wallet Intelligence & Soft Currency Balance Analytics")
 
     st.markdown("""
@@ -1233,10 +1247,7 @@ elif section == "Wallet Intelligence":
         st.plotly_chart(fig_xp_scatter, use_container_width=True)
         st.markdown('</div>', unsafe_allow_html=True)
 
-# =============================================================================
-# 6. WITHDRAWAL OPERATIONS
-# =============================================================================
-elif section == "Wallet & Withdrawals" or section == "Withdrawal Operations":
+    st.markdown("---")
     card_header("Withdrawal Operations & Payout Pipeline Specification")
 
     st.markdown("""
@@ -1276,9 +1287,9 @@ HAVING (SUM(CASE WHEN entry_type = 'CREDIT' THEN amount ELSE 0 END) -
     st.markdown('</div>', unsafe_allow_html=True)
 
 # =============================================================================
-# 7. REFERRAL & VIRAL GROWTH
+# 6. REFERRAL & VIRAL GROWTH
 # =============================================================================
-elif section == "Referral Analytics" or section == "Referral & Viral Growth":
+elif section == "Referral & Virality" or section == "Referral Analytics" or section == "Referral & Viral Growth":
     card_header("Referral Telemetry & Viral Growth Analytics")
 
     r1, r2, r3, r4 = st.columns(4)

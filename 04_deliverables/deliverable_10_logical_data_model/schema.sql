@@ -257,3 +257,148 @@ CREATE TABLE IF NOT EXISTS referrals (
 
 CREATE INDEX IF NOT EXISTS idx_referrals_referrer ON referrals(referrer_user_id);
 CREATE INDEX IF NOT EXISTS idx_referrals_referee ON referrals(referee_user_id);
+
+-- -----------------------------------------------------------------------------
+-- 11. DATA QUALITY & RECONCILIATION AUDIT LOG
+-- -----------------------------------------------------------------------------
+CREATE TABLE IF NOT EXISTS data_quality_audit_log (
+    audit_id BIGSERIAL PRIMARY KEY,
+    audit_timestamp TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    dataset_name VARCHAR(100) NOT NULL,
+    check_name VARCHAR(100) NOT NULL,
+    severity VARCHAR(20) NOT NULL CHECK (severity IN ('CRITICAL', 'HIGH', 'MEDIUM', 'LOW', 'INFO')),
+    record_identifier VARCHAR(64),
+    issue_description TEXT NOT NULL,
+    remediation_status VARCHAR(30) NOT NULL DEFAULT 'DETECTED' CHECK (remediation_status IN ('DETECTED', 'QUARANTINED', 'CLEANED', 'RESOLVED'))
+);
+
+CREATE INDEX IF NOT EXISTS idx_dq_check ON data_quality_audit_log(check_name);
+CREATE INDEX IF NOT EXISTS idx_dq_severity ON data_quality_audit_log(severity);
+
+-- -----------------------------------------------------------------------------
+-- 12. ACCOUNTING INTEGRITY: STATE MACHINE & LEDGER BALANCE ENFORCEMENT
+-- -----------------------------------------------------------------------------
+
+-- Trigger Function 1: Enforce valid state transitions for withdrawals
+CREATE OR REPLACE FUNCTION fn_enforce_withdrawal_status_transition()
+RETURNS TRIGGER AS $$
+BEGIN
+    -- Only validate when status actually changes
+    IF OLD.status IS NOT DISTINCT FROM NEW.status THEN
+        RETURN NEW;
+    END IF;
+
+    -- State transition rules:
+    -- Requested -> Processing, Rejected
+    -- Processing -> Settled, Rejected
+    -- Settled -> Reversed
+    -- Terminal states: Rejected, Reversed cannot transition
+    IF OLD.status = 'Requested' AND NEW.status NOT IN ('Processing', 'Rejected') THEN
+        RAISE EXCEPTION 'Invalid withdrawal transition from % to % for ID %', OLD.status, NEW.status, OLD.withdrawal_id;
+    ELSIF OLD.status = 'Processing' AND NEW.status NOT IN ('Settled', 'Rejected') THEN
+        RAISE EXCEPTION 'Invalid withdrawal transition from % to % for ID %', OLD.status, NEW.status, OLD.withdrawal_id;
+    ELSIF OLD.status = 'Settled' AND NEW.status NOT IN ('Reversed') THEN
+        RAISE EXCEPTION 'Invalid withdrawal transition from % to % for ID %', OLD.status, NEW.status, OLD.withdrawal_id;
+    ELSIF OLD.status IN ('Rejected', 'Reversed') THEN
+        RAISE EXCEPTION 'Cannot update terminal withdrawal status % for ID %', OLD.status, OLD.withdrawal_id;
+    END IF;
+
+    RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+DROP TRIGGER IF EXISTS trg_withdrawal_status_transition ON withdrawals;
+CREATE TRIGGER trg_withdrawal_status_transition
+BEFORE UPDATE ON withdrawals
+FOR EACH ROW
+EXECUTE FUNCTION fn_enforce_withdrawal_status_transition();
+
+-- Trigger Function 2: Enforce Double-Entry Transaction Balance
+-- Evaluates transaction integrity after commit/statement: debits must equal credits.
+CREATE OR REPLACE FUNCTION fn_check_ledger_transaction_balance()
+RETURNS TRIGGER AS $$
+DECLARE
+    v_net_imbalance NUMERIC(14, 2);
+    v_tx_id VARCHAR(64);
+BEGIN
+    v_tx_id := NEW.transaction_id;
+
+    SELECT COALESCE(SUM(CASE WHEN entry_type = 'DEBIT' THEN amount ELSE -amount END), 0.00)
+    INTO v_net_imbalance
+    FROM veloop.wallet_ledger
+    WHERE transaction_id = v_tx_id;
+
+    IF v_net_imbalance != 0.00 THEN
+        RAISE EXCEPTION 'Accounting Integrity Violation: Transaction % is unbalanced! Net imbalance: %', v_tx_id, v_net_imbalance;
+    END IF;
+
+    RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+-- Constraint Trigger: evaluated at end of statement/transaction to allow paired inserts
+DROP TRIGGER IF EXISTS trg_ledger_balance_check ON wallet_ledger;
+CREATE CONSTRAINT TRIGGER trg_ledger_balance_check
+AFTER INSERT OR UPDATE ON wallet_ledger
+DEFERRABLE INITIALLY DEFERRED
+FOR EACH ROW
+EXECUTE FUNCTION fn_check_ledger_transaction_balance();
+
+-- Stored Procedure: Transaction-safe posting of balanced double-entry mutations
+CREATE OR REPLACE PROCEDURE sp_record_balanced_transaction(
+    p_tx_id VARCHAR(64),
+    p_debit_account_id VARCHAR(64),
+    p_credit_account_id VARCHAR(64),
+    p_amount NUMERIC(14, 2),
+    p_ref_type VARCHAR(50),
+    p_ref_id VARCHAR(64),
+    p_narration TEXT
+)
+LANGUAGE plpgsql
+AS $$
+DECLARE
+    v_debit_new_bal NUMERIC(14, 2);
+    v_credit_new_bal NUMERIC(14, 2);
+BEGIN
+    IF p_amount <= 0.00 THEN
+        RAISE EXCEPTION 'Transaction amount must be strictly positive: %', p_amount;
+    END IF;
+
+    -- Update debit account balance
+    UPDATE veloop.wallet_accounts
+    SET current_balance = current_balance - p_amount,
+        updated_at = CURRENT_TIMESTAMP
+    WHERE account_id = p_debit_account_id
+    RETURNING current_balance INTO v_debit_new_bal;
+
+    IF NOT FOUND THEN
+        RAISE EXCEPTION 'Debit account % not found', p_debit_account_id;
+    END IF;
+
+    -- Update credit account balance
+    UPDATE veloop.wallet_accounts
+    SET current_balance = current_balance + p_amount,
+        updated_at = CURRENT_TIMESTAMP
+    WHERE account_id = p_credit_account_id
+    RETURNING current_balance INTO v_credit_new_bal;
+
+    IF NOT FOUND THEN
+        RAISE EXCEPTION 'Credit account % not found', p_credit_account_id;
+    END IF;
+
+    -- Insert DEBIT entry
+    INSERT INTO veloop.wallet_ledger (
+        transaction_id, account_id, entry_type, amount, balance_after, reference_type, reference_id, narration
+    ) VALUES (
+        p_tx_id, p_debit_account_id, 'DEBIT', p_amount, v_debit_new_bal, p_ref_type, p_ref_id, p_narration
+    );
+
+    -- Insert CREDIT entry
+    INSERT INTO veloop.wallet_ledger (
+        transaction_id, account_id, entry_type, amount, balance_after, reference_type, reference_id, narration
+    ) VALUES (
+        p_tx_id, p_credit_account_id, 'CREDIT', p_amount, v_credit_new_bal, p_ref_type, p_ref_id, p_narration
+    );
+END;
+$$;
+
