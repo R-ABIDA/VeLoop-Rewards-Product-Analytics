@@ -405,28 +405,28 @@ def load_dashboard_data():
                 "task_activity",
                 "milestones"
             ]
-
+            required_tables = [
+                "users",
+                "sessions",
+                "feature_events",
+                "daily_activity"
+           ]
             table_errors = {}
             for table_name in table_names: 
                 try:
                     table_data = db.get_table(table_name)
                     if table_data is None:
                         data[table_name] = pd.DataFrame()
-                    else:
-                        data[table_name] = table_data
+                    
 
                 except Exception as table_exc:
 
                     data[table_name] = pd.DataFrame()
-                    table_errors[table_name] = str(table_exc)
+                    table_errors.append(f"{table_name}: {str(table_exc)}"
+                    )
 
-            required_tables = [
 
-                "users",
-                "sessions",
-                "feature_events",
-                "daily_activity"
-            ]
+    
 
             missing_required = [
                 table
@@ -434,26 +434,20 @@ def load_dashboard_data():
                 if data.get(table, pd.DataFrame()).empty
             ]
 
-            if missing_required:
-
-                error_details = []
+            missing_required[
+                table
 
                 for table in missing_required:
+                if data.get(table, pd.DataFrame()).empty
+            ]
+            if missing_required:
+                raise RuntimeError(
+                    "Required PostgreSQL tables unavailable: "
+                    + ", ".join(missing_required)
+                    + "\nTable errors: "
+                    + " | ".join(table_errors)
 
-                    if table in table_errors:
-                        error_details.append(
-                        f"{table}: {table_errors[table]}"
-                    )
-                    else:
-                        error_details.append(
-                        f"{table}: No records returned"
-                    )
-
-            raise RuntimeError(
-                "Required PostgreSQL tables could not be loaded. "
-                + " | ".join(error_details)
-            )
-
+                )
             database_connected = True
 
             data["tasks"] = data.get(
