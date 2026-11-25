@@ -27,3 +27,11 @@ __pycache__/
 .DS_Store
 Thumbs.db
 *.tmp
+
+# Streamlit secrets (local only; configure secrets in deployment settings)
+.streamlit/secrets.toml
+.streamlit/*.toml
+
+# Python runtime artifacts
+__pycache__/
+*.py[cod]
