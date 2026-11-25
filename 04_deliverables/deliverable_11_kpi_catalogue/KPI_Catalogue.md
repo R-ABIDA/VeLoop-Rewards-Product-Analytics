@@ -43,3 +43,11 @@
 | KPI-SUP-02 | Support | Help Center Search Deflection Rate | Percentage of help center visits resolved without submitting a ticket | Deflection Rate = ((Help Center Visits - Tickets Submitted) / Visits) * 100% | session_id, entry_point, ticket_id | Sessions, Support | Monthly | Support Operations | Measures self-service efficacy of FAQ and knowledge base documentation. | Proposed |
 | KPI-SUP-03 | Support | Inquiry Distribution by Category | Breakdown of support tickets across Withdrawal, Task, and Account issues | Category Share = (Tickets in Category c / Total Tickets) * 100% | ticket_id, issue_category | Support System | Weekly | Product / Support | Prioritizes engineering bug fixes based on actual user friction volume. | Proposed |
 | KPI-SUP-04 | Support | Median Ticket Resolution Time (Hours) | Median elapsed hours from ticket submission to verified user resolution | Resolution Time = Median(resolved_timestamp - submitted_timestamp in hours) | submitted_ts, resolved_ts | Support System | Weekly | Support Lead | Core operational SLA for customer satisfaction and retention. | Proposed |
+
+## Current implementation status — 25 November 2026
+
+This deliverable is an analytical specification/report and must be read separately from runtime verification. The current Streamlit source contains seven navigation sections: Overview, User Analytics, Earning & Rewards, Wallet & Withdrawal, Referral & Virality, Feature & Engagement, and Data Quality & Audit. Workbook-level simulated records are not interchangeable with PostgreSQL-loaded records.
+
+The supplied PostgreSQL execution evidence is marked `AUTH_REQUIRED_NOT_VERIFIED`; successful live database execution is therefore not established by that evidence. The automated project test suite was rerun for this archive and passed 40/40 tests. This does not verify live PostgreSQL, production payment settlement, or public dashboard deployment.
+
+Wallet, withdrawal, user, session, event, task, and milestone examples are simulated/test data. Referral event activity must not be described as verified referral conversion without validated referrer/referee relationship records. A proposed schema or KPI definition is not evidence that the corresponding production workflow is deployed.

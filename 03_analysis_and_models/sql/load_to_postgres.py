@@ -21,9 +21,9 @@ import sys
 import argparse
 import pandas as pd
 import numpy as np
-import psycopg2
-from psycopg2 import sql, extras
-from psycopg2.extensions import ISOLATION_LEVEL_AUTOCOMMIT
+
+# Keep CSV preparation utilities importable without a live PostgreSQL driver.
+# The driver is loaded only by the database execution path below.
 
 def parse_args():
     parser = argparse.ArgumentParser(description="VELOOP PostgreSQL CSV Ingestion & Pipeline Runner")
@@ -105,6 +105,13 @@ def execute_csv_ingestion(cur, conn, evidence_lines):
     Ingests cleaned CSV records into PostgreSQL in foreign-key dependency order.
     Uses execute_values with ON CONFLICT DO NOTHING for idempotent execution.
     """
+    try:
+        from psycopg2 import extras
+    except ImportError as exc:
+        raise RuntimeError(
+            "PostgreSQL ingestion requires psycopg2-binary. "
+            "Install project dependencies with: pip install -r requirements.txt"
+        ) from exc
     ingestion_plan = [
         {
             "name": "users",
@@ -466,6 +473,15 @@ def run_pipeline():
         return
 
     try:
+        try:
+            import psycopg2
+            from psycopg2.extensions import ISOLATION_LEVEL_AUTOCOMMIT
+        except ImportError as exc:
+            raise RuntimeError(
+                "PostgreSQL execution requires psycopg2-binary. "
+                "Install project dependencies with: pip install -r requirements.txt"
+            ) from exc
+
         # Step 1: Connect to default postgres DB to ensure veloop_rewards exists
         print("\nStep 1: Connecting to PostgreSQL server...")
         conn = psycopg2.connect(

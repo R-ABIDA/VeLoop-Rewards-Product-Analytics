@@ -87,7 +87,7 @@
 * **Dataset Volume:** 67,868 records profiled across 9 sheets in 2 supplied workbooks.
 * **Referential Integrity Audit:** 100% of foreign keys in `02_Sessions`, `03_Feature_Events`, `04_Daily_Activity`, `05_Task_Activity`, and `06_Milestones` resolve to valid parent `user_id` records. **Zero orphan records**.
 * **KPI Computability Feasibility:**
-  * ✅ User & Engagement KPIs: Fully calculable (Mean DAU: 44.4, Task Completion Rate: 57.15%, Mean Session: 52.3s).
+  * ✅ Source-workbook profiling: Mean DAU 44.4, task completion rate 57.15% (5,627 / 9,846 task rows), and mean session 52.3s. These are simulated workbook-derived metrics; task-level availability in PostgreSQL/dashboard must be verified separately.
   * ❌ Financial & Withdrawal KPIs: Blocked due to missing standalone ledgers in supplied files.
 * **Key Deliverable:** Deliverable 12 (Profiling Workbook & Report).
 
@@ -156,8 +156,13 @@
 ---
 
 ### Slide 14: Conclusion & Internship Defense Summary
-* **Completeness:** 100% of 19 Work Packages (A–S) addressed; all 21 official deliverables authored and verified.
+* **Artifact coverage:** 19 Work Packages (A–S) addressed in the documentation; the 21 deliverable artifacts are included. Production integrations and external deployment require separate verification.
 * **Integrity:** Zero fabrication of production numbers; absolute compliance with non-negotiable authenticity rules.
 * **Business Value:** Delivers a reliable, traceable, and reusable analytical foundation enabling VELOOP Rewards to launch with total financial integrity and executive visibility.
 * **Key Deliverable:** Deliverable 21 (Final Consolidated Report).
 
+
+
+## Current implementation and verification note — 25 November 2026
+
+The current Streamlit source implements seven navigation sections and uses a light corporate-blue theme. The automated suite was rerun for this archive and passed 40/40 tests. The archived PostgreSQL evidence remains `AUTH_REQUIRED_NOT_VERIFIED`; public deployment, production integrations, and real payment settlement are not verified. Task-completion figures above are simulated workbook-derived results, not proof of PostgreSQL task records.

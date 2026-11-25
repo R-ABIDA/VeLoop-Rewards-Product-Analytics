@@ -41,9 +41,9 @@ PROJECT_ROOT = Path(__file__).resolve().parents[1]
 
 DASHBOARD_DIR = Path(__file__).resolve().parent
 
-PROCESSED_DIR = PROJECT_ROOT / "03_processed_data"
+PROCESSED_DIR = PROJECT_ROOT / "02_processed_data"
 
-REPORTS_DIR = PROJECT_ROOT / "06_reports"
+REPORTS_DIR = PROJECT_ROOT / "06_documentation_and_reports"
 
 REPORTS_DIR.mkdir(parents=True, exist_ok=True)
 
@@ -468,57 +468,27 @@ def load_dashboard_data():
         data = {}
 
         csv_files = {
-            "users": [
-                "users.csv",
-                "processed_users.csv"
-            ],
-            "sessions": [
-                "sessions.csv",
-                "processed_sessions.csv"
-            ],
-            "feature_events": [
-                "feature_events.csv",
-                "events.csv",
-                "processed_feature_events.csv"
-            ],
-            "daily_activity": [
-                "daily_activity.csv",
-                "processed_daily_activity.csv"
-            ],
-            "wallet_accounts": [
-                "wallet_accounts.csv"
-            ],
-            "wallet_ledger": [
-                "wallet_ledger.csv"
-            ],
-            "withdrawals": [
-                "withdrawals.csv"
-            ],
-            "referrals": [
-                "referrals.csv"
-            ],
-            "event_catalog": [
-                "event_catalog.csv"
-            ],
-            "event_validation_test_log": [
-                "event_validation_test_log.csv"
-            ],
-            "tasks": [
-                "task_activity.csv",
-                "tasks.csv"
-            ],
-            "milestones": [
-                "milestones.csv"
-            ]
+            "users": ["02_processed_data/users_cleaned.csv", "02_processed_data/users.csv"],
+            "sessions": ["02_processed_data/sessions_cleaned.csv", "02_processed_data/sessions.csv"],
+            "feature_events": ["02_processed_data/events_cleaned.csv", "02_processed_data/feature_events.csv", "02_processed_data/events.csv"],
+            "daily_activity": ["02_processed_data/daily_activity_cleaned.csv", "02_processed_data/daily_activity.csv"],
+            "wallet_accounts": ["Wallet & Withdrawal Simulation/wallet_accounts_simulated.csv", "02_processed_data/wallet_accounts.csv"],
+            "wallet_ledger": ["Wallet & Withdrawal Simulation/wallet_ledger_simulated.csv", "02_processed_data/wallet_ledger.csv"],
+            "withdrawals": ["Wallet & Withdrawal Simulation/withdrawals_simulated.csv", "02_processed_data/withdrawals.csv"],
+            "referrals": ["02_processed_data/referrals.csv"],
+            "event_catalog": ["02_processed_data/event_catalog.csv"],
+            "event_validation_test_log": ["02_processed_data/event_validation_test_log.csv"],
+            "tasks": ["02_processed_data/tasks_cleaned.csv", "02_processed_data/task_activity.csv"],
+            "milestones": ["02_processed_data/milestones_cleaned.csv", "02_processed_data/milestones.csv"]
         }
 
         for logical_name, filenames in csv_files.items():
 
             loaded_df = pd.DataFrame()
 
-            for filename in filenames:
+            for relative_path in filenames:
 
-                file_path = PROCESSED_DIR / filename
+                file_path = PROJECT_ROOT / relative_path
 
                 if file_path.exists():
 

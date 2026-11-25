@@ -28,10 +28,5 @@ __pycache__/
 Thumbs.db
 *.tmp
 
-# Streamlit secrets (local only; configure secrets in deployment settings)
+# Streamlit secrets (never commit credentials)
 .streamlit/secrets.toml
-.streamlit/*.toml
-
-# Python runtime artifacts
-__pycache__/
-*.py[cod]

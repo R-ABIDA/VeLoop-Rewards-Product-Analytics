@@ -49,25 +49,25 @@ class TestDashboardInteractivity(unittest.TestCase):
         if "task_status" in cls.tasks.columns:
             cls.tasks["status"] = cls.tasks["task_status"]
 
-    def test_01_all_10_modules_defined(self):
-        """Verify that all 10 requested modules are in app.py."""
+    def test_01_seven_current_business_sections_defined(self):
+        """Verify the seven current business sections, not the retired ten-module layout."""
         with open("05_dashboard/app.py", "r", encoding="utf-8") as f:
             code = f.read()
 
-        expected_modules = [
+        expected_sections = [
             "Overview",
             "User Analytics",
             "Earning & Rewards",
-            "Wallet & Withdrawals",
-            "Referral Analytics",
-            "Event Analytics",
-            "Data Quality",
-            "Data Explorer",
-            "Reports & Exports",
-            "Project Information"
+            "Wallet & Withdrawal",
+            "Referral & Virality",
+            "Feature & Engagement",
+            "Data Quality & Audit"
         ]
-        for m in expected_modules:
-            self.assertIn(f'section == "{m}"', code, f"Module condition missing for: {m}")
+        for section_name in expected_sections:
+            self.assertIn(
+                f'section == "{section_name}"', code,
+                f"Dashboard section condition missing: {section_name}"
+            )
 
     def test_02_filters_logic(self):
         """Verify that date interval and device filters work without errors."""

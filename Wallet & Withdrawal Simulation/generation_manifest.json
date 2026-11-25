@@ -1,0 +1,18 @@
+{
+  "source_archive": "Veloop data Analysis (3)(1).zip",
+  "source_user_file": "02_processed_data/users_cleaned.csv",
+  "source_user_count": 1000,
+  "synthetic_wallet_accounts": 2001,
+  "synthetic_ledger_rows": 2680,
+  "synthetic_ledger_transactions": 1340,
+  "synthetic_withdrawals": 180,
+  "withdrawal_status_counts": {
+    "Settled": 100,
+    "Reversed": 10,
+    "Processing": 20,
+    "Requested": 20,
+    "Rejected": 30
+  },
+  "all_transactions_balanced": true,
+  "data_type": "synthetic analytical test data"
+}

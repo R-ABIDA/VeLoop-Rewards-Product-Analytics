@@ -1,8 +1,8 @@
 """
 VELOOP REWARDS — MASTER AUTOMATED TEST SUITE
 Validates that all 21 official deliverables, schemas, Excel workbooks, cleaned datasets,
-Jupyter notebooks, evidence charts, PowerPoint presentation, PDF reports, and 10 dashboard
-modules exist, compile, and adhere to data authenticity standards.
+Jupyter notebooks, evidence charts, PowerPoint presentation, PDF reports, and the seven current dashboard
+sections exist, compile, and adhere to data authenticity standards.
 """
 
 import os
@@ -88,8 +88,8 @@ class TestAllDeliverables(unittest.TestCase):
         df_e = pd.read_csv("02_processed_data/events_cleaned.csv")
         self.assertEqual(len(df_e), 35704, "Cleaned events should have exactly 35704 records")
 
-    def test_05_dashboard_10_modules_compilation(self):
-        """Verify that Streamlit app compiles without Python syntax errors and contains all 10 modules."""
+    def test_05_dashboard_seven_sections_compile(self):
+        """Verify Python syntax and the seven current business sections in app.py."""
         app_path = "05_dashboard/app.py"
         self.assertTrue(os.path.exists(app_path))
         py_compile.compile(app_path, doraise=True)
@@ -97,20 +97,20 @@ class TestAllDeliverables(unittest.TestCase):
         with open(app_path, "r", encoding="utf-8") as f:
             app_code = f.read()
 
-        expected_modules = [
+        expected_sections = [
             "Overview",
             "User Analytics",
             "Earning & Rewards",
-            "Wallet & Withdrawals",
-            "Referral Analytics",
-            "Event Analytics",
-            "Data Quality",
-            "Data Explorer",
-            "Reports & Exports",
-            "Project Information"
+            "Wallet & Withdrawal",
+            "Referral & Virality",
+            "Feature & Engagement",
+            "Data Quality & Audit"
         ]
-        for m in expected_modules:
-            self.assertIn(f'"{m}"', app_code, f"Missing dashboard module: {m}")
+        for section_name in expected_sections:
+            self.assertIn(
+                f'section == "{section_name}"', app_code,
+                f"Missing dashboard section condition: {section_name}"
+            )
 
     def test_06_jupyter_profiling_notebook(self):
         """Verify that the profiling Jupyter notebook exists, is valid, and has executed outputs."""

@@ -197,3 +197,10 @@ erDiagram
 * **`wallet_transactions.reversal_transaction_id` $\rightarrow$ `wallet_transactions.transaction_id`:** When a prior credit is clawed back for fraud, a new offsetting transaction record is created that directly points to the historical transaction being reversed. This provides a clean, tamper-evident audit trail without overwriting historical database records.
 * **`users.referring_user_id` $\rightarrow$ `users.user_id`:** Self-referencing foreign key on the `users` table allowing direct recursive traversal of multi-tier referral trees.
 
+## Current implementation status — 25 November 2026
+
+This deliverable is an analytical specification/report and must be read separately from runtime verification. The current Streamlit source contains seven navigation sections: Overview, User Analytics, Earning & Rewards, Wallet & Withdrawal, Referral & Virality, Feature & Engagement, and Data Quality & Audit. Workbook-level simulated records are not interchangeable with PostgreSQL-loaded records.
+
+The supplied PostgreSQL execution evidence is marked `AUTH_REQUIRED_NOT_VERIFIED`; successful live database execution is therefore not established by that evidence. The automated project test suite was rerun for this archive and passed 40/40 tests. This does not verify live PostgreSQL, production payment settlement, or public dashboard deployment.
+
+Wallet, withdrawal, user, session, event, task, and milestone examples are simulated/test data. Referral event activity must not be described as verified referral conversion without validated referrer/referee relationship records. A proposed schema or KPI definition is not evidence that the corresponding production workflow is deployed.
