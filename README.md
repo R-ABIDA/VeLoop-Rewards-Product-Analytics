@@ -85,22 +85,19 @@ To ensure 100% reproducible and audit-compliant analytics, an automated cleaning
 
 ## 6. Dashboard Sections & Live Interactive Capabilities
 
-The Streamlit BI dashboard ([`05_dashboard/app.py`](05_dashboard/app.py)) is organized into the **7 official working sections** plus utility modules, featuring a sample-matched dark theme (matte charcoal `#212435`, crisp white navigation sidebar, custom Plotly dark charts, and zero top white space):
+The Streamlit dashboard in [`05_dashboard/app.py`](05_dashboard/app.py) is organized around **seven primary analytical sections**. It uses PostgreSQL when configured and must retain the visible data-authenticity notice: `SIMULATED DATA — CREATED FOR ANALYTICAL TESTING`.
 
-1. **Executive Overview:** High-level platform KPIs (Total Users: 1,000, Active Users: 815, Total Sessions: 7,913, Total Events: 35,704, Task Completion Rate: 57.1%), DAU trend line, and feature adoption donut.
-2. **User & Account Analytics:** User demographics, age distribution histogram, gender split, device breakdown (Android vs iOS vs Web), and acquisition source distribution.
-3. **Engagement & Behavioral Analytics:** Session duration distributions, features per session, feature event frequency chart, and daily active user stickiness.
-4. **Earning & Reward Analytics:** Micro-task execution funnel (Viewed $\rightarrow$ Started $\rightarrow$ Completed), task conversion rate, category performance breakdown, and reward status audit.
-5. **Wallet Intelligence:** Observed soft currency analytics (XP wealth quartile distribution, 2,172 wallet view events across 810 users, 1,686 active wallet days) and prominent Data Authenticity Notice regarding absence of monetary transactions.
-6. **Withdrawal Operations:** Operational payout specifications, SLA aging queue templates (<6h, 6–12h, 12–24h, 24h+), payout rail distributions (UPI, Paytm, Bank Transfer), and clear notice stating simulated data contains no live payout records.
-7. **Referral & Viral Growth:** Observed referral acquisition metrics (119 users, 11.9% share, 1,913 active days, 2,521 events), unique 8-character referral code integrity check, and future relational conversion funnel.
-8. **Data Quality & Audit (Utility):** 10-duplicate event audit breakdown, 8 messy user duplicate audit, and missing values analysis.
-9. **Data Explorer & File Upload (Utility):** Dynamic CSV and Excel file uploader with schema validation, record preview, and column summary stats.
-10. **Reports & Document Exports (Utility):** One-click download buttons for all 4 official PDF reports, 7 Excel workbooks, and cleaned CSV datasets.
-11. **Project Information & Governance (Utility):** Project metadata, internship scope, and data authenticity policy.
+1. **Overview:** Executive KPIs and activity trends.
+2. **User Analytics:** User profile, acquisition, demographic and device analysis.
+3. **Earning & Rewards:** XP balance and available reward/activity analysis. Metrics must reflect the fields actually populated in the source tables.
+4. **Wallet & Withdrawal:** Wallet accounts, ledger entries, withdrawal records and reconciliation checks. These records are simulated and are not real-money payouts.
+5. **Referral & Virality:** Referral event activity and relationship-based conversion analysis. A conversion must not be claimed unless a verified referrer–referee relationship record exists.
+6. **Feature & Engagement:** Sessions, feature events, device usage and engagement patterns.
+7. **Data Quality & Audit:** Record counts, duplicates, missing values, validation results and the event discrepancy audit.
+
+The dashboard may also expose utility controls such as date/device filters, search, exports and database status. These are controls, not additional analytical sections. Task-level or referral-relationship metrics must display as unavailable when their source tables contain no supporting records; do not replace missing data with fabricated values.
 
 ---
-
 ## 7. PostgreSQL Schema & SQL File Structure
 
 Located in [`03_analysis_and_models/sql/`](03_analysis_and_models/sql):
@@ -182,24 +179,18 @@ python -m unittest 07_tests_and_validation/test_sql_and_reconciliation.py
 
 ---
 
-## 11. Public Streamlit Community Cloud Deployment Instructions
+## 11. Public Streamlit Community Cloud Deployment
 
-The repository is fully configured for zero-configuration deployment to **Streamlit Community Cloud**:
+This repository contains deployment instructions and the Streamlit entry point at `05_dashboard/app.py`. A public deployment URL is **not asserted here**; add the verified Streamlit Community Cloud URL only after the deployed app has been opened and tested successfully.
 
-### Deployment Steps:
-1. Fork or push the repository to GitHub: `https://github.com/R-ABIDA/VeLoop-Rewards-Product-Analytics`.
-2. Sign in to [Streamlit Community Cloud](https://share.streamlit.io/) with your GitHub account.
-3. Click **"New app"**.
-4. Configure the deployment parameters:
-   * **Repository:** `R-ABIDA/VeLoop-Rewards-Product-Analytics`
-   * **Branch:** `main`
-   * **Main file path:** `05_dashboard/app.py`
-   * **App URL (optional):** `veloop-rewards-analytics`
-5. Click **"Deploy!"**.
-6. The application uses repository-relative paths (`01_raw_data/`, `02_processed_data/`), standard packages in `requirements.txt`, and requires no external database credentials or environment variables.
+For deployment, configure the app with:
+- Repository: `R-ABIDA/VeLoop-Rewards-Product-Analytics`
+- Branch: `main`
+- Main file: `05_dashboard/app.py`
+- Python dependencies: `requirements.txt`
+- Database credentials: Streamlit Cloud Secrets (never commit `.streamlit/secrets.toml`).
 
 ---
-
 ## 12. Complete 21-Deliverable Checklist
 
 | # | Code | Deliverable Name | File Link(s) | Status |
