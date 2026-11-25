@@ -389,11 +389,8 @@ def load_dashboard_data():
     # --------------------------------------------------------
     # 8.1 PostgreSQL loading
     # --------------------------------------------------------
-
     if DB_AVAILABLE:
-
         try:
-
             table_names = [
                 "users",
                 "sessions",
@@ -409,20 +406,22 @@ def load_dashboard_data():
                 "milestones"
             ]
 
-            for table_name in table_names:
-
+            table_errors = {}
+            for table_name in table_names: 
                 try:
-
-                    data[table_name] = db.get_table(table_name)
-
-                    if data[table_name] is None:
+                    table_data = db.get_table(table_name)
+                    if table_data is None:
                         data[table_name] = pd.DataFrame()
+                    else:
+                        data[table_name] = table_data
 
-                except Exception:
+                except Exception as table_exc:
 
                     data[table_name] = pd.DataFrame()
+                    table_errors[table_name] = str(table_exc)
 
             required_tables = [
+
                 "users",
                 "sessions",
                 "feature_events",
@@ -437,28 +436,52 @@ def load_dashboard_data():
 
             if missing_required:
 
-                raise RuntimeError(
-                    "Required PostgreSQL tables are empty or unavailable: "
-                    + ", ".join(missing_required)
-                )
+                error_details = []
+
+                for table in missing_required:
+
+                    if table in table_errors:
+                        error_details.append(
+                        f"{table}: {table_errors[table]}"
+                    )
+                    else:
+                        error_details.append(
+                        f"{table}: No records returned"
+                    )
+
+            raise RuntimeError(
+                "Required PostgreSQL tables could not be loaded. "
+                + " | ".join(error_details)
+            )
 
             database_connected = True
 
-            data["tasks"] = data.get("task_activity", pd.DataFrame()).copy()
-            data["milestones"] = data.get("milestones", pd.DataFrame()).copy()
+            data["tasks"] = data.get(
+                "task_activity",
+                pd.DataFrame()
+            ) .copy()
+
+            data["milestones"] = data.get(
+                "milestones",
+                pd.DataFrame()
+            ).copy()
 
             data_source = "PostgreSQL"
 
-        except Exception as exc:
 
+        except Exception as exc:
             database_error = str(exc)
             database_connected = False
 
     else:
+    
 
-        database_error = DB_IMPORT_ERROR or "Database module unavailable."
+        database_error = (
 
-
+            DB_IMPORT_ERROR
+            or "Database module unavailable."
+        )
+    
     # --------------------------------------------------------
     # 8.2 CSV / Excel fallback
     # --------------------------------------------------------
