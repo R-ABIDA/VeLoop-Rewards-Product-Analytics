@@ -411,11 +411,11 @@ def load_dashboard_data():
                 "feature_events",
                 "daily_activity"
            ]
-            table_errors = {}
+            table_errors = []
             for table_name in table_names: 
                 try:
-                    table_data = db.get_table(table_name)
-                    if table_data is None:
+                    data[table_name] = db.get_table(table_name)
+                    if data[table_name] is None:
                         data[table_name] = pd.DataFrame()
                     
 
@@ -434,12 +434,6 @@ def load_dashboard_data():
                 if data.get(table, pd.DataFrame()).empty
             ]
 
-            missing_required[
-                table
-
-                for table in missing_required:
-                if data.get(table, pd.DataFrame()).empty
-            ]
             if missing_required:
                 raise RuntimeError(
                     "Required PostgreSQL tables unavailable: "
