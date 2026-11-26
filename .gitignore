@@ -27,6 +27,7 @@ __pycache__/
 .DS_Store
 Thumbs.db
 *.tmp
-
-# Streamlit secrets (never commit credentials)
-.streamlit/secrets.toml
+# Ignore Streamlit credentials in every folder
+.streamlit/
+**/.streamlit/
+**/secrets.toml
