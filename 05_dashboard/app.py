@@ -1,16 +1,5 @@
-"""
+
 VELOOP REWARDS — PRODUCT ANALYTICS & BI DASHBOARD
-
-Theme:
-Enterprise Blue — Corporate Business Intelligence
-
-Data policy:
-SIMULATED DATA — CREATED FOR ANALYTICAL TESTING
-
-Database:
-PostgreSQL first, CSV / Excel fallback
-"""
-
 # ============================================================
 # 1. IMPORTS
 # ============================================================
@@ -115,23 +104,9 @@ st.markdown(
     }
     .stApp { background: #F3F6FB; color: #172B45; }
     [data-testid="stHeader"] { background: rgba(243,246,251,.96); }
-    [data-testid="stSidebar"] {
-    display: block !important;
-    visibility: visible !important;
-    opacity: 1 !important;
-    background: #142B4A !important;
-    border-right: 1px solid #233F61 !important;
-    min-width: 250px;
-}
-
-[data-testid="stSidebar"] > div,
-[data-testid="stSidebarContent"] {
-    background: #142B4A !important;
-}
-
-[data-testid="stSidebar"] * {
-    color: #EAF2FC;
-}
+    [data-testid="stSidebar"] { background: #142B4A; border-right: 1px solid #233F61; }
+    [data-testid="stSidebar"] > div, [data-testid="stSidebarContent"] { background: #142B4A; }
+    [data-testid="stSidebar"] * { color: #EAF2FC; }
     [data-testid="stSidebar"] [data-testid="stRadio"] label { padding: 7px 10px; border-radius: 8px; }
     [data-testid="stSidebar"] [data-testid="stRadio"] label:hover { background: #24466D; }
     [data-testid="stMetric"] {
