@@ -1,9 +1,10 @@
 
 """
-VELOOP REWARDS — STREAMLIT & POSTGRESQL INTEGRATION
+VELOOP REWARDS — POSTGRESQL ONLY
 Neon PostgreSQL connection, health diagnostics and table retrieval.
-Schema: veloop
+
 Database: neondb
+Schema: veloop
 """
 
 import os
@@ -16,21 +17,42 @@ from sqlalchemy.exc import SQLAlchemyError
 from streamlit.errors import StreamlitSecretNotFoundError
 
 
+# ============================================================
+# DATABASE CONFIGURATION
+# ============================================================
+
 SCHEMA_NAME = "veloop"
+DATABASE_NAME = "neondb"
 
 ALLOWED_TABLES = {
-    "users", "sessions", "feature_events", "daily_activity",
-    "wallet_accounts", "wallet_ledger", "withdrawals",
-    "referrals", "event_catalog", "event_validation_test_log",
-    "milestones", "task_activity", "simulated_user_behavior",
-    "data_quality_audit_log", "stg_daily_activity_cleaned",
-    "stg_feature_events_cleaned", "stg_wallet_accounts_simulated",
-    "stg_wallet_ledger_simulated", "stg_withdrawals_simulated"
+    "users",
+    "sessions",
+    "feature_events",
+    "daily_activity",
+    "wallet_accounts",
+    "wallet_ledger",
+    "withdrawals",
+    "referrals",
+    "event_catalog",
+    "event_validation_test_log",
+    "milestones",
+    "task_activity",
+    "simulated_user_behavior",
+    "data_quality_audit_log",
+    "stg_daily_activity_cleaned",
+    "stg_feature_events_cleaned",
+    "stg_wallet_accounts_simulated",
+    "stg_wallet_ledger_simulated",
+    "stg_withdrawals_simulated",
 }
 
 
+# ============================================================
+# CONNECTION SETTINGS
+# ============================================================
+
 def get_connection_config():
-    """Read Neon settings from Streamlit secrets or environment."""
+    """Read PostgreSQL settings from Streamlit secrets or environment."""
 
     try:
         sec = st.secrets["postgres"]
@@ -38,136 +60,252 @@ def get_connection_config():
         sec = None
 
     if sec is not None:
-        return {
-            "host": sec.get("host", ""),
+        config = {
+            "host": str(sec.get("host", "")).strip(),
             "port": int(sec.get("port", 5432)),
-            "user": sec.get("user", sec.get("username", "neondb_owner")),
-            "password": sec.get("password", ""),
-            "dbname": sec.get("dbname", sec.get("database", "neondb")),
-            "sslmode": sec.get("sslmode", "require")
+            "user": str(
+                sec.get("user", sec.get("username", ""))
+            ).strip(),
+            "password": str(sec.get("password", "")),
+            "dbname": str(
+                sec.get("dbname", sec.get("database", DATABASE_NAME))
+            ).strip(),
+            "sslmode": str(
+                sec.get("sslmode", "require")
+            ).strip(),
         }
 
-    return {
-        "host": os.getenv("PGHOST", ""),
-        "port": int(os.getenv("PGPORT", "5432")),
-        "user": os.getenv("PGUSER", "neondb_owner"),
-        "password": os.getenv("PGPASSWORD", ""),
-        "dbname": os.getenv("PGDATABASE", "neondb"),
-        "sslmode": os.getenv("PGSSLMODE", "require")
-    }
+    else:
+        config = {
+            "host": os.getenv("PGHOST", "").strip(),
+            "port": int(os.getenv("PGPORT", "5432")),
+            "user": os.getenv("PGUSER", "").strip(),
+            "password": os.getenv("PGPASSWORD", ""),
+            "dbname": os.getenv(
+                "PGDATABASE", DATABASE_NAME
+            ).strip(),
+            "sslmode": os.getenv(
+                "PGSSLMODE", "require"
+            ).strip(),
+        }
+
+    required_fields = [
+        "host",
+        "user",
+        "password",
+        "dbname",
+    ]
+
+    missing_fields = [
+        field
+        for field in required_fields
+        if not config[field]
+    ]
+
+    if missing_fields:
+        raise RuntimeError(
+            "Missing PostgreSQL configuration: "
+            + ", ".join(missing_fields)
+        )
+
+    if config["port"] <= 0 or config["port"] > 65535:
+        raise RuntimeError("Invalid PostgreSQL port.")
+
+    if not config["host"]:
+        raise RuntimeError("Neon PostgreSQL host is not configured.")
+
+    if "YOUR_" in config["host"].upper():
+        raise RuntimeError(
+            "Replace the placeholder with your actual Neon host."
+        )
+
+    return config
 
 
-@st.cache_resource
+# ============================================================
+# DATABASE ENGINE
+# ============================================================
+
+@st.cache_resource(show_spinner=False)
 def get_db_engine():
-    """Create and test the PostgreSQL connection."""
-
-    cfg = get_connection_config()
-
-    if not cfg["host"]:
-        return None, "Neon PostgreSQL host is not configured."
-
-    if not cfg["password"]:
-        return None, "PostgreSQL password is not configured."
+    """Create and test the Neon PostgreSQL connection."""
 
     try:
-        url = URL.create(
+        config = get_connection_config()
+
+        database_url = URL.create(
             drivername="postgresql+psycopg2",
-            username=cfg["user"],
-            password=cfg["password"],
-            host=cfg["host"],
-            port=cfg["port"],
-            database=cfg["dbname"]
+            username=config["user"],
+            password=config["password"],
+            host=config["host"],
+            port=config["port"],
+            database=config["dbname"],
         )
 
         engine = create_engine(
-            url,
+            database_url,
             pool_pre_ping=True,
             pool_size=5,
             max_overflow=10,
+            pool_recycle=1800,
             connect_args={
                 "connect_timeout": 10,
-                "sslmode": cfg["sslmode"]
-            }
+                "sslmode": config["sslmode"],
+            },
         )
 
-        with engine.connect() as conn:
-            conn.execute(text("SELECT 1"))
+        with engine.connect() as connection:
+            connection.execute(text("SELECT 1"))
 
-        return engine, "Connected successfully."
+        return engine, (
+            f"Connected successfully to PostgreSQL database "
+            f"'{config['dbname']}'."
+        )
 
-    except SQLAlchemyError as e:
-        return None, f"Database connection error: {str(e).splitlines()[0]}"
+    except SQLAlchemyError as error:
+        return None, (
+            "PostgreSQL connection error: "
+            f"{str(error).splitlines()[0]}"
+        )
 
-    except Exception as e:
-        return None, f"Unexpected error: {str(e).splitlines()[0]}"
+    except Exception as error:
+        return None, (
+            "Database configuration or connection error: "
+            f"{str(error).splitlines()[0]}"
+        )
 
+
+# ============================================================
+# CACHE REFRESH
+# ============================================================
+
+def clear_db_cache():
+    """Clear the cached PostgreSQL engine and connection result."""
+
+    get_db_engine.clear()
+
+
+# ============================================================
+# DATABASE HEALTH
+# ============================================================
 
 def check_db_health():
-    engine, msg = get_db_engine()
+    """Return the current PostgreSQL connection status."""
+
+    engine, message = get_db_engine()
 
     if engine is not None:
         return {
             "connected": True,
             "status": "ONLINE",
-            "message": "Connected to Neon PostgreSQL.",
-            "badge_color": "#10B981"
+            "message": message,
+            "badge_color": "#10B981",
         }
 
     return {
         "connected": False,
-        "status": "OFFLINE / FALLBACK",
-        "message": f"PostgreSQL not connected: {msg}",
-        "badge_color": "#F59E0B"
+        "status": "OFFLINE",
+        "message": message,
+        "badge_color": "#EF4444",
     }
 
 
+# ============================================================
+# SQL QUERY EXECUTION
+# ============================================================
+
 def query_database(sql_query, params=None):
-    engine, msg = get_db_engine()
+    """Execute a SQL query and return a DataFrame."""
+
+    engine, message = get_db_engine()
 
     if engine is None:
-        raise RuntimeError(msg)
+        raise RuntimeError(message)
 
     try:
-        with engine.connect() as conn:
-            return pd.read_sql(text(sql_query), conn, params=params)
-    except Exception as e:
-        raise RuntimeError(f"SQL execution error: {e}") from e
+        with engine.connect() as connection:
+            return pd.read_sql(
+                text(sql_query),
+                connection,
+                params=params,
+            )
 
+    except Exception as error:
+        raise RuntimeError(
+            f"PostgreSQL query failed: {error}"
+        ) from error
+
+
+# ============================================================
+# TABLE RETRIEVAL
+# ============================================================
 
 def get_table(table_name):
+    """Load an approved table from the veloop schema."""
+
     table_name = str(table_name).strip().lower()
 
     if table_name not in ALLOWED_TABLES:
-        raise ValueError(f"Table '{table_name}' is not approved.")
+        raise ValueError(
+            f"Table '{table_name}' is not in the approved table list."
+        )
 
-    engine, msg = get_db_engine()
+    engine, message = get_db_engine()
 
     if engine is None:
-        raise RuntimeError(msg)
+        raise RuntimeError(message)
 
-    sql_query = f'SELECT * FROM "{SCHEMA_NAME}"."{table_name}"'
+    sql_query = (
+        f'SELECT * FROM "{SCHEMA_NAME}"."{table_name}"'
+    )
 
     try:
-        with engine.connect() as conn:
-            return pd.read_sql(text(sql_query), conn)
-    except Exception as e:
-        raise RuntimeError(
-            f"Unable to load table '{SCHEMA_NAME}.{table_name}': {e}"
-        ) from e
+        with engine.connect() as connection:
+            return pd.read_sql(
+                text(sql_query),
+                connection,
+            )
 
+    except Exception as error:
+        raise RuntimeError(
+            f"Unable to load PostgreSQL table "
+            f"'{SCHEMA_NAME}.{table_name}': {error}"
+        ) from error
+
+
+# ============================================================
+# TABLE ROW COUNT
+# ============================================================
 
 def get_table_count(table_name):
+    """Return the row count of an approved PostgreSQL table."""
+
     table_name = str(table_name).strip().lower()
 
     if table_name not in ALLOWED_TABLES:
-        raise ValueError("Table is not approved.")
+        raise ValueError(
+            f"Table '{table_name}' is not in the approved table list."
+        )
 
-    engine, msg = get_db_engine()
+    engine, message = get_db_engine()
 
     if engine is None:
-        raise RuntimeError(msg)
+        raise RuntimeError(message)
 
-    sql_query = f'SELECT COUNT(*) FROM "{SCHEMA_NAME}"."{table_name}"'
+    sql_query = (
+        f'SELECT COUNT(*) FROM "{SCHEMA_NAME}"."{table_name}"'
+    )
 
-    with engine.connect() as conn:
-        return int(conn.execute(text(sql_query)).scalar_one())
+    try:
+        with engine.connect() as connection:
+            result = connection.execute(
+                text(sql_query)
+            ).scalar_one()
+
+        return int(result)
+
+    except Exception as error:
+        raise RuntimeError(
+            f"Unable to count records in "
+            f"'{SCHEMA_NAME}.{table_name}': {error}"
+        ) from error
