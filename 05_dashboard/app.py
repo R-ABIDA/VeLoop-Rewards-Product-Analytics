@@ -74,20 +74,20 @@ st.set_page_config(
 # ============================================================
 
 COLORS = {
-    "background": "#0B1220",
-    "sidebar": "#070E1B",
-    "card": "#111C2E",
-    "card_secondary": "#16243A",
-    "border": "#26364D",
-    "primary": "#4285F4",
-    "cyan": "#38BDF8",
-    "green": "#34A879",
-    "yellow": "#E0AD4F",
-    "red": "#E06C75",
-    "purple": "#9B8AFB",
-    "pink": "#D477A8",
-    "text": "#E8EEF8",
-    "muted": "#9AAAC0",
+    "background": "#F3F6FB",
+    "sidebar": "#142B4A",
+    "card": "#FFFFFF",
+    "card_secondary": "#EAF1FA",
+    "border": "#DCE5F0",
+    "primary": "#2463A6",
+    "cyan": "#1596C5",
+    "green": "#23845B",
+    "yellow": "#C58A22",
+    "red": "#C94F55",
+    "purple": "#7866B2",
+    "pink": "#B45E91",
+    "text": "#172B45",
+    "muted": "#66788F",
     "white": "#FFFFFF"
 }
 
@@ -142,32 +142,6 @@ st.markdown(
     p, label { color: #43566E; }
     hr { border-color: #DCE5F0; }
     [data-testid="stExpander"] { background: #FFFFFF; border: 1px solid #DCE5F0; border-radius: 10px; }
-
-    /* VELOOP Google Cloud-inspired dark theme */
-    .stApp, [data-testid="stAppViewContainer"] { background: #0B1220 !important; color: #E8EEF8 !important; }
-    [data-testid="stHeader"] { background: rgba(11,18,32,.96) !important; }
-    [data-testid="stSidebar"], [data-testid="stSidebar"] > div,
-    [data-testid="stSidebarContent"] { background: #070E1B !important; border-right: 1px solid #26364D !important; }
-    [data-testid="stSidebar"] { min-width: 270px !important; }
-    [data-testid="stSidebar"] * { color: #E8EEF8 !important; }
-    [data-testid="stSidebar"] [data-testid="stRadio"] label { background: transparent; padding: 9px 11px; border-radius: 8px; }
-    [data-testid="stSidebar"] [data-testid="stRadio"] label:hover { background: #16243A !important; }
-    [data-testid="stMetric"], div[data-testid="stVerticalBlockBorderWrapper"],
-    [data-testid="stExpander"], [data-testid="stDataFrame"] { background: #111C2E !important; border-color: #26364D !important; color: #E8EEF8 !important; }
-    [data-testid="stMetricLabel"], .small-muted { color: #9AAAC0 !important; }
-    [data-testid="stMetricValue"], h1, h2, h3, h4, h5, p, label,
-    .main-title, .section-title, .card-header { color: #E8EEF8 !important; }
-    .main-subtitle { color: #9AAAC0 !important; }
-    .card-header { border-bottom-color: #26364D !important; }
-    .notice { background: #132A45; border-color: #28517E; color: #C9DDF7; }
-    .warning-notice { background: #332817; border-color: #725526; color: #F4D99B; }
-    .success-notice { background: #142F2A; border-color: #28634F; color: #BDE8D5; }
-    .data-notice { background: #35271E; border-color: #765035; color: #F1C7A5; }
-    .stButton > button { background: #4285F4; border-color: #4285F4; color: #FFFFFF; }
-    .stButton > button:hover { background: #2F6FD4; border-color: #2F6FD4; color: #FFFFFF; }
-    .stTextInput input, .stSelectbox div[data-baseweb="select"], .stDateInput input,
-    .stMultiSelect div[data-baseweb="select"] { background: #111C2E !important; color: #E8EEF8 !important; border-color: #34465F !important; }
-    hr { border-color: #26364D !important; }
     </style>
     """,
     unsafe_allow_html=True
@@ -308,7 +282,7 @@ def style_fig(fig, height=350):
         ),
         yaxis=dict(
             showgrid=True,
-            gridcolor="#26364D",
+            gridcolor="#E5EBF3",
             zeroline=False,
             color=COLORS["muted"]
         )
@@ -591,12 +565,6 @@ def load_dashboard_data():
         "sessions": {"device": "device_type"},
         "feature_events": {"device": "device_type", "action_type": "event_name"},
         "daily_activity": {"daily_xp_earned": "xp_earned"},
-        "wallet_ledger": {
-            "created_at": "transaction_datetime",
-            "entry_type": "transaction_type"
-        },
-        "withdrawals": {"fiat_amount": "amount"},
-        "referrals": {"status": "referral_status"},
         "tasks": {
             "category": "task_category",
             "task_status": "status",
@@ -627,7 +595,7 @@ def load_dashboard_data():
             "city": "Unknown",
             "primary_device": "Unknown",
             "device_type": "Unknown",
-            "xp_balance": np.nan,
+            "xp_balance": 0,
             "acquisition_source": "Unknown",
             "registration_datetime": pd.NaT,
             "account_status": "Unknown"
@@ -665,7 +633,7 @@ def load_dashboard_data():
             "event_datetime": pd.NaT,
             "device": "Unknown",
             "device_type": "Unknown",
-            "xp_earned": np.nan
+            "xp_earned": 0
         }
     )
 
@@ -683,8 +651,8 @@ def load_dashboard_data():
             "active_flag": "No",
             "wallet_activity": "No",
             "referral_activity": "No",
-            "daily_xp_earned": np.nan,
-            "xp_earned": np.nan
+            "daily_xp_earned": 0,
+            "xp_earned": 0
         }
     )
 
@@ -696,8 +664,8 @@ def load_dashboard_data():
         data["wallet_accounts"],
         {
             "user_id": "",
-            "opening_balance": np.nan,
-            "current_balance": np.nan,
+            "opening_balance": 0,
+            "current_balance": 0,
             "wallet_status": "Unknown"
         }
     )
@@ -712,7 +680,7 @@ def load_dashboard_data():
             "transaction_id": "",
             "user_id": "",
             "transaction_type": "Unknown",
-            "amount": np.nan,
+            "amount": 0,
             "transaction_datetime": pd.NaT,
             "debit": 0,
             "credit": 0
@@ -728,10 +696,7 @@ def load_dashboard_data():
         {
             "withdrawal_id": "",
             "user_id": "",
-            "amount": np.nan,
-            "fiat_amount": np.nan,
-            "tokens_debited": np.nan,
-            "fiat_currency": "INR",
+            "amount": 0,
             "status": "Unknown",
             "requested_at": pd.NaT,
             "processed_at": pd.NaT
@@ -747,7 +712,7 @@ def load_dashboard_data():
         {
             "referral_id": "",
             "referrer_user_id": "",
-            "referee_user_id": "",
+            "referred_user_id": "",
             "referral_status": "Unknown",
             "created_at": pd.NaT
         }
@@ -850,7 +815,7 @@ def load_dashboard_data():
             "debit",
             "credit"
         ],
-        "withdrawals": ["amount", "fiat_amount", "tokens_debited"],
+        "withdrawals": ["amount"],
         "tasks": ["xp_earned", "reward_points_allocated"],
         "feature_events": ["xp_earned"]
     }
@@ -1000,9 +965,8 @@ with st.sidebar:
     # DASHBOARD NAVIGATION
     # --------------------------------------------------------
 
-    st.markdown("**DASHBOARD NAVIGATION**")
     section = st.radio(
-        "",
+        "DASHBOARD NAVIGATION",
         [
             "Overview",
             "User Analytics",
@@ -3233,19 +3197,17 @@ elif section == "Earning & Rewards":
         valid_daily.get("daily_xp_earned", pd.Series(dtype=float)),
         errors="coerce"
     ).dropna()
-    xp_earned_is_recorded = bool(not daily_xp_values.empty and daily_xp_values.ne(0).any())
-    total_xp_earned = float(daily_xp_values.sum()) if not daily_xp_values.empty else np.nan
-    average_xp_earned = float(daily_xp_values.mean()) if not daily_xp_values.empty else np.nan
-    median_xp_earned = float(daily_xp_values.median()) if not daily_xp_values.empty else np.nan
+    total_xp_earned = float(daily_xp_values.sum()) if not daily_xp_values.empty else 0.0
+    average_xp_earned = float(daily_xp_values.mean()) if not daily_xp_values.empty else 0.0
+    median_xp_earned = float(daily_xp_values.median()) if not daily_xp_values.empty else 0.0
 
     user_xp_values = pd.to_numeric(
         filtered_users.get("xp_balance", pd.Series(dtype=float)),
         errors="coerce"
     ).dropna()
-    xp_balance_is_recorded = bool(not user_xp_values.empty and user_xp_values.ne(0).any())
-    total_xp_balance = float(user_xp_values.sum()) if not user_xp_values.empty else np.nan
-    average_xp_balance = float(user_xp_values.mean()) if not user_xp_values.empty else np.nan
-    maximum_xp_balance = float(user_xp_values.max()) if not user_xp_values.empty else np.nan
+    total_xp_balance = float(user_xp_values.sum()) if not user_xp_values.empty else 0.0
+    average_xp_balance = float(user_xp_values.mean()) if not user_xp_values.empty else 0.0
+    maximum_xp_balance = float(user_xp_values.max()) if not user_xp_values.empty else 0.0
 
     reward_col1, reward_col2, reward_col3, reward_col4, reward_col5 = st.columns(5)
     with reward_col1:
@@ -3255,22 +3217,21 @@ elif section == "Earning & Rewards":
     with reward_col3:
         st.metric("Completion Rate", f"{completion_rate:.2f}%")
     with reward_col4:
-        st.metric("Daily XP Earned", f"{total_xp_earned:,.0f}" if xp_earned_is_recorded else "No XP recorded")
+        st.metric("Daily XP Earned", f"{total_xp_earned:,.0f}")
     with reward_col5:
-        st.metric("Average Daily XP / Record", f"{average_xp_earned:,.1f}" if xp_earned_is_recorded else "Unavailable")
+        st.metric("Average Daily XP / Record", f"{average_xp_earned:,.1f}")
 
     st.markdown("### Current User XP Balance")
     xp_col1, xp_col2, xp_col3 = st.columns(3)
     with xp_col1:
-        st.metric("Total User XP Balance", f"{total_xp_balance:,.0f}" if xp_balance_is_recorded else "No XP recorded")
+        st.metric("Total User XP Balance", f"{total_xp_balance:,.0f}")
     with xp_col2:
-        st.metric("Average User XP Balance", f"{average_xp_balance:,.2f}" if xp_balance_is_recorded else "Unavailable")
+        st.metric("Average User XP Balance", f"{average_xp_balance:,.2f}")
     with xp_col3:
-        st.metric("Maximum User XP Balance", f"{maximum_xp_balance:,.0f}" if xp_balance_is_recorded else "Unavailable")
+        st.metric("Maximum User XP Balance", f"{maximum_xp_balance:,.0f}")
     st.caption(
         "XP earned is sourced from daily_activity.daily_xp_earned. "
-        "Current balances are sourced independently from users.xp_balance. "
-        "Zero-only or missing values are not presented as verified XP earnings."
+        "Current balances are sourced independently from users.xp_balance."
     )
 
     st.markdown("---")
@@ -3395,7 +3356,7 @@ elif section == "Earning & Rewards":
     with validation_col2:
         st.metric("Invalid Daily Records", f"{len(invalid_task_records):,}")
     with validation_col3:
-        st.metric("Median Daily XP", f"{median_xp_earned:,.0f}" if xp_earned_is_recorded else "Unavailable")
+        st.metric("Median Daily XP", f"{median_xp_earned:,.0f}")
 
     if not invalid_task_records.empty:
         st.warning(
@@ -3425,9 +3386,8 @@ elif section == "Wallet & Withdrawal":
 
     show_notice(
         "Wallet and withdrawal figures are based on the available "
-        "wallet balances and ledger amounts are denominated in TOKENS. "
-        "Withdrawal fiat_amount is displayed separately in INR. These are "
-        "simulated analytical records, not proof of real payouts.",
+        "wallet datasets. Confirm these values against production "
+        "financial records before making settlement or accounting decisions.",
         "warning"
     )
 
@@ -3438,21 +3398,13 @@ elif section == "Wallet & Withdrawal":
 
     total_wallet_accounts = len(wallet_accounts_df)
 
-    user_wallet_accounts = wallet_accounts_df.copy()
-    if "account_type" in user_wallet_accounts.columns:
-        user_wallet_accounts = user_wallet_accounts[
-            user_wallet_accounts["account_type"].astype(str).str.upper().isin(
-                ["USER_AVAILABLE", "USER_LOCKED"]
-            )
-        ].copy()
-
     total_opening_balance = safe_sum(
-        user_wallet_accounts,
+        wallet_accounts_df,
         "opening_balance"
     )
 
     total_current_balance = safe_sum(
-        user_wallet_accounts,
+        wallet_accounts_df,
         "current_balance"
     )
 
@@ -3483,15 +3435,15 @@ elif section == "Wallet & Withdrawal":
     with wallet_col2:
 
         st.metric(
-            "User Opening Balance (TOKENS)",
-            f"{total_opening_balance:,.2f}"
+            "Opening Balance",
+            f"₹{total_opening_balance:,.2f}"
         )
 
     with wallet_col3:
 
         st.metric(
-            "User Current Balance (TOKENS)",
-            f"{total_current_balance:,.2f}"
+            "Current Balance",
+            f"₹{total_current_balance:,.2f}"
         )
 
     with wallet_col4:
@@ -3589,7 +3541,7 @@ elif section == "Wallet & Withdrawal":
             withdrawal_amount_data["amount"] = pd.to_numeric(
                 withdrawal_amount_data["amount"],
                 errors="coerce"
-            )
+            ).fillna(0)
 
             withdrawal_amount_summary = (
                 withdrawal_amount_data
@@ -3619,7 +3571,6 @@ elif section == "Wallet & Withdrawal":
                 yaxis_title="Amount"
             )
 
-            fig.update_layout(yaxis_title="Fiat withdrawal amount (INR)")
             st.plotly_chart(
                 style_fig(fig, 360),
                 use_container_width=True
@@ -3628,7 +3579,7 @@ elif section == "Wallet & Withdrawal":
         else:
 
             st.info(
-                "Fiat withdrawal amount data is unavailable."
+                "Withdrawal amount data is unavailable."
             )
 
 
@@ -3940,21 +3891,13 @@ elif section == "Wallet & Withdrawal":
         )
     ):
 
-        reconciliation_accounts = wallet_accounts_df.copy()
-        if "account_type" in reconciliation_accounts.columns:
-            reconciliation_accounts = reconciliation_accounts[
-                reconciliation_accounts["account_type"].astype(str).str.upper().isin(
-                    ["USER_AVAILABLE", "USER_LOCKED"]
-                )
-            ].copy()
-
         opening_total = safe_sum(
-            reconciliation_accounts,
+            wallet_accounts_df,
             "opening_balance"
         )
 
         current_total = safe_sum(
-            reconciliation_accounts,
+            wallet_accounts_df,
             "current_balance"
         )
 
@@ -3965,22 +3908,22 @@ elif section == "Wallet & Withdrawal":
         with reconciliation_col1:
 
             st.metric(
-                "User Opening Balance (TOKENS)",
-                f"{opening_total:,.2f}"
+                "Opening Balance Total",
+                f"₹{opening_total:,.2f}"
             )
 
         with reconciliation_col2:
 
             st.metric(
-                "User Current Balance (TOKENS)",
-                f"{current_total:,.2f}"
+                "Current Balance Total",
+                f"₹{current_total:,.2f}"
             )
 
         with reconciliation_col3:
 
             st.metric(
-                "Net User Balance Change (TOKENS)",
-                f"{balance_change:,.2f}"
+                "Net Balance Change",
+                f"₹{balance_change:,.2f}"
             )
 
     else:
@@ -4010,9 +3953,7 @@ elif section == "Wallet & Withdrawal":
         display_columns = [
             "withdrawal_id",
             "user_id",
-            "tokens_debited",
-            "fiat_currency",
-            "fiat_amount",
+            "amount",
             "status",
             "requested_at",
             "processed_at"
@@ -4438,9 +4379,9 @@ elif section == "Referral & Virality":
     else:
 
         st.info(
-            "The referrals table contains no referrer–referee relationship records "
-            "for the selected period. Referral event telemetry does not establish "
-            "a verified conversion."
+            "Referral relationship table contains no records "
+            "for the selected period. Conversion rate and successful "
+            "referral counts cannot be calculated."
         )
 
 
