@@ -952,6 +952,10 @@ st.markdown(
 
 with st.sidebar:
 
+    # --------------------------------------------------------
+    # BRANDING
+    # --------------------------------------------------------
+
     st.markdown(
         """
         <div class="sidebar-brand">
@@ -966,6 +970,10 @@ with st.sidebar:
     )
 
     st.markdown("---")
+
+    # --------------------------------------------------------
+    # DASHBOARD NAVIGATION
+    # --------------------------------------------------------
 
     section = st.radio(
         "DASHBOARD NAVIGATION",
@@ -984,15 +992,19 @@ with st.sidebar:
 
     st.markdown("---")
 
+    # --------------------------------------------------------
+    # DATABASE CONNECTION STATUS
+    # --------------------------------------------------------
+
     st.markdown("### Data Connection")
 
     if DATABASE_CONNECTED:
 
-        st.success("PostgreSQL Connected")
+        st.success("Neon PostgreSQL Connected")
 
     else:
 
-        st.warning("CSV / Excel Fallback")
+        st.error("PostgreSQL Disconnected")
 
     st.caption(f"Data source: {DATA_SOURCE}")
 
@@ -1007,18 +1019,33 @@ with st.sidebar:
 
     st.markdown("---")
 
+    # --------------------------------------------------------
+    # REFRESH DASHBOARD
+    # --------------------------------------------------------
+
     if st.button(
         "🔄 Refresh Dashboard",
-        use_container_width=True
+        use_container_width=True,
+        key="refresh_dashboard_button"
     ):
 
         st.cache_data.clear()
+
+        if DB_AVAILABLE:
+            db.clear_db_cache()
+
         st.rerun()
 
     st.markdown("---")
 
+    # --------------------------------------------------------
+    # FOOTER
+    # --------------------------------------------------------
+
     st.caption("VELOOP Rewards Analytics")
     st.caption("Product Intelligence Dashboard")
+    st.caption("Powered by Neon PostgreSQL")
+
 
 
 # ============================================================
