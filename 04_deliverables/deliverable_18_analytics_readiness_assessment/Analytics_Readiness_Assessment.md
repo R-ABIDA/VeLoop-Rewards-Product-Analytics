@@ -22,21 +22,12 @@ In accordance with **Work Package R (Section 24)** of `Data_Analyst_01.pdf`, eve
 
 ## 2. Comprehensive 10-Dimension Readiness Scorecard
 
-```mermaid
-radar-beta
+xychart-beta
     title "VELOOP Platform Analytics Readiness Scorecard (Max 100)"
-    "Event Coverage": 85
-    "Data Model": 75
-    "Data Dictionary": 90
-    "KPI Definitions": 90
-    "Data Quality": 80
-    "Dashboard Readiness": 95
-    "Engineering Instrumentation": 55
-    "Access Control": 70
-    "Documentation": 95
-    "Reporting Capabilities": 85
-```
-
+    x-axis ["Events", "Model", "Dictionary", "KPIs", "Quality", "Dashboard", "Engineering", "Access", "Docs", "Reports"]
+    y-axis "Readiness Score" 0 --> 100
+    bar [85, 75, 90, 90, 80, 95, 55, 70, 95, 85]
+    
 | Dimension # | Evaluation Dimension | Current State in Project | Production Need | Readiness Score | Priority Gap | Detailed Technical & Business Rationale |
 | :---: | :--- | :--- | :--- | :---: | :---: | :--- |
 | **01** | **Event Coverage** | 35,704 simulated events across 15 features; 32 standardized events designed. | Streaming event coverage across all 18 domains including registration and login streams. | **85 / 100** | **High** | Core gaming/ad events are rich, but client-side registration, login, and backgrounding lifecycle events require engineering instrumentation. |
