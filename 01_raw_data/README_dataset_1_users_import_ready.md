@@ -12,7 +12,8 @@ It is used to analyse user profiles, registration patterns, account status, onbo
 |---|---|
 | Dataset | VELoop Rewards User Dataset |
 | Source file | `users_import_data.csv` |
-| Database | PostgreSQL |
+| Database Platform | Neon |
+| Database Engine | PostgreSQL |
 | Schema | `veloop` |
 | Table | `veloop.users` |
 | Total records | 1,000 |
@@ -42,10 +43,11 @@ The following analyses were performed using SQL:
 
 ## 4. Tools and Technologies
 
-- PostgreSQL
-- SQL
-- pgAdmin 4
-- Excel / CSV
+- **Neon:** Cloud-hosted PostgreSQL database platform.
+- **PostgreSQL:** Relational database engine used to store and query user records.
+- **SQL:** Data querying, validation, aggregation, and analysis.
+- **pgAdmin 4:** Database administration and SQL query execution.
+- **Excel / CSV:** Source data inspection and validation.
 
 ## 5. Key Findings
 
@@ -79,3 +81,4 @@ Therefore, those business areas are not treated as completed transaction analyti
 ## 8. Conclusion
 
 Dataset 1 provides a foundation for understanding the VELoop Rewards user base. Its SQL analysis helps identify user demographics, account status, onboarding progress, acquisition patterns, and registration trends.
+
