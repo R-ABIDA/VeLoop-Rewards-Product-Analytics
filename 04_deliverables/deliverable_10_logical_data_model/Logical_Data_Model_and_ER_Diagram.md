@@ -1,9 +1,8 @@
 # VELOOP REWARDS — LOGICAL DATA MODEL & ER DIAGRAM SPECIFICATION
 **Deliverable ID:** Deliverable 10  
 **Work Package:** Work Package H — Logical Data Model & ER Diagram  
-**Author:** Data Analyst Intern  
-**Organization:** VELOOP Rewards  
-**Date:** 2026-11-11  
+**Author:** Data Analysis Intern  
+**Organization:** VELOOP Rewards    
 **Integrity Label:** `SIMULATED DATA — CREATED FOR ANALYTICAL TESTING`  
 **Classification:** Confirmed, Proposed, To Be Verified, Simulated  
 
@@ -24,136 +23,133 @@ The complete schema is written in PostgreSQL 15+ compatible DDL and saved at [`0
 ---
 
 ## 2. Professional Entity-Relationship (ER) Diagram
-
 ```mermaid
 erDiagram
-    users ||--o{ sessions : "initiates (1:N)"
-    users ||--o{ feature_events : "emits (1:N)"
-    users ||--o{ task_activity : "executes (1:N)"
-    users ||--o{ rewards_ledger : "earns (1:N)"
-    users ||--o{ wallet_transactions : "owns (1:N)"
-    users ||--o{ withdrawals : "requests (1:N)"
-    users ||--o{ referrals : "refers (1:N as referrer)"
-    users ||--o| referrals : "acquired_by (1:1 as referee)"
-    users ||--o{ daily_activity : "aggregates (1:N)"
+    users ||--o{ sessions : initiates
+    users ||--o{ feature_events : emits
+    users ||--o{ task_activity : executes
+    users ||--o{ rewards_ledger : earns
+    users ||--o{ wallet_transactions : owns
+    users ||--o{ withdrawals : requests
+    users ||--o{ referrals : refers
+    users ||--o| referrals : acquired_by
+    users ||--o{ daily_activity : aggregates
 
-    sessions ||--o{ feature_events : "contains (1:N)"
-    sessions ||--o{ task_activity : "frames (1:N)"
+    sessions ||--o{ feature_events : contains
+    sessions ||--o{ task_activity : frames
 
-    task_catalog ||--o{ task_activity : "instantiates (1:N)"
-    task_activity ||--o| rewards_ledger : "triggers (1:1)"
+    task_catalog ||--o{ task_activity : defines
+    task_activity ||--o| rewards_ledger : triggers
 
-    rewards_ledger ||--|| wallet_transactions : "posts_to (1:1)"
-    wallet_transactions ||--o| wallet_transactions : "reverses (1:1 self-ref)"
-    withdrawals ||--|| wallet_transactions : "holds_or_settles (1:1)"
+    rewards_ledger ||--o| wallet_transactions : posts_to
+    wallet_transactions ||--o| wallet_transactions : reverses
+    withdrawals ||--o| wallet_transactions : settles
 
     users {
-        VARCHAR_16 user_id PK
-        CHAR_64 email_hash
-        VARCHAR_20 account_status
+        VARCHAR user_id PK
+        VARCHAR email_hash
+        VARCHAR account_status
         TIMESTAMP account_created_at
-        VARCHAR_16 referral_code
+        VARCHAR referral_code
         INTEGER xp_balance
         DECIMAL token_balance
     }
 
     sessions {
-        VARCHAR_16 session_id PK
-        VARCHAR_16 user_id FK
+        VARCHAR session_id PK
+        VARCHAR user_id FK
         TIMESTAMP session_start
         TIMESTAMP session_end
         INTEGER session_duration_seconds
-        VARCHAR_20 device
-        VARCHAR_50 entry_point
+        VARCHAR device
+        VARCHAR entry_point
     }
 
     feature_events {
-        VARCHAR_16 event_id PK
-        VARCHAR_16 session_id FK
-        VARCHAR_16 user_id FK
+        VARCHAR event_id PK
+        VARCHAR session_id FK
+        VARCHAR user_id FK
         TIMESTAMP event_datetime
-        VARCHAR_50 feature_name
-        VARCHAR_50 event_name
-        VARCHAR_20 event_status
+        VARCHAR feature_name
+        VARCHAR event_name
+        VARCHAR event_status
         JSONB payload_json
     }
 
     task_catalog {
-        VARCHAR_16 task_id PK
-        VARCHAR_100 task_name
-        VARCHAR_30 task_category
+        VARCHAR task_id PK
+        VARCHAR task_name
+        VARCHAR task_category
         DECIMAL base_reward_amount
-        VARCHAR_10 reward_unit
+        VARCHAR reward_unit
         BOOLEAN is_active
     }
 
     task_activity {
-        VARCHAR_16 activity_id PK
-        VARCHAR_16 user_id FK
-        VARCHAR_16 task_id FK
-        VARCHAR_16 session_id FK
+        VARCHAR activity_id PK
+        VARCHAR user_id FK
+        VARCHAR task_id FK
+        VARCHAR session_id FK
         TIMESTAMP task_started_at
         TIMESTAMP task_completed_at
-        VARCHAR_20 task_status
-        VARCHAR_50 failure_reason
-        VARCHAR_20 reward_status
+        VARCHAR task_status
+        VARCHAR failure_reason
+        VARCHAR reward_status
     }
 
     rewards_ledger {
-        VARCHAR_16 reward_id PK
-        VARCHAR_16 activity_id FK
-        VARCHAR_16 user_id FK
+        VARCHAR reward_id PK
+        VARCHAR activity_id FK
+        VARCHAR user_id FK
         DECIMAL reward_amount
-        VARCHAR_10 reward_unit
-        VARCHAR_20 disbursement_status
-        VARCHAR_16 transaction_id FK
+        VARCHAR reward_unit
+        VARCHAR disbursement_status
+        VARCHAR transaction_id FK
         TIMESTAMP credited_at
     }
 
     wallet_transactions {
-        VARCHAR_16 transaction_id PK
-        VARCHAR_16 user_id FK
+        VARCHAR transaction_id PK
+        VARCHAR user_id FK
         TIMESTAMP timestamp
-        VARCHAR_25 transaction_type
+        VARCHAR transaction_type
         DECIMAL amount
-        VARCHAR_10 unit
-        VARCHAR_15 status
-        VARCHAR_32 reference_id
-        VARCHAR_16 reversal_transaction_id FK
+        VARCHAR unit
+        VARCHAR status
+        VARCHAR reference_id
+        VARCHAR reversal_transaction_id FK
     }
 
     withdrawals {
-        VARCHAR_16 withdrawal_id PK
-        VARCHAR_16 user_id FK
+        VARCHAR withdrawal_id PK
+        VARCHAR user_id FK
         DECIMAL requested_amount
-        VARCHAR_20 payout_method
-        CHAR_64 destination_hash
+        VARCHAR payout_method
+        VARCHAR destination_hash
         TIMESTAMP requested_timestamp
         TIMESTAMP final_timestamp
-        VARCHAR_20 status
-        VARCHAR_50 rejection_reason
+        VARCHAR status
+        VARCHAR rejection_reason
     }
 
     referrals {
-        VARCHAR_16 referral_id PK
-        VARCHAR_16 referring_user_id FK
-        VARCHAR_16 referred_user_id FK "UNIQUE"
+        VARCHAR referral_id PK
+        VARCHAR referring_user_id FK
+        VARCHAR referred_user_id FK
         TIMESTAMP registration_timestamp
         TIMESTAMP activation_timestamp
-        VARCHAR_20 referral_status
+        VARCHAR referral_status
         DECIMAL commission_amount
     }
 
     daily_activity {
-        VARCHAR_16 user_id PK_FK
+        VARCHAR user_id PK
         DATE activity_date PK
         INTEGER session_count
         INTEGER completed_task_count
-        VARCHAR_3 active_flag
+        VARCHAR active_flag
     }
 ```
-
----
 
 ## 3. Primary Key & Relational Integrity Specifications (H1 & H2)
 
