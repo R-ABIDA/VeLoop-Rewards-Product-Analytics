@@ -1,8 +1,8 @@
 # VELOOP REWARDS — REQUIREMENTS AND DELIVERABLES TRACKER
 **Project Name:** Product Analytics, Data Readiness & Data Management Blueprint  
 **Organization:** VELOOP Rewards & VELOOP CO.  
-**Internship Role:** Data Analyst Intern  
-**Task Code:** Data Analyst Internship — Task 01  
+**Internship Role:** Data Analysis Intern  
+**Task Code:** Data Analysis Internship — Task 01  
 **Target Duration:** 22–25 Days  
 **Integrity Label:** `SIMULATED DATA — CREATED FOR ANALYTICAL TESTING`  
 **Overall Completion Status:** Artifact present; implementation status documented separately — ALL 21 DELIVERABLES VERIFIED  
