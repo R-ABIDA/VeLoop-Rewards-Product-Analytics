@@ -44,7 +44,7 @@
 | KPI-SUP-03 | Support | Inquiry Distribution by Category | Breakdown of support tickets across Withdrawal, Task, and Account issues | Category Share = (Tickets in Category c / Total Tickets) * 100% | ticket_id, issue_category | Support System | Weekly | Product / Support | Prioritizes engineering bug fixes based on actual user friction volume. | Proposed |
 | KPI-SUP-04 | Support | Median Ticket Resolution Time (Hours) | Median elapsed hours from ticket submission to verified user resolution | Resolution Time = Median(resolved_timestamp - submitted_timestamp in hours) | submitted_ts, resolved_ts | Support System | Weekly | Support Lead | Core operational SLA for customer satisfaction and retention. | Proposed |
 
-## Current implementation status — 25 November 2026
+## Current implementation status 
 
 This deliverable is an analytical specification/report and must be read separately from runtime verification. The current Streamlit source contains seven navigation sections: Overview, User Analytics, Earning & Rewards, Wallet & Withdrawal, Referral & Virality, Feature & Engagement, and Data Quality & Audit. Workbook-level simulated records are not interchangeable with PostgreSQL-loaded records.
 
