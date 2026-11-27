@@ -40,6 +40,6 @@ psql -h <host> -U <user> -d <database> -f 06_data_quality_audit_checks.sql
 
 
 
-## Current execution status — 25 November 2026
+## Current execution status 
 
 The SQL scripts are included as project schema and analytical-query artifacts. The archived PostgreSQL execution evidence reports `AUTH_REQUIRED_NOT_VERIFIED`; do not claim successful live DDL/ingestion until it is rerun with valid credentials and captured output. The project Python test suite passed 40/40 tests in the review environment, which is not a substitute for a live database execution check.
