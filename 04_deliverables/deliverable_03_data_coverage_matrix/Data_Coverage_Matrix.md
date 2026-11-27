@@ -66,7 +66,7 @@
 | GAP-014 | Privacy & PII | Plaintext PII Storage in Analytical Data Layers | `Users` sheet includes plaintext `full_name` and `email` directly in the analytical reporting view | Violates privacy best practices (GDPR/DPDP); exposes sensitive personal data to unauthorized analytical consumers | High | Implement pseudo-anonymization: hash or mask email and name in analytical marts; restrict raw PII to production auth database | Proposed |
 | GAP-015 | Schema Documentation | Absence of Centralized Enterprise Data Dictionary | Supplied data dictionary sheets contain only 25-26 fields; lacks unified catalog covering all 18 domains and 75+ core entities | Cross-functional confusion between engineering, analytics, and product teams on metric definitions and field validations | High | Publish complete 75+ field enterprise Data Dictionary (Deliverable 09) with validation rules, sensitivity tiers, and owners | Proposed |
 
-## Current implementation status — 25 November 2026
+## Current implementation status 
 
 This deliverable is an analytical specification/report and must be read separately from runtime verification. The current Streamlit source contains seven navigation sections: Overview, User Analytics, Earning & Rewards, Wallet & Withdrawal, Referral & Virality, Feature & Engagement, and Data Quality & Audit. Workbook-level simulated records are not interchangeable with PostgreSQL-loaded records.
 
