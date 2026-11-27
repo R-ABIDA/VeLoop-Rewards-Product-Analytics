@@ -1,6 +1,6 @@
 # VELOOP REWARDS — PHASED IMPLEMENTATION PLAN
 **Project Name:** Product Analytics, Data Readiness & Data Management Blueprint  
-**Task Code:** Data Analyst Internship — Task 01  
+**Task Code:** Data Analysis Internship — Task 01  
 **Project Horizon:** 25 Working Days  
 **Working Rhythm:** 2 Development Days followed by 1 Review Day (Sprint Cadence)  
 **Integrity Label:** `SIMULATED DATA — CREATED FOR ANALYTICAL TESTING`  
