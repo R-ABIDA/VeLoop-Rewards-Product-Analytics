@@ -1,8 +1,11 @@
 **VELOOP Rewards — Product Analytics & BI Project**
 
 **Project:** VELOOP Rewards — Product Analytics, Data Readiness & Data Management
+
 **Role:** Data Analysis Intern
+
 **Integrity Notice:** SIMULATED DATA — CREATED FOR ANALYTICAL TESTING
+
 **Live Deployment:** https://veloop-rewards-appuct-analytics-crpntwuvkwxjzq9besdn7x.streamlit.app/
 
 
