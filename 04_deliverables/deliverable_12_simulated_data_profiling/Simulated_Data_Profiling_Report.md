@@ -1,9 +1,8 @@
 # VELOOP REWARDS — SIMULATED DATA PROFILING REPORT
 **Deliverable ID:** Deliverable 12  
 **Work Package:** Work Package J — Simulated Data Profiling  
-**Author:** Data Analyst Intern  
-**Organization:** VELOOP Rewards  
-**Date:** 2026-11-11  
+**Author:** Data Analysis Intern  
+**Organization:** VELOOP Rewards    
 **Integrity Label:** `SIMULATED DATA — CREATED FOR ANALYTICAL TESTING`  
 **Classification:** Confirmed, Proposed, To Be Verified, Simulated  
 
@@ -42,19 +41,17 @@ The primary objective is to evaluate data volume, completeness, relational integ
 ## 3. Relational & Foreign Key Integrity Audit (J2)
 
 Referential integrity was programmatically verified by testing foreign key relationships against the parent `Users_1000_Clean` dataset:
-
 ```mermaid
 flowchart TD
-    Users["Users_1000_Clean\n(1,000 Unique user_id)"]
-    
-    Users -->|user_id (100% Match / 0 Orphans)| S["02_Sessions\n(7,913 records)"]
-    Users -->|user_id (100% Match / 0 Orphans)| FE["03_Feature_Events\n(35,704 records)"]
-    Users -->|user_id (100% Match / 0 Orphans)| TA["05_Task_Activity\n(9,846 records)"]
-    Users -->|user_id (100% Match / 0 Orphans)| DA["04_Daily_Activity\n(6,667 records)"]
-    Users -->|user_id (100% Match / 0 Orphans)| M["06_Milestones\n(4,799 records)"]
-    S -->|session_id (100% Match / 0 Orphans)| FE
-```
+    Users["Users_1000_Clean<br/>1,000 Unique user_id"]
 
+    Users -->|"user_id: 100% Match, 0 Orphans"| S["02_Sessions<br/>7,913 records"]
+    Users -->|"user_id: 100% Match, 0 Orphans"| FE["03_Feature_Events<br/>35,704 records"]
+    Users -->|"user_id: 100% Match, 0 Orphans"| TA["05_Task_Activity<br/>9,846 records"]
+    Users -->|"user_id: 100% Match, 0 Orphans"| DA["04_Daily_Activity<br/>6,667 records"]
+    Users -->|"user_id: 100% Match, 0 Orphans"| M["06_Milestones<br/>4,799 records"]
+    S -->|"session_id: 100% Match, 0 Orphans"| FE
+```
 ### Relational Verification Matrix:
 1. **`Users` $\rightarrow$ `Sessions`:** 1,000 parent users $\rightarrow$ 7,913 session records. Zero orphans. Integrity Status: **100% Valid**.
 2. **`Users` $\rightarrow$ `Feature_Events`:** 1,000 parent users $\rightarrow$ 35,704 events. Zero orphans. Integrity Status: **100% Valid**.
@@ -89,7 +86,7 @@ A representative sample of proposed KPIs was tested directly against the supplie
 * **Deliverable 12 Excel Workbook:** [`04_deliverables/deliverable_12_simulated_data_profiling/Simulated_Data_Profiling_Workbook.xlsx`](04_deliverables/deliverable_12_simulated_data_profiling/Simulated_Data_Profiling_Workbook.xlsx)
 * **Underlying Raw Datasets:** [`01_raw_data/VELoop_Rewards_Data_01.xlsx`](01_raw_data/VELoop_Rewards_Data_01.xlsx) and [`01_raw_data/VELOOP_Simulated_User_Behavior_1000.xlsx`](01_raw_data/VELOOP_Simulated_User_Behavior_1000.xlsx)
 
-## Current implementation status — 25 November 2026
+## Current implementation status 
 
 This deliverable is an analytical specification/report and must be read separately from runtime verification. The current Streamlit source contains seven navigation sections: Overview, User Analytics, Earning & Rewards, Wallet & Withdrawal, Referral & Virality, Feature & Engagement, and Data Quality & Audit. Workbook-level simulated records are not interchangeable with PostgreSQL-loaded records.
 
