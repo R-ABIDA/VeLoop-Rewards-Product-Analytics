@@ -1,8 +1,8 @@
 # VELOOP REWARDS — FINAL CONSOLIDATED TECHNICAL REPORT
 ## Product Analytics, Data Readiness & Data Management Blueprint
 **Deliverable ID:** Deliverable 21  
-**Project Task:** Data Analyst Internship — Task 01 (Comprehensive Final Report)  
-**Author:** Data Analyst Intern  
+**Project Task:** Data Analysis Internship — Task 01 (Comprehensive Final Report)  
+**Author:** Data Analysis Intern  
 **Organization:** VELOOP Rewards   
 **Integrity Label:** `SIMULATED DATA — CREATED FOR ANALYTICAL TESTING`  
 **Classification:** Confirmed, Proposed, To Be Verified, Simulated  
