@@ -1,7 +1,7 @@
 # VELOOP REWARDS — MISSING DEPENDENCIES AND SOURCE REGISTER
 **Project:** Product Analytics, Data Readiness & Data Management Blueprint  
 **Organization:** VELOOP Rewards  
-**Internship Role:** Data Analyst Intern  
+**Internship Role:** Data Analysis Intern  
 **Integrity Label:** `SIMULATED DATA — CREATED FOR ANALYTICAL TESTING`  
 **Classification:** Confirmed & To Be Verified  
 
