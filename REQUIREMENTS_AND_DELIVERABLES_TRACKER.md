@@ -203,13 +203,18 @@ The following rules apply to all deliverables:
 The principal deliverable locations are organized as follows:
 
 ```text
+
 VELOOP-Rewards-Product-Analytics/
 │
-├── README.md
-├── requirements.txt
-├── PROJECT_IMPLEMENTATION_STATUS.md
+├── .devcontainer/
+│   └── devcontainer.json
 │
+├── 01_raw_data/
 ├── 02_processed_data/
+├── 03_analysis_and_models/
+│   ├── notebooks/
+│   ├── profiling/
+│   └── sql/
 │
 ├── 04_deliverables/
 │   ├── deliverable_01_executive_summary/
@@ -235,18 +240,34 @@ VELOOP-Rewards-Product-Analytics/
 │   └── deliverable_21_final_consolidated_report/
 │
 ├── 05_dashboard/
-│   └── app.py
+│   ├── app.py
+│   └── db.py
 │
+├── 06_documentation_and_reports/
 ├── 07_tests_and_validation/
+│   ├── evidence/
+│   ├── test_all_deliverables.py
+│   ├── test_dashboard_interactive.py
+│   ├── test_event_tracking_schemas.py
+│   ├── test_phase1_audit.py
+│   └── test_sql_and_reconciliation.py
 │
-└── 08_presentation/
-    ├── VELOOP_Rewards_Final_Presentation.md
-    └── VELOOP_Rewards_Final_Presentation.html
+├── 08_evidence_charts/
+├── 08_presentation/
+├── Data/
+├── Wallet & Withdrawal Simulation/
+│
+├── .env.example
+├── .gitignore
+├── MISSING_DEPENDENCIES_AND_SOURCE_REGISTER.md
+├── PHASED_IMPLEMENTATION_PLAN.md
+├── PROJECT_IMPLEMENTATION_STATUS.md
+├── README.md
+├── REQUIREMENTS_AND_DELIVERABLES_TRACKER.md
+└── requirements.txt
+
 ```
 
-*This is a reference structure based on the tracker paths. Confirm the current GitHub repository tree before treating it as an exact directory inventory.*
-
----
 
 ## 9. Final Project Completion Statement
 
