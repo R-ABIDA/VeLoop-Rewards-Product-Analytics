@@ -1,10 +1,11 @@
-# VELOOP Rewards — Product Analytics & BI Project
+**VELOOP Rewards — Product Analytics & BI Project**
 
-**Project:** VELOOP Rewards — Product Analytics, Data Readiness & Data Management  
-**Role:** Data Analyst Intern  
-**Integrity notice:** `SIMULATED DATA — CREATED FOR ANALYTICAL TESTING`  
-**GitHub:** https://github.com/R-ABIDA/VeLoop-Rewards-Product-Analytics  
-**Documentation status:** Updated 25 November 2026
+**Project:** VELOOP Rewards — Product Analytics, Data Readiness & Data Management
+**Role:** Data Analyst Intern
+**Integrity Notice:** SIMULATED DATA — CREATED FOR ANALYTICAL TESTING
+**GitHub Repository:** https://github.com/R-ABIDA/VeLoop-Rewards-Product-Analytics
+**Live Deployment:** https://veloop-rewards-appuct-analytics-crpntwuvkwxjzq9besdn7x.streamlit.app/
+
 
 > **Important:** The workbooks and generated transaction files in this repository contain simulated/test data. They do not represent actual VELOOP customers, real revenue, real payouts, or production business performance.
 
