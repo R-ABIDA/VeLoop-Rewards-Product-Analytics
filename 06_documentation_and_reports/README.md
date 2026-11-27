@@ -1,5 +1,5 @@
 # VELOOP REWARDS — DOCUMENTATION & REPORTS REPOSITORY
-**Project:** Product Analytics, Data Readiness & Data Management Blueprint  
+**Project:** Product Analytics, Data Readiness & Data Management  
 **Task:** Task 01 Internship Project Submission  
 **Author:** Data Analysis Intern  
 **Integrity Policy:** SIMULATED DATA — CREATED FOR ANALYTICAL TESTING  
