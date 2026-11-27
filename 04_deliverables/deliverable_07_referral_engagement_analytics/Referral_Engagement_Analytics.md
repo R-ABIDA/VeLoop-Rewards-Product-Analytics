@@ -1,9 +1,8 @@
 # VELOOP REWARDS — REFERRAL & ENGAGEMENT ANALYTICS SPECIFICATION
 **Deliverable ID:** Deliverable 07  
 **Work Package:** Work Package E — Referral & Engagement Analytics  
-**Author:** Data Analyst Intern  
+**Author:** Data Analysis Intern  
 **Organization:** VELOOP Rewards  
-**Date:** 2026-11-11  
 **Integrity Label:** `SIMULATED DATA — CREATED FOR ANALYTICAL TESTING`  
 **Classification:** Confirmed, Proposed, To Be Verified, Simulated  
 
@@ -158,7 +157,7 @@ In accordance with **Section 20 of `Data_Analyst_01.pdf`**, an "Active User" mus
 > * **Zero Fabricated Attribution Policy:** Without a relational foreign key table (`referring_user_id` $\rightarrow$ `referred_user_id`), calculating user-level referral counts, individual referrer leaderboards, or true viral coefficients ($K$-factor) would require inventing non-existent links. In strict compliance with the Data Authenticity Policy, no fake referral pairs or commissions have been fabricated.
 > * **Production Implementation Blueprint:** The relational schema `referrals` specified in Section 3 and the SQL attribution views in `03_analysis_and_models/sql/05_referral_virality_analytics.sql` provide the complete design for engineering deployment.
 
-## Current implementation status — 25 November 2026
+## Current implementation status 
 
 This deliverable is an analytical specification/report and must be read separately from runtime verification. The current Streamlit source contains seven navigation sections: Overview, User Analytics, Earning & Rewards, Wallet & Withdrawal, Referral & Virality, Feature & Engagement, and Data Quality & Audit. Workbook-level simulated records are not interchangeable with PostgreSQL-loaded records.
 
